@@ -1,0 +1,25 @@
+# Dependências
+node_modules/
+client/node_modules/
+server/node_modules/
+
+# Build do frontend
+client/dist/
+
+# Arquivos sensíveis do servidor
+server/clientes.json
+server/bairros.json
+server/monitor_log.json
+server/ixc_config.json
+
+# Logs
+*.log
+npm-debug.log*
+
+# Sistema
+.DS_Store
+Thumbs.db
+
+# Variáveis de ambiente
+.env
+.env.local

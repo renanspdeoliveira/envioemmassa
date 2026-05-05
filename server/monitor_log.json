@@ -1,0 +1,5202 @@
+[
+  {
+    "ts": "2026-05-05T10:03:14.748784",
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "offline": 4,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "nome": "FHTT91F3D050",
+        "pon": "0-0-15-1"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "nome": "FHTT03DD9700",
+        "pon": "0-0-18-2"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "nome": "1",
+        "pon": "1-1-2-1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T10:03:08.947044",
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "offline": 4,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "nome": "FHTT91F3D050",
+        "pon": "0-0-15-1"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "nome": "FHTT03DD9700",
+        "pon": "0-0-18-2"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "nome": "1",
+        "pon": "1-1-2-1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T09:58:08.928308",
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "offline": 4,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "nome": "FHTT91F3D050",
+        "pon": "0-0-15-1"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "nome": "FHTT03DD9700",
+        "pon": "0-0-18-2"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "nome": "1",
+        "pon": "1-1-2-1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T09:53:08.878377",
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "offline": 4,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "nome": "FHTT91F3D050",
+        "pon": "0-0-15-1"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "nome": "FHTT03DD9700",
+        "pon": "0-0-18-2"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "nome": "1",
+        "pon": "1-1-2-1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T09:48:08.833222",
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "offline": 4,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "nome": "FHTT91F3D050",
+        "pon": "0-0-15-1"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "nome": "FHTT03DD9700",
+        "pon": "0-0-18-2"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "nome": "1",
+        "pon": "1-1-2-1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T09:43:08.786055",
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "offline": 4,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "nome": "FHTT91F3D050",
+        "pon": "0-0-15-1"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "nome": "FHTT03DD9700",
+        "pon": "0-0-18-2"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "nome": "1",
+        "pon": "1-1-2-1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T09:38:08.757651",
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "offline": 4,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "nome": "FHTT91F3D050",
+        "pon": "0-0-15-1"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "nome": "FHTT03DD9700",
+        "pon": "0-0-18-2"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "nome": "1",
+        "pon": "1-1-2-1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T09:33:08.709496",
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "offline": 4,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "nome": "FHTT91F3D050",
+        "pon": "0-0-15-1"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "nome": "FHTT03DD9700",
+        "pon": "0-0-18-2"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "nome": "1",
+        "pon": "1-1-2-1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T09:28:08.668026",
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "offline": 4,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "nome": "FHTT91F3D050",
+        "pon": "0-0-15-1"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "nome": "FHTT03DD9700",
+        "pon": "0-0-18-2"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "nome": "1",
+        "pon": "1-1-2-1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T09:23:08.651788",
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "offline": 4,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "nome": "FHTT91F3D050",
+        "pon": "0-0-15-1"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "nome": "FHTT03DD9700",
+        "pon": "0-0-18-2"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "nome": "1",
+        "pon": "1-1-2-1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T09:18:08.618303",
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "offline": 4,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "nome": "FHTT91F3D050",
+        "pon": "0-0-15-1"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "nome": "FHTT03DD9700",
+        "pon": "0-0-18-2"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "nome": "1",
+        "pon": "1-1-2-1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T09:13:08.582586",
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "offline": 4,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "nome": "FHTT91F3D050",
+        "pon": "0-0-15-1"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "nome": "FHTT03DD9700",
+        "pon": "0-0-18-2"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "nome": "1",
+        "pon": "1-1-2-1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T09:08:08.566288",
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "offline": 4,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "nome": "FHTT91F3D050",
+        "pon": "0-0-15-1"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "nome": "FHTT03DD9700",
+        "pon": "0-0-18-2"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "nome": "1",
+        "pon": "1-1-2-1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T09:03:08.552355",
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "offline": 4,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "nome": "FHTT91F3D050",
+        "pon": "0-0-15-1"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "nome": "FHTT03DD9700",
+        "pon": "0-0-18-2"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "nome": "1",
+        "pon": "1-1-2-1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T08:58:08.417262",
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "offline": 4,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "nome": "FHTT91F3D050",
+        "pon": "0-0-15-1"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "nome": "FHTT03DD9700",
+        "pon": "0-0-18-2"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "nome": "1",
+        "pon": "1-1-2-1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:57:18.958Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:57:18.462Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:57:17.953Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:57:17.463Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:57:16.967Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:57:16.534Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:57:16.094Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:57:15.649Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:57:15.223Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:57:14.791Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:57:14.357Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:57:13.758Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:57:13.217Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:57:12.785Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:57:12.344Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:57:11.915Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:57:11.476Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:57:11.012Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:57:10.577Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:57:10.159Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:57:09.759Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:57:09.358Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:57:08.915Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:57:08.376Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:57:07.957Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:57:07.566Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:57:07.164Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:57:06.761Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:57:06.333Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:57:05.938Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:57:05.539Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:57:05.109Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:57:04.671Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:57:04.222Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:57:03.796Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:57:03.354Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:57:02.929Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:57:02.516Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:57:02.099Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:57:01.618Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:57:01.176Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:57:00.718Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:57:00.268Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:59.821Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:59.330Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:58.880Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:58.400Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:57.957Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:57.515Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:57.041Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:56.602Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:56.151Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:55.690Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:55.243Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:54.814Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:54.373Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:53.941Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:53.506Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:53.071Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:52.645Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:52.217Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:51.778Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:51.382Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:50.851Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:50.428Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:49.951Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:49.433Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:48.941Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:48.467Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:48.000Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:47.545Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:47.068Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:46.586Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:46.038Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:45.593Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:45.113Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:44.616Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:44.161Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:43.645Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:43.149Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:42.672Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:42.203Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:41.735Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:41.308Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:40.876Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:40.435Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:40.003Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:39.583Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:39.169Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:38.708Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:38.251Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:37.801Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:37.374Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:36.930Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:36.459Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:36.000Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:35.550Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:35.105Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:34.634Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:34.143Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:33.679Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:33.197Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:32.685Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:32.172Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:31.645Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:31.208Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:30.786Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:30.326Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:29.871Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:29.441Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:29.028Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:28.601Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:28.162Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:27.711Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:27.290Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:26.878Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:26.431Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:25.992Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:25.542Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:25.094Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:24.673Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:24.223Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:23.782Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:23.355Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:22.920Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:22.505Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:22.088Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:21.633Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:21.191Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:20.752Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:20.274Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:19.823Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:19.401Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:18.965Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:18.532Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:18.096Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:17.639Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:17.211Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:16.788Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:16.345Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:15.903Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:15.481Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:15.044Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:14.634Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:14.206Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:13.768Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:13.280Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:12.835Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:12.380Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:11.916Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:11.492Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:11.077Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:10.642Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:10.213Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:09.767Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:09.327Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:08.904Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:08.485Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:08.062Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:07.617Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:07.152Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:06.718Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:06.280Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:05.843Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:05.408Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:04.975Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:04.549Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:04.119Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:03.668Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:03.198Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:02.723Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:02.279Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:01.839Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:01.402Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:00.920Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:00.499Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:56:00.042Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:55:59.598Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:55:59.162Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:55:58.746Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:55:58.329Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:55:57.893Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:55:57.452Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:55:56.995Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  },
+  {
+    "ts": "2026-05-05T11:55:56.582Z",
+    "total": 6311,
+    "desautorizadas": 3,
+    "semStatus": 1,
+    "alertas": [
+      {
+        "login": "paulocorrea",
+        "mac": "FHTT91f3d050",
+        "pon": "0-0-15-1",
+        "nome": "FHTT91f3d050"
+      },
+      {
+        "login": null,
+        "mac": "FHTT03dd9700",
+        "pon": "0-0-18-2",
+        "nome": "FHTT03dd9700"
+      },
+      {
+        "login": null,
+        "mac": "1",
+        "pon": "1-1-2-1",
+        "nome": "1"
+      }
+    ]
+  }
+]
