@@ -5,6 +5,7 @@ export default defineConfig({
   plugins: [react()],
   server: {
     port: 5173,
+    allowedHosts: ['monitor.grupofuturanet.net.br'],
     proxy: {
       '/api': {
         target: 'http://localhost:3001',
