@@ -20,12 +20,24 @@ function saveLog(entry) {
   fs.writeFileSync(LOG_FILE, JSON.stringify(log, null, 2));
 }
 
+function normalizeStatus(status) {
+  return (status || '')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '');
+}
+
+function isPendingAuthStatus(status) {
+  const normalized = normalizeStatus(status);
+  return normalized === 'desautorizada' || normalized === 'pedindo autenticacao';
+}
+
 function startMonitor(getOnus) {
   const CHECK_MS = 5 * 60 * 1000; // 5 min
 
   function check() {
     const onus   = getOnus();
-    const desaut = onus.filter(r => r['Status ONU'] === 'Desautorizada');
+    const desaut = onus.filter(r => isPendingAuthStatus(r['Status ONU']));
     const sem    = onus.filter(r => r['Status ONU'] === 'Sem status');
     const entry  = {
       ts:            new Date().toISOString(),

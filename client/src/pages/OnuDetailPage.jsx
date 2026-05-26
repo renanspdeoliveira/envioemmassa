@@ -97,7 +97,7 @@ export default function OnuDetailPage() {
             <div style={{ padding: '4px 18px 16px' }}>
               <InfoRow label="Total ONUs" value={ponSummary['Total ONUs']} />
               <InfoRow label="Autorizadas" value={<Badge color="green">{ponSummary.Autorizadas}</Badge>} />
-              <InfoRow label="Desautorizadas" value={ponSummary.Desautorizadas > 0 ? <Badge color="red">{ponSummary.Desautorizadas}</Badge> : '0'} />
+              <InfoRow label="Pedindo autenticacao" value={ponSummary.Desautorizadas > 0 ? <Badge color="red">{ponSummary.Desautorizadas}</Badge> : '0'} />
               <InfoRow label="Sinal RX médio" value={<RxBadge value={ponSummary['Sinal RX médio']} />} />
               <InfoRow label="Pior RX" value={<RxBadge value={ponSummary['Pior RX']} />} />
               <InfoRow label="Sem leitura RX" value={ponSummary['Sem leitura RX/zero']} />

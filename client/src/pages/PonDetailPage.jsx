@@ -28,7 +28,7 @@ export default function PonDetailPage() {
           <Badge color="gray">Slot {pon.Slot}</Badge>
           <Badge color="gray">PON {pon.PON}</Badge>
           <Badge color="green">{pon.Autorizadas} autorizadas</Badge>
-          {pon.Desautorizadas > 0 && <Badge color="red">{pon.Desautorizadas} desautorizadas</Badge>}
+          {pon.Desautorizadas > 0 && <Badge color="red">{pon.Desautorizadas} pedindo autenticacao</Badge>}
         </div>
       </div>
 
@@ -36,7 +36,7 @@ export default function PonDetailPage() {
         {[
           { label: 'Total ONUs', value: pon['Total ONUs'] },
           { label: 'Autorizadas', value: pon.Autorizadas, color: 'var(--green-text)' },
-          { label: 'Desautorizadas', value: pon.Desautorizadas, color: pon.Desautorizadas > 0 ? 'var(--red-text)' : undefined },
+          { label: 'Pedindo autenticacao', value: pon.Desautorizadas, color: pon.Desautorizadas > 0 ? 'var(--red-text)' : undefined },
           { label: 'RX médio', value: pon['Sinal RX médio'] ? `${pon['Sinal RX médio']?.toFixed(2)} dBm` : '—' },
           { label: 'Pior RX', value: pon['Pior RX'] ? `${pon['Pior RX']?.toFixed(2)} dBm` : '—', color: pon['Pior RX'] < -27 ? 'var(--red-text)' : 'var(--amber-text)' },
           { label: 'Sem leitura', value: pon['Sem leitura RX/zero'] },

@@ -225,7 +225,7 @@ export default function EnvioMassaPage() {
               <Select value={filters.status} onChange={e => setFilters(f=>({...f, status:e.target.value}))} style={{ width:'100%' }}>
                 <option value="">Todos</option>
                 <option>Autorizada</option>
-                <option>Desautorizada</option>
+                <option>Pedindo autenticacao</option>
               </Select>
             </div>
             <div>

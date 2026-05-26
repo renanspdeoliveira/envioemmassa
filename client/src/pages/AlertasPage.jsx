@@ -51,7 +51,7 @@ export default function AlertasPage() {
         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
           <thead>
             <tr>
-              {['OLT', 'Slot', 'PON', 'Cliente', 'Login', 'MAC/Serial', 'Status', 'Sinal RX', 'Potência'].map(h => <th key={h} style={th}>{h}</th>)}
+              {['OLT', 'GCOB', 'PON', 'Cliente', 'Login', 'MAC/Serial', 'Status', 'Sinal RX', 'Potência'].map(h => <th key={h} style={th}>{h}</th>)}
             </tr>
           </thead>
           <tbody>
@@ -62,7 +62,7 @@ export default function AlertasPage() {
                 onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-hover)'}
                 onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
                 <td style={td}><Badge color="blue" size="sm">{r.OLT}</Badge></td>
-                <td style={{ ...td, fontFamily: 'var(--font-mono)', fontSize: 12 }}>{r.Slot}</td>
+                <td style={{ ...td, fontFamily: 'var(--font-mono)', fontSize: 12 }}>{r.GCOB || '—'}</td>
                 <td style={{ ...td, fontFamily: 'var(--font-mono)', fontSize: 12 }}>{r.PON}</td>
                 <td style={td}>{r['Nome Cliente'] || '—'}</td>
                 <td style={{ ...td, fontFamily: 'var(--font-mono)', fontSize: 12 }}>{r.Login || '—'}</td>
@@ -96,7 +96,7 @@ export default function AlertasPage() {
         <OnuTable rows={offline} />
       </AlertCard>
 
-      <AlertCard title="ONUs Desautorizadas" count={counts.desautorizadas} color="red" icon={Wifi}>
+      <AlertCard title="ONUs Pedindo autenticacao" count={counts.desautorizadas} color="red" icon={Wifi}>
         <OnuTable rows={desautorizadas} />
       </AlertCard>
 
@@ -121,7 +121,7 @@ export default function AlertasPage() {
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
             <thead>
               <tr>
-                {['#', 'PON ID', 'OLT', 'Slot', 'Total ONUs', 'RX médio', 'Pior RX', 'Sem leitura'].map(h => <th key={h} style={th}>{h}</th>)}
+                {['#', 'PON ID', 'OLT', 'GCOB', 'Total ONUs', 'RX médio', 'Pior RX', 'Sem leitura'].map(h => <th key={h} style={th}>{h}</th>)}
               </tr>
             </thead>
             <tbody>
@@ -134,7 +134,7 @@ export default function AlertasPage() {
                   <td style={{ ...td, color: 'var(--text-tertiary)', fontFamily: 'var(--font-mono)', fontSize: 11 }}>{i + 1}</td>
                   <td style={{ ...td, fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--accent-blue-text)' }}>{p['PON ID']}</td>
                   <td style={td}><Badge color="blue" size="sm">{p.OLT}</Badge></td>
-                  <td style={{ ...td, fontFamily: 'var(--font-mono)', fontSize: 12 }}>{p.Slot}</td>
+                  <td style={{ ...td, fontFamily: 'var(--font-mono)', fontSize: 12 }}>{p.GCOB || '—'}</td>
                   <td style={td}><strong>{p['Total ONUs']}</strong></td>
                   <td style={td}><RxBadge value={p['Sinal RX médio']} /></td>
                   <td style={td}><span style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: p['Pior RX'] < -30 ? 'var(--red-text)' : 'var(--amber-text)', fontWeight: 600 }}>{p['Pior RX']?.toFixed(2)} dBm</span></td>

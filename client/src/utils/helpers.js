@@ -21,7 +21,7 @@ export function rxColor(rx) {
 
 export function statusColor(status) {
   if (status === 'Autorizada') return 'green'
-  if (status === 'Desautorizada') return 'red'
+  if (status === 'Desautorizada' || status === 'Pedindo autenticacao') return 'red'
   return 'amber'
 }
 

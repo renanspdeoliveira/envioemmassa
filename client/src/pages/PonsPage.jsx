@@ -2,15 +2,14 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useApi } from '../hooks/useApi'
 import { api } from '../utils/api'
-import { Card, CardHeader, Spinner, ErrorMsg, Badge, RxBadge, Select, PageHeader, Btn } from '../components/UI'
-import { Radio } from 'lucide-react'
+import { Card, CardHeader, Spinner, ErrorMsg, Badge, Select, PageHeader, Btn } from '../components/UI'
 
 export default function PonsPage() {
   const navigate = useNavigate()
   const [olt, setOlt] = useState('')
   const [slot, setSlot] = useState('')
 
-  const { data, loading, error, refetch } = useApi(
+  const { data, loading, error } = useApi(
     () => api.pons({ ...(olt && { olt }), ...(slot && { slot }), limit: 300 }),
     [olt, slot]
   )
@@ -28,7 +27,7 @@ export default function PonsPage() {
   }
 
   function ponHealth(row) {
-    if (row['Desautorizadas'] > 0 || row['Sem status'] > 0) return 'amber'
+    if (row.Desautorizadas > 0 || row['Sem status'] > 0) return 'amber'
     if (row['Pior RX'] !== null && row['Pior RX'] < -27) return 'red'
     if (row['Sem leitura RX/zero'] > 3) return 'amber'
     return 'green'
@@ -45,7 +44,7 @@ export default function PonsPage() {
     <div>
       <PageHeader
         title="PONs por OLT"
-        subtitle="Visão detalhada de cada porta PON e seus indicadores de qualidade"
+        subtitle="Visao detalhada de cada porta PON e seus indicadores de qualidade"
         action={
           <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
             <Select value={olt} onChange={e => { setOlt(e.target.value); setSlot('') }}>
@@ -72,21 +71,44 @@ export default function PonsPage() {
               <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
                 <thead>
                   <tr>
-                    {['PON ID', 'Total ONUs', 'Autorizadas', 'Desautoriz.', 'Sem status', 'RX médio', 'Pior RX', 'Sem leitura', 'Saúde', ''].map(h => (
-                      <th key={h} style={{ padding: '9px 12px', textAlign: 'left', fontSize: 11, color: 'var(--text-secondary)', background: 'var(--bg-secondary)', borderBottom: '1px solid var(--border)', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '.05em', whiteSpace: 'nowrap' }}>{h}</th>
+                    {['PON ID', 'Total ONUs', 'Autorizadas', 'Pedindo aut.', 'Sem status', 'RX medio', 'Pior RX', 'Sem leitura', 'Saude', ''].map(h => (
+                      <th
+                        key={h}
+                        style={{
+                          padding: '9px 12px',
+                          textAlign: 'left',
+                          fontSize: 11,
+                          color: 'var(--text-secondary)',
+                          background: 'var(--bg-secondary)',
+                          borderBottom: '1px solid var(--border)',
+                          fontWeight: 500,
+                          textTransform: 'uppercase',
+                          letterSpacing: '.05em',
+                          whiteSpace: 'nowrap',
+                        }}
+                      >
+                        {h}
+                      </th>
                     ))}
                   </tr>
                 </thead>
                 <tbody>
                   {pons.map((p, i) => {
                     const health = ponHealth(p)
-                    const healthLabels = { green: ['green', '● OK'], amber: ['amber', '⚠ Atenção'], red: ['red', '✕ Crítico'] }
+                    const healthLabels = {
+                      green: ['green', 'OK'],
+                      amber: ['amber', 'Atencao'],
+                      red: ['red', 'Critico'],
+                    }
                     const [hColor, hLabel] = healthLabels[health]
+
                     return (
-                      <tr key={i}
-                        onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-hover)'}
-                        onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
-                        <td style={td}><span style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--accent-blue-text)' }}>{p['PON ID'] || '—'}</span></td>
+                      <tr
+                        key={i}
+                        onMouseEnter={e => (e.currentTarget.style.background = 'var(--bg-hover)')}
+                        onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+                      >
+                        <td style={td}><span style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--accent-blue-text)' }}>{p['PON ID'] || '-'}</span></td>
                         <td style={td}><strong>{p['Total ONUs']}</strong></td>
                         <td style={td}><span style={{ color: 'var(--green-text)' }}>{p.Autorizadas}</span></td>
                         <td style={td}>
@@ -100,13 +122,13 @@ export default function PonsPage() {
                             : <span style={{ color: 'var(--text-tertiary)' }}>0</span>}
                         </td>
                         <td style={td}>
-                          <span style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: rxColor(p['Sinal RX médio']) }}>
-                            {p['Sinal RX médio'] !== null ? `${p['Sinal RX médio']?.toFixed(2)} dBm` : '—'}
+                          <span style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: rxColor(p['Sinal RX mÃ©dio']) }}>
+                            {p['Sinal RX mÃ©dio'] !== null ? `${p['Sinal RX mÃ©dio']?.toFixed(2)} dBm` : '-'}
                           </span>
                         </td>
                         <td style={td}>
                           <span style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: rxColor(p['Pior RX']) }}>
-                            {p['Pior RX'] !== null ? `${p['Pior RX']?.toFixed(2)} dBm` : '—'}
+                            {p['Pior RX'] !== null ? `${p['Pior RX']?.toFixed(2)} dBm` : '-'}
                           </span>
                         </td>
                         <td style={td}>

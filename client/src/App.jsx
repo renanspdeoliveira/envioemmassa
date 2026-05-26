@@ -3,9 +3,9 @@ import Sidebar from './components/Sidebar'
 import DashboardPage from './pages/DashboardPage'
 import OnusPage from './pages/OnusPage'
 import OnuDetailPage from './pages/OnuDetailPage'
+import OnuDesautorizadasPage from './pages/OnuDesautorizadasPage'
 import PonsPage from './pages/PonsPage'
 import PonDetailPage from './pages/PonDetailPage'
-import AlertasPage from './pages/AlertasPage'
 import SinalPage from './pages/SinalPage'
 import EnvioMassaPage from './pages/EnvioMassaPage'
 import IxcConfigPage from './pages/IxcConfigPage'
@@ -18,11 +18,11 @@ export default function App() {
         <main style={{ marginLeft: 220, flex: 1, padding: '28px 32px', minHeight: '100vh', maxWidth: 'calc(100vw - 220px)' }}>
           <Routes>
             <Route path="/" element={<DashboardPage />} />
+            <Route path="/onus-desautorizadas" element={<OnuDesautorizadasPage />} />
             <Route path="/onus" element={<OnusPage />} />
             <Route path="/onus/:mac" element={<OnuDetailPage />} />
             <Route path="/pons" element={<PonsPage />} />
             <Route path="/pons/:ponId" element={<PonDetailPage />} />
-            <Route path="/alertas" element={<AlertasPage />} />
             <Route path="/sinal" element={<SinalPage />} />
             <Route path="/envio" element={<EnvioMassaPage />} />
             <Route path="/ixc" element={<IxcConfigPage />} />

@@ -123,7 +123,7 @@ export default function OnusPage() {
           <Select value={filters.status} onChange={e => setFilters(f=>({...f,status:e.target.value}))}>
             <option value="">Todos status</option>
             <option>Autorizada</option>
-            <option>Desautorizada</option>
+            <option>Pedindo autenticacao</option>
             <option>Sem status</option>
           </Select>
 

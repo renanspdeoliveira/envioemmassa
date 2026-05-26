@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import { useApi } from '../hooks/useApi'
 import { api } from '../utils/api'
 import { StatCard, Card, CardHeader, Spinner, ErrorMsg, Badge } from '../components/UI'
@@ -5,7 +6,7 @@ import { PageHeader } from '../components/UI'
 import { Activity, AlertTriangle, CheckCircle, Radio, Server, Wifi, WifiOff } from 'lucide-react'
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  PieChart, Pie, Cell, Legend
+  PieChart, Pie, Cell
 } from 'recharts'
 
 const CHART_COLORS = ['#58a6ff', '#56d364', '#e3b341', '#ff7b72', '#8b949e']
@@ -34,7 +35,7 @@ export default function DashboardPage() {
 
   const statusData = [
     { name: 'Autorizadas', value: stats.autorizadas, color: '#56d364' },
-    { name: 'Desautorizadas', value: stats.desautorizadas, color: '#ff7b72' },
+    { name: 'Pedindo autenticacao', value: stats.desautorizadas, color: '#ff7b72' },
     { name: 'Sem status', value: stats.semStatus, color: '#e3b341' },
   ]
 
@@ -43,30 +44,24 @@ export default function DashboardPage() {
   return (
     <div>
       <PageHeader
-        title="Visão Geral"
-        subtitle="Monitoramento em tempo real da rede GPON — Taquaritinga"
-        action={
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <span style={{ width: 7, height: 7, borderRadius: '50%', background: 'var(--green)', display: 'inline-block', boxShadow: '0 0 6px var(--green)' }} />
-            <span style={{ fontSize: 12, color: 'var(--green-text)' }}>Rede operacional</span>
-          </div>
-        }
+        title="Visao Geral"
       />
 
-      {/* KPI Grid */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 12, marginBottom: 24 }}>
         <StatCard label="Total de ONUs" value={stats.total?.toLocaleString('pt-BR')} sub="todos os equipamentos" icon={Wifi} color="blue" />
         <StatCard label="Autorizadas" value={stats.autorizadas?.toLocaleString('pt-BR')} sub={`${((stats.autorizadas / stats.total) * 100).toFixed(1)}% do total`} icon={CheckCircle} color="green" />
-        <StatCard label="Irregulares" value={stats.irregulares?.toLocaleString('pt-BR')} sub="sinal fora do padrão" icon={AlertTriangle} color="amber" />
-        <StatCard label="Alertas offline" value={stats.offlineAtencao} sub="ONUs para atenção" icon={WifiOff} color="red" />
+        <Link to="/onus-desautorizadas" style={{ textDecoration: 'none' }}>
+          <StatCard label="Pedindo autenticacao" value={stats.desautorizadas?.toLocaleString('pt-BR')} sub="abrir lista de ONUs" icon={AlertTriangle} color="amber" />
+        </Link>
+        <StatCard label="Irregulares" value={stats.irregulares?.toLocaleString('pt-BR')} sub="sinal fora do padrao" icon={AlertTriangle} color="amber" />
+        <StatCard label="Alertas offline" value={stats.offlineAtencao} sub="ONUs para atencao" icon={WifiOff} color="red" />
         <StatCard label="Total de PONs" value={stats.totalPons} sub={`${stats.semLeituraRx} sem leitura RX`} icon={Radio} color="blue" />
-        <StatCard label="RX médio" value={stats.avgRx ? `${stats.avgRx} dBm` : '—'} sub={`pior: ${stats.worstRx} dBm`} icon={Activity} />
+        <StatCard label="RX medio" value={stats.avgRx ? `${stats.avgRx} dBm` : '-'} sub={`pior: ${stats.worstRx} dBm`} icon={Activity} />
       </div>
 
-      {/* Charts Row */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16 }}>
         <Card>
-          <CardHeader title="ONUs por OLT" subtitle="Distribuição total de clientes" />
+          <CardHeader title="ONUs por OLT" subtitle="Distribuicao total de clientes" />
           <div style={{ padding: '16px 8px' }}>
             <ResponsiveContainer width="100%" height={220}>
               <BarChart data={oltData} margin={{ top: 4, right: 16, left: -10, bottom: 4 }}>
@@ -83,7 +78,7 @@ export default function DashboardPage() {
         </Card>
 
         <Card>
-          <CardHeader title="Status das ONUs" subtitle="Autorização na rede" />
+          <CardHeader title="Status das ONUs" subtitle="Autorizacao na rede" />
           <div style={{ padding: '16px 8px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
             <ResponsiveContainer width="100%" height={180}>
               <PieChart>
@@ -106,10 +101,9 @@ export default function DashboardPage() {
         </Card>
       </div>
 
-      {/* RX Distribution + RX by Slot */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: 16, marginBottom: 16 }}>
         <Card>
-          <CardHeader title="Distribuição de Sinal RX" subtitle="Qualidade óptica das ONUs" />
+          <CardHeader title="Distribuicao de Sinal RX" subtitle="Qualidade optica das ONUs" />
           <div style={{ padding: '12px 8px' }}>
             <ResponsiveContainer width="100%" height={240}>
               <BarChart data={rxDist || []} layout="vertical" margin={{ top: 4, right: 16, left: 4, bottom: 4 }}>
@@ -126,15 +120,15 @@ export default function DashboardPage() {
         </Card>
 
         <Card>
-          <CardHeader title="Sinal RX médio por Slot" subtitle="Saúde óptica por segmento" />
+          <CardHeader title="Sinal RX medio por Slot" subtitle="Saude optica por segmento" />
           <div style={{ padding: '12px 8px' }}>
             <ResponsiveContainer width="100%" height={240}>
               <BarChart data={rxData || []} margin={{ top: 4, right: 16, left: -10, bottom: 60 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
                 <XAxis dataKey="label" tick={{ fill: 'var(--text-secondary)', fontSize: 10, angle: -45, textAnchor: 'end' }} axisLine={false} tickLine={false} interval={0} />
                 <YAxis tick={{ fill: 'var(--text-secondary)', fontSize: 11 }} axisLine={false} tickLine={false} domain={['auto', 0]} />
-                <Tooltip content={<CustomTooltip />} formatter={(v) => [`${v} dBm`, 'RX médio']} />
-                <Bar dataKey="avgRx" name="RX médio" radius={[3, 3, 0, 0]}>
+                <Tooltip content={<CustomTooltip />} formatter={(v) => [`${v} dBm`, 'RX medio']} />
+                <Bar dataKey="avgRx" name="RX medio" radius={[3, 3, 0, 0]}>
                   {(rxData || []).map((d, i) => {
                     const color = d.avgRx > -20 ? '#56d364' : d.avgRx >= -24 ? '#58a6ff' : d.avgRx >= -27 ? '#e3b341' : '#ff7b72'
                     return <Cell key={i} fill={color} />
@@ -146,7 +140,6 @@ export default function DashboardPage() {
         </Card>
       </div>
 
-      {/* OLT Summary */}
       <Card>
         <CardHeader title="Resumo por OLT" />
         <div style={{ padding: 16, display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 12 }}>

@@ -32,6 +32,10 @@ const DATA_FILE = path.join(__dirname, 'data.json');
 const REL_FILE  = path.join(__dirname, 'relatorio_clientes.json');
 const BRR_FILE  = path.join(__dirname, 'bairros.json');
 const CLI_FILE  = path.join(__dirname, 'clientes.json');
+const REMOVED_ONU_MACS = new Set([
+  'FHTT03dd9700',
+  'FHTT91f3d050',
+]);
 
 function readJson(file, fallback) {
   try { return JSON.parse(fs.readFileSync(file, 'utf8')); }
@@ -74,6 +78,28 @@ function normStr(s) {
   return (s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 }
 
+function isPendingAuthStatus(status) {
+  const normalized = normStr(status);
+  return normalized === 'desautorizada' || normalized === 'pedindo autenticacao';
+}
+
+function isValidOnuRecord(row) {
+  const mac = (row?.['MAC/Serial'] || '').trim();
+  const name = (row?.['Nome Cliente'] || '').trim();
+  if (!mac) return false;
+  if (mac === '1') return false;
+  if (name === '1') return false;
+  if (REMOVED_ONU_MACS.has(mac)) return false;
+  return true;
+}
+
+function applyOnuFilters() {
+  baseOnus = baseOnus.filter(isValidOnuRecord);
+  offlineList = offlineList.filter(isValidOnuRecord);
+}
+
+applyOnuFilters();
+
 function enrichOnu(r) {
   const loginKey = (r.Login || '').toLowerCase();
   const nomeFmt  = formatClientName(r['Nome Cliente'] || '');
@@ -101,7 +127,13 @@ function filterOnus(q) {
   if (q.olt)    list = list.filter(r => r.OLT === q.olt);
   if (q.slot)   list = list.filter(r => String(r.Slot) === String(q.slot));
   if (q.pon)    list = list.filter(r => String(r.PON)  === String(q.pon));
-  if (q.status) list = list.filter(r => r['Status ONU'] === q.status);
+  if (q.status) {
+    list = list.filter(r => {
+      const status = r['Status ONU'];
+      if (isPendingAuthStatus(q.status)) return isPendingAuthStatus(status);
+      return status === q.status;
+    });
+  }
   if (q.ponId)  list = list.filter(r => r['PON ID']    === q.ponId);
   if (q.search) {
     const s = normStr(q.search);
@@ -135,7 +167,7 @@ app.get('/api/stats', safe((req, res) => {
   res.json({
     total:           baseOnus.length,
     autorizadas:     baseOnus.filter(r=>r['Status ONU']==='Autorizada').length,
-    desautorizadas:  baseOnus.filter(r=>r['Status ONU']==='Desautorizada').length,
+    desautorizadas:  baseOnus.filter(r=>isPendingAuthStatus(r['Status ONU'])).length,
     semStatus:       baseOnus.filter(r=>r['Status ONU']==='Sem status').length,
     oltCounts:       baseOnus.reduce((acc,r)=>{ acc[r.OLT]=(acc[r.OLT]||0)+1; return acc; },{}),
     avgRx:           rxVals.length ? (rxVals.reduce((a,b)=>a+b,0)/rxVals.length).toFixed(2) : null,
@@ -185,11 +217,11 @@ app.get('/api/pons/:ponId', safe((req, res) => {
 }));
 
 app.get('/api/alertas', safe((req, res) => {
-  const desaut   = baseOnus.filter(r=>r['Status ONU']==='Desautorizada').map(enrichOnu);
-  const semSt    = baseOnus.filter(r=>r['Status ONU']==='Sem status').map(enrichOnu);
-  const baixoSin = baseOnus.filter(r=>r['Sinal RX']&&r['Sinal RX']<-27).map(enrichOnu);
+  const desaut   = baseOnus.filter(r=>isValidOnuRecord(r) && isPendingAuthStatus(r['Status ONU'])).map(enrichOnu);
+  const semSt    = baseOnus.filter(r=>isValidOnuRecord(r) && r['Status ONU']==='Sem status').map(enrichOnu);
+  const baixoSin = baseOnus.filter(r=>isValidOnuRecord(r) && r['Sinal RX']&&r['Sinal RX']<-27).map(enrichOnu);
   res.json({
-    offline: offlineList.map(enrichOnu),
+    offline: offlineList.filter(isValidOnuRecord).map(enrichOnu),
     desautorizadas:desaut, semStatus:semSt, baixoSinal:baixoSin,
     pioresPons: resumoPon.filter(r=>r['Pior RX']!=null).sort((a,b)=>a['Pior RX']-b['Pior RX']).slice(0,10),
     counts: { offline:offlineList.length, desautorizadas:desaut.length, semStatus:semSt.length, baixoSinal:baixoSin.length }
@@ -353,6 +385,7 @@ app.post('/api/sync/onus', safe((req, res) => {
   baseOnus    = fresh.base_onus  || [];
   resumoPon   = fresh.resumo_pon || [];
   offlineList = fresh.offline    || [];
+  applyOnuFilters();
   res.json({ok:true, total:baseOnus.length});
 }));
 
