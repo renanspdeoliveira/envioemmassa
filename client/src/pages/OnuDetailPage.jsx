@@ -3,15 +3,29 @@ import { useApi } from '../hooks/useApi'
 import { api } from '../utils/api'
 import { Card, CardHeader, Spinner, ErrorMsg, StatusBadge, PotenciaBadge, RxBadge, Badge, Btn } from '../components/UI'
 import { ArrowLeft, Router, Signal, Wifi } from 'lucide-react'
-import { fmt } from '../utils/helpers'
 
 function InfoRow({ label, value, mono = false }) {
   return (
     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 0', borderBottom: '1px solid var(--border-subtle)' }}>
       <span style={{ fontSize: 12, color: 'var(--text-secondary)', fontWeight: 500 }}>{label}</span>
-      <span style={{ fontSize: 13, color: 'var(--text-primary)', fontFamily: mono ? 'var(--font-mono)' : 'inherit' }}>{value || '—'}</span>
+      <span style={{ fontSize: 13, color: 'var(--text-primary)', fontFamily: mono ? 'var(--font-mono)' : 'inherit' }}>{value || '-'}</span>
     </div>
   )
+}
+
+function getDisplayClientName(onu) {
+  const name = onu?.['Nome Cliente']
+  const mac = onu?.['MAC/Serial']
+  if (!name) return 'ONU sem cliente vinculado'
+  if (mac && String(name).trim().toUpperCase() === String(mac).trim().toUpperCase()) return 'ONU sem cliente vinculado'
+  if (/^FHTT[0-9A-F]+$/i.test(String(name).trim()) && !onu?.Login) return 'ONU sem cliente vinculado'
+  return name
+}
+
+function getDisplayOlt(onu) {
+  const olt = onu?.OLT
+  if (!olt || String(olt).trim().toUpperCase() === 'OLT') return null
+  return olt
 }
 
 export default function OnuDetailPage() {
@@ -24,6 +38,9 @@ export default function OnuDetailPage() {
   if (!data) return null
 
   const { onu, siblings, ponSummary } = data
+  const displayName = getDisplayClientName(onu)
+  const displayOlt = getDisplayOlt(onu)
+  const displayPonId = onu['PON ID'] || null
 
   return (
     <div>
@@ -36,49 +53,46 @@ export default function OnuDetailPage() {
           <Wifi size={22} color="var(--accent-blue-text)" />
         </div>
         <div>
-          <h1 style={{ fontSize: 20, fontWeight: 600, color: 'var(--text-primary)' }}>{onu['Nome Cliente'] || 'Cliente sem nome'}</h1>
+          <h1 style={{ fontSize: 20, fontWeight: 600, color: 'var(--text-primary)' }}>{displayName}</h1>
           <div style={{ display: 'flex', gap: 8, marginTop: 6, flexWrap: 'wrap' }}>
             <StatusBadge status={onu['Status ONU']} />
-            <PotenciaBadge value={onu['Potência']} />
-            <Badge color="blue">{onu.OLT}</Badge>
-            <Badge color="gray">PON {onu['PON ID']}</Badge>
+            <PotenciaBadge value={onu['Potência']} || onu['PotÃªncia']} />
+            {displayOlt && <Badge color="blue">{displayOlt}</Badge>}
+            {displayPonId && <Badge color="gray">PON {displayPonId}</Badge>}
           </div>
         </div>
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16 }}>
-        {/* Client info */}
         <Card>
           <CardHeader title="Dados do Cliente" icon={Router} />
           <div style={{ padding: '4px 18px 16px' }}>
-            <InfoRow label="Nome" value={onu['Nome Cliente']} />
+            <InfoRow label="Nome" value={displayName} />
             <InfoRow label="Login" value={onu['Login']} mono />
             <InfoRow label="MAC / Serial" value={onu['MAC/Serial']} mono />
-            <InfoRow label="ONU Nº" value={onu['ONU Nº']} mono />
+            <InfoRow label="ONU Nº" value={onu['ONU Nº'] || onu['ONU NÂº']} mono />
             <InfoRow label="Tipo ONU" value={onu['ONU Tipo']} />
-            <InfoRow label="VLAN" value={onu.VLAN ? Math.round(onu.VLAN) : '—'} mono />
-            <InfoRow label="Última atualização" value={onu['Última atualização']} />
+            <InfoRow label="VLAN" value={onu.VLAN ? Math.round(onu.VLAN) : '-'} mono />
+            <InfoRow label="Última atualização" value={onu['Última atualização'] || onu['Ãšltima atualizaÃ§Ã£o']} />
           </div>
         </Card>
 
-        {/* Network info */}
         <Card>
           <CardHeader title="Rede / Sinal" icon={Signal} />
           <div style={{ padding: '4px 18px 16px' }}>
-            <InfoRow label="OLT" value={<Badge color="blue">{onu.OLT}</Badge>} />
+            <InfoRow label="OLT" value={displayOlt ? <Badge color="blue">{displayOlt}</Badge> : null} />
             <InfoRow label="GBOC" value={onu.Slot} mono />
             <InfoRow label="PON" value={onu.PON} mono />
-            <InfoRow label="PON ID" value={onu['PON ID']} mono />
+            <InfoRow label="PON ID" value={displayPonId} mono />
             <InfoRow label="PON Grupo" value={onu['PON Grupo']} />
             <InfoRow label="Sinal RX" value={<RxBadge value={onu['Sinal RX']} />} />
             <InfoRow label="Sinal TX" value={<RxBadge value={onu['Sinal TX']} />} />
-            <InfoRow label="Potência" value={<PotenciaBadge value={onu['Potência']} />} />
+            <InfoRow label="Potência" value={<PotenciaBadge value={onu['Potência'] || onu['PotÃªncia']} />} />
           </div>
         </Card>
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16 }}>
-        {/* Location */}
         <Card>
           <CardHeader title="Localização Física" />
           <div style={{ padding: '4px 18px 16px' }}>
@@ -86,11 +100,10 @@ export default function OnuDetailPage() {
             <InfoRow label="Caixa FTTH / CTO" value={onu['Caixa FTTH/CTO']} mono />
             <InfoRow label="Porta FTTH" value={onu['Porta FTTH']} />
             <InfoRow label="ID ONU Fibra" value={onu['ID ONU Fibra']} mono />
-            <InfoRow label="Causa última queda" value={onu['Causa última queda'] || 'Sem registro'} />
+            <InfoRow label="Causa última queda" value={onu['Causa última queda'] || onu['Causa Ãºltima queda'] || 'Sem registro'} />
           </div>
         </Card>
 
-        {/* PON summary */}
         {ponSummary && (
           <Card>
             <CardHeader title={`Resumo da PON ${ponSummary['PON ID']}`} />
@@ -98,7 +111,7 @@ export default function OnuDetailPage() {
               <InfoRow label="Total ONUs" value={ponSummary['Total ONUs']} />
               <InfoRow label="Autorizadas" value={<Badge color="green">{ponSummary.Autorizadas}</Badge>} />
               <InfoRow label="Pedindo autenticacao" value={ponSummary.Desautorizadas > 0 ? <Badge color="red">{ponSummary.Desautorizadas}</Badge> : '0'} />
-              <InfoRow label="Sinal RX médio" value={<RxBadge value={ponSummary['Sinal RX médio']} />} />
+              <InfoRow label="Sinal RX médio" value={<RxBadge value={ponSummary['Sinal RX médio'] || ponSummary['Sinal RX mÃ©dio']} />} />
               <InfoRow label="Pior RX" value={<RxBadge value={ponSummary['Pior RX']} />} />
               <InfoRow label="Sem leitura RX" value={ponSummary['Sem leitura RX/zero']} />
             </div>
@@ -106,7 +119,6 @@ export default function OnuDetailPage() {
         )}
       </div>
 
-      {/* Sibling ONUs */}
       {siblings?.length > 0 && (
         <Card>
           <CardHeader title={`Outras ONUs na mesma PON (${siblings.length} mostradas)`} />
@@ -121,16 +133,19 @@ export default function OnuDetailPage() {
               </thead>
               <tbody>
                 {siblings.map((s, i) => (
-                  <tr key={i} onClick={() => navigate(`/onus/${encodeURIComponent(s['MAC/Serial'])}`)}
+                  <tr
+                    key={i}
+                    onClick={() => navigate(`/onus/${encodeURIComponent(s['MAC/Serial'])}`)}
                     style={{ cursor: 'pointer' }}
                     onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-hover)'}
-                    onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
-                    <td style={td}>{s['Nome Cliente'] || '—'}</td>
-                    <td style={{ ...td, fontFamily: 'var(--font-mono)', fontSize: 12 }}>{s.Login || '—'}</td>
-                    <td style={{ ...td, fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--text-secondary)' }}>{s['MAC/Serial'] || '—'}</td>
+                    onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+                  >
+                    <td style={td}>{getDisplayClientName(s)}</td>
+                    <td style={{ ...td, fontFamily: 'var(--font-mono)', fontSize: 12 }}>{s.Login || '-'}</td>
+                    <td style={{ ...td, fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--text-secondary)' }}>{s['MAC/Serial'] || '-'}</td>
                     <td style={td}><StatusBadge status={s['Status ONU']} /></td>
                     <td style={td}><RxBadge value={s['Sinal RX']} /></td>
-                    <td style={td}><PotenciaBadge value={s['Potência']} /></td>
+                    <td style={td}><PotenciaBadge value={s['Potência'] || s['PotÃªncia']} /></td>
                   </tr>
                 ))}
               </tbody>
