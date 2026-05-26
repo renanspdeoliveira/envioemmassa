@@ -1,4 +1,5 @@
 import argparse
+import copy
 import json
 import os
 import re
@@ -14,25 +15,18 @@ IXC_USER = "103"
 IXC_PASS = "9a4ee574f3aa86a71e8e2142c2fb7dbd7cfb26e3436935a2d6aee20fbf9f4200"
 ENDPOINT = "/webservice/v1/radpop_radio_cliente_fibra"
 DATA_FILE = os.path.join("server", "data.json")
+BACKUP_FILE = os.path.join("server", "data.full.backup.json")
+RAW_FILE = os.path.join("server", "ixc_radpop_raw.json")
 SYNC_URL = "http://localhost:3001/api/sync/onus"
 DEFAULT_INTERVAL_SECONDS = 300
 
 
 def parse_args():
     parser = argparse.ArgumentParser(
-        description="Atualiza server/data.json a partir da IXC e mantem a base em tempo real."
+        description="Atualiza a base de ONUs usando a IXC sem sobrescrever dados ricos com campos vazios."
     )
-    parser.add_argument(
-        "--interval",
-        type=int,
-        default=DEFAULT_INTERVAL_SECONDS,
-        help="Intervalo entre atualizacoes em segundos. Padrao: 300",
-    )
-    parser.add_argument(
-        "--once",
-        action="store_true",
-        help="Executa uma unica atualizacao e encerra.",
-    )
+    parser.add_argument("--interval", type=int, default=DEFAULT_INTERVAL_SECONDS)
+    parser.add_argument("--once", action="store_true")
     return parser.parse_args()
 
 
@@ -86,21 +80,16 @@ def parse_int(value):
 def normalize_status(value):
     status = norm_text(value).lower()
     if not status:
-      return "Sem status"
+        return None
     if "desaut" in status or "pedindo" in status:
         return "Pedindo autenticacao"
     if "autor" in status:
         return "Autorizada"
+    if "sem status" in status:
+        return "Sem status"
     if "off" in status:
         return "Offline"
     return norm_text(value)
-
-
-def normalize_signal(value):
-    signal = parse_float(value)
-    if signal is None:
-        return 0
-    return round(signal, 2)
 
 
 def split_pon_parts(item, previous):
@@ -116,7 +105,6 @@ def split_pon_parts(item, previous):
         text = norm_text(candidate)
         if not text:
             continue
-
         numbers = [int(n) for n in re.findall(r"\d+", text)]
         if len(numbers) >= 4:
             return numbers[-2], numbers[-1], f"1-1-{numbers[-2]}-{numbers[-1]}"
@@ -129,75 +117,84 @@ def split_pon_parts(item, previous):
 def build_lookup(rows):
     lookup = {}
     for row in rows:
-        keys = {
+        keys = [
             norm_upper(row.get("MAC/Serial")),
             norm_upper(row.get("Login")),
             str(row.get("ID ONU Fibra") or "").strip(),
-        }
+        ]
         for key in keys:
             if key:
                 lookup[key] = row
     return lookup
 
 
+def get_first_present(item, *keys):
+    for key in keys:
+        value = item.get(key)
+        if norm_text(value):
+            return value
+    return None
+
+
+def should_append_new_row(item):
+    return bool(
+        norm_text(item.get("mac"))
+        and (
+            norm_text(item.get("cliente"))
+            or norm_text(item.get("login"))
+            or norm_text(item.get("olt"))
+            or norm_text(item.get("porta_pon"))
+            or parse_float(item.get("sinal")) is not None
+        )
+    )
+
+
 def merge_onu(item, previous):
-    slot, pon, pon_id = split_pon_parts(item, previous)
-    olt = norm_text(item.get("olt")) or previous.get("OLT") or "OLT"
-    status = normalize_status(item.get("status") or previous.get("Status ONU"))
-    rx = normalize_signal(item.get("sinal"))
-    tx = previous.get("Sinal TX", 0) or 0
-    onu_number = parse_int(item.get("onu")) or previous.get("ONU Nº")
+    row = copy.deepcopy(previous)
 
-    if not pon_id and slot is not None and pon is not None:
-        pon_id = f"1-1-{slot}-{pon}"
-
-    pon_group = previous.get("PON Grupo")
-    if slot is not None and pon is not None:
-        pon_group = f"{olt} | Slot {slot} | PON {pon}"
-
+    slot, pon, pon_id = split_pon_parts(item, row)
+    olt = get_first_present(item, "olt") or row.get("OLT")
+    login = get_first_present(item, "login") or row.get("Login")
+    mac = get_first_present(item, "mac") or row.get("MAC/Serial")
+    client_name = get_first_present(item, "cliente", "nome_cliente") or row.get("Nome Cliente")
+    status = normalize_status(get_first_present(item, "status", "status_onu")) or row.get("Status ONU")
+    rx = parse_float(get_first_present(item, "sinal", "rx", "sinal_rx"))
+    tx = parse_float(get_first_present(item, "tx", "sinal_tx"))
+    id_onu = parse_int(get_first_present(item, "id", "id_onu_fibra")) or row.get("ID ONU Fibra")
+    onu_number = parse_int(get_first_present(item, "onu", "numero_onu")) or row.get("ONU Nº")
     updated_at = (
-        norm_text(item.get("ultima_conexao"))
-        or norm_text(item.get("ultima_atualizacao"))
-        or previous.get("Última atualização")
+        get_first_present(item, "ultima_conexao", "ultima_atualizacao")
+        or row.get("Última atualização")
         or datetime.now().strftime("%d/%m/%Y %H:%M:%S")
     )
 
-    client_name = (
-        norm_text(item.get("cliente"))
-        or previous.get("Nome Cliente")
-        or norm_text(item.get("login"))
-        or norm_text(item.get("mac"))
-    )
+    row["OLT"] = olt
+    row["Slot"] = slot
+    row["PON"] = pon
+    row["PON ID"] = pon_id or row.get("PON ID")
+    if row.get("OLT") and row.get("Slot") is not None and row.get("PON") is not None:
+        row["PON Grupo"] = f"{row['OLT']} | Slot {row['Slot']} | PON {row['PON']}"
+    row["ID ONU Fibra"] = id_onu
+    row["Nome Cliente"] = client_name
+    row["Login"] = login
+    row["MAC/Serial"] = mac
+    row["Status ONU"] = status or row.get("Status ONU") or "Sem status"
+    if rx is not None:
+        row["Sinal RX"] = round(rx, 2)
+    if tx is not None:
+        row["Sinal TX"] = round(tx, 2)
+    row["Última atualização"] = updated_at
+    row["ONU Nº"] = onu_number
+    row["ONU Tipo"] = get_first_present(item, "modelo", "tipo_onu") or row.get("ONU Tipo")
+    row["IP"] = get_first_present(item, "ip") or row.get("IP")
 
-    return {
-        "OLT": olt,
-        "Slot": slot,
-        "PON": pon,
-        "PON ID": pon_id,
-        "PON Grupo": pon_group,
-        "ID ONU Fibra": parse_int(item.get("id")) or previous.get("ID ONU Fibra"),
-        "Nome Cliente": client_name,
-        "Login": norm_text(item.get("login")) or previous.get("Login"),
-        "MAC/Serial": norm_text(item.get("mac")) or previous.get("MAC/Serial"),
-        "Status ONU": status,
-        "Sinal RX": rx,
-        "Sinal TX": tx,
-        "Última atualização": updated_at,
-        "ONU Nº": onu_number,
-        "ONU Tipo": previous.get("ONU Tipo") or item.get("modelo"),
-        "Caixa FTTH/CTO": previous.get("Caixa FTTH/CTO"),
-        "Porta FTTH": previous.get("Porta FTTH"),
-        "POP": previous.get("POP") or "TAQUARITINGA",
-        "VLAN": previous.get("VLAN"),
-        "Causa última queda": previous.get("Causa última queda"),
-        "Potência": previous.get("Potência") or "Indefinido",
-        "IP": norm_text(item.get("ip")) or previous.get("IP"),
-    }
+    return row
 
 
 def build_base_onus(records, previous_rows):
     previous_lookup = build_lookup(previous_rows)
-    fresh_rows = []
+    updated_rows = []
+    seen_macs = set()
 
     for item in records:
         keys = [
@@ -205,17 +202,55 @@ def build_base_onus(records, previous_rows):
             norm_upper(item.get("login")),
             str(item.get("id") or "").strip(),
         ]
-        previous = {}
+
+        previous = None
         for key in keys:
             if key and key in previous_lookup:
                 previous = previous_lookup[key]
                 break
 
-        merged = merge_onu(item, previous)
-        if norm_text(merged.get("MAC/Serial")):
-            fresh_rows.append(merged)
+        if previous is None and not should_append_new_row(item):
+            continue
 
-    fresh_rows.sort(
+        base = previous or {
+            "OLT": None,
+            "Slot": None,
+            "PON": None,
+            "PON ID": None,
+            "PON Grupo": None,
+            "ID ONU Fibra": None,
+            "Nome Cliente": None,
+            "Login": None,
+            "MAC/Serial": None,
+            "Status ONU": "Sem status",
+            "Sinal RX": 0,
+            "Sinal TX": 0,
+            "Última atualização": None,
+            "ONU Nº": None,
+            "ONU Tipo": None,
+            "Caixa FTTH/CTO": None,
+            "Porta FTTH": None,
+            "POP": "TAQUARITINGA",
+            "VLAN": None,
+            "Causa última queda": None,
+            "Potência": "Indefinido",
+            "IP": None,
+        }
+
+        merged = merge_onu(item, base)
+        mac = norm_upper(merged.get("MAC/Serial"))
+        if not mac:
+            continue
+
+        updated_rows.append(merged)
+        seen_macs.add(mac)
+
+    for row in previous_rows:
+        mac = norm_upper(row.get("MAC/Serial"))
+        if mac and mac not in seen_macs:
+            updated_rows.append(row)
+
+    updated_rows.sort(
         key=lambda row: (
             norm_text(row.get("OLT")),
             row.get("Slot") or 0,
@@ -223,7 +258,7 @@ def build_base_onus(records, previous_rows):
             norm_text(row.get("Nome Cliente")),
         )
     )
-    return fresh_rows
+    return updated_rows
 
 
 def build_resumo_pon(base_onus):
@@ -252,8 +287,7 @@ def build_resumo_pon(base_onus):
         )
 
         summary["Total ONUs"] += 1
-        status = normalize_status(row.get("Status ONU"))
-
+        status = normalize_status(row.get("Status ONU")) or "Sem status"
         if status == "Autorizada":
             summary["Autorizadas"] += 1
         elif status == "Pedindo autenticacao":
@@ -280,13 +314,13 @@ def build_resumo_pon(base_onus):
 
 
 def build_offline_list(base_onus):
-    offline_rows = []
+    offline = []
     for row in base_onus:
-        status = normalize_status(row.get("Status ONU"))
+        status = normalize_status(row.get("Status ONU")) or "Sem status"
         rx = parse_float(row.get("Sinal RX"))
         if status == "Offline" or (status != "Autorizada" and rx in (None, 0)):
-            offline_rows.append(row)
-    return offline_rows
+            offline.append(row)
+    return offline
 
 
 def fetch_ixc_rows():
@@ -304,7 +338,6 @@ def fetch_ixc_rows():
         "Content-Type": "application/json",
         "ixcsoft": "listar",
     }
-
     response = requests.get(
         url,
         headers=headers,
@@ -324,19 +357,43 @@ def reload_backend():
         return False
 
 
+def load_full_base():
+    current = read_json(DATA_FILE, None)
+    if current and current.get("base_onus"):
+        return current
+
+    backup = read_json(BACKUP_FILE, None)
+    if backup and backup.get("base_onus"):
+        return backup
+
+    raise RuntimeError(
+        "Nao encontrei uma base rica com 'base_onus'. "
+        "Restaure primeiro um data.json completo antes de rodar este sincronizador."
+    )
+
+
+def backup_full_base(data):
+    write_json(BACKUP_FILE, data)
+
+
 def run_cycle():
-    previous_data = read_json(DATA_FILE, {"base_onus": [], "resumo_pon": [], "offline": []})
-    previous_base = previous_data.get("base_onus") or []
+    full_data = load_full_base()
+    previous_base = full_data.get("base_onus") or []
 
     response = fetch_ixc_rows()
     payload = response.json()
+    write_json(RAW_FILE, payload)
+
     records = payload.get("registros") or []
+    if not records:
+        raise RuntimeError("A IXC retornou zero registros.")
 
     base_onus = build_base_onus(records, previous_base)
     resumo_pon = build_resumo_pon(base_onus)
     offline = build_offline_list(base_onus)
 
     new_data = {
+        **full_data,
         "updated_at": datetime.now().isoformat(),
         "source": "IXC radpop_radio_cliente_fibra",
         "base_onus": base_onus,
@@ -344,24 +401,22 @@ def run_cycle():
         "offline": offline,
     }
 
+    backup_full_base(full_data)
     write_json(DATA_FILE, new_data)
-    reloaded = reload_backend()
 
+    reloaded = reload_backend()
     print(
         f"[{datetime.now().strftime('%d/%m/%Y %H:%M:%S')}] "
         f"Base atualizada | ONUs: {len(base_onus)} | PONs: {len(resumo_pon)} | Offline: {len(offline)}"
     )
-    if reloaded:
-        print("Backend sincronizado com sucesso.")
-    else:
-        print("data.json salvo, mas o backend nao respondeu no /api/sync/onus.")
+    print("Backend sincronizado com sucesso." if reloaded else "data.json salvo, mas o backend nao respondeu no /api/sync/onus.")
 
 
 def main():
     args = parse_args()
 
     print("=" * 60)
-    print(" Atualizador de base de ONUs via IXC")
+    print(" Atualizador seguro de base de ONUs via IXC")
     print(f" Endpoint: {IXC_URL}{ENDPOINT}")
     print(f" Intervalo: {args.interval} segundos")
     print(" Modo: unico" if args.once else " Modo: continuo")
