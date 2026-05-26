@@ -9,10 +9,7 @@ npm install
 echo "[2/4] Instalando dependencias do servidor..."
 cd server && npm install && cd ..
 
-echo "[3/4] Instalando dependencias do cliente..."
-cd client && npm install && cd ..
-
-echo "[4/4] Tudo instalado!"
+echo "[3/3] Tudo instalado!"
 echo ""
 echo "========================================"
 echo " Iniciando o sistema..."

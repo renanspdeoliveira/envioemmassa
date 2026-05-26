@@ -1,0 +1,145 @@
+import { useParams, useNavigate } from 'react-router-dom'
+import { useApi } from '../hooks/useApi'
+import { api } from '../utils/api'
+import { Card, CardHeader, Spinner, ErrorMsg, StatusBadge, PotenciaBadge, RxBadge, Badge, Btn } from '../components/UI'
+import { ArrowLeft, Router, Signal, Wifi } from 'lucide-react'
+import { fmt } from '../utils/helpers'
+
+function InfoRow({ label, value, mono = false }) {
+  return (
+    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 0', borderBottom: '1px solid var(--border-subtle)' }}>
+      <span style={{ fontSize: 12, color: 'var(--text-secondary)', fontWeight: 500 }}>{label}</span>
+      <span style={{ fontSize: 13, color: 'var(--text-primary)', fontFamily: mono ? 'var(--font-mono)' : 'inherit' }}>{value || '—'}</span>
+    </div>
+  )
+}
+
+export default function OnuDetailPage() {
+  const { mac } = useParams()
+  const navigate = useNavigate()
+  const { data, loading, error } = useApi(() => api.onuDetail(mac), [mac])
+
+  if (loading) return <Spinner />
+  if (error) return <ErrorMsg message={error} />
+  if (!data) return null
+
+  const { onu, siblings, ponSummary } = data
+
+  return (
+    <div>
+      <div style={{ marginBottom: 20 }}>
+        <Btn onClick={() => navigate(-1)}><ArrowLeft size={14} /> Voltar</Btn>
+      </div>
+
+      <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12, marginBottom: 24 }}>
+        <div style={{ width: 44, height: 44, borderRadius: 10, background: 'var(--accent-blue-subtle)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+          <Wifi size={22} color="var(--accent-blue-text)" />
+        </div>
+        <div>
+          <h1 style={{ fontSize: 20, fontWeight: 600, color: 'var(--text-primary)' }}>{onu['Nome Cliente'] || 'Cliente sem nome'}</h1>
+          <div style={{ display: 'flex', gap: 8, marginTop: 6, flexWrap: 'wrap' }}>
+            <StatusBadge status={onu['Status ONU']} />
+            <PotenciaBadge value={onu['Potência']} />
+            <Badge color="blue">{onu.OLT}</Badge>
+            <Badge color="gray">PON {onu['PON ID']}</Badge>
+          </div>
+        </div>
+      </div>
+
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16 }}>
+        {/* Client info */}
+        <Card>
+          <CardHeader title="Dados do Cliente" icon={Router} />
+          <div style={{ padding: '4px 18px 16px' }}>
+            <InfoRow label="Nome" value={onu['Nome Cliente']} />
+            <InfoRow label="Login" value={onu['Login']} mono />
+            <InfoRow label="MAC / Serial" value={onu['MAC/Serial']} mono />
+            <InfoRow label="ONU Nº" value={onu['ONU Nº']} mono />
+            <InfoRow label="Tipo ONU" value={onu['ONU Tipo']} />
+            <InfoRow label="VLAN" value={onu.VLAN ? Math.round(onu.VLAN) : '—'} mono />
+            <InfoRow label="Última atualização" value={onu['Última atualização']} />
+          </div>
+        </Card>
+
+        {/* Network info */}
+        <Card>
+          <CardHeader title="Rede / Sinal" icon={Signal} />
+          <div style={{ padding: '4px 18px 16px' }}>
+            <InfoRow label="OLT" value={<Badge color="blue">{onu.OLT}</Badge>} />
+            <InfoRow label="Slot" value={onu.Slot} mono />
+            <InfoRow label="PON" value={onu.PON} mono />
+            <InfoRow label="PON ID" value={onu['PON ID']} mono />
+            <InfoRow label="PON Grupo" value={onu['PON Grupo']} />
+            <InfoRow label="Sinal RX" value={<RxBadge value={onu['Sinal RX']} />} />
+            <InfoRow label="Sinal TX" value={<RxBadge value={onu['Sinal TX']} />} />
+            <InfoRow label="Potência" value={<PotenciaBadge value={onu['Potência']} />} />
+          </div>
+        </Card>
+      </div>
+
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16 }}>
+        {/* Location */}
+        <Card>
+          <CardHeader title="Localização Física" />
+          <div style={{ padding: '4px 18px 16px' }}>
+            <InfoRow label="POP" value={onu.POP} />
+            <InfoRow label="Caixa FTTH / CTO" value={onu['Caixa FTTH/CTO']} mono />
+            <InfoRow label="Porta FTTH" value={onu['Porta FTTH']} />
+            <InfoRow label="ID ONU Fibra" value={onu['ID ONU Fibra']} mono />
+            <InfoRow label="Causa última queda" value={onu['Causa última queda'] || 'Sem registro'} />
+          </div>
+        </Card>
+
+        {/* PON summary */}
+        {ponSummary && (
+          <Card>
+            <CardHeader title={`Resumo da PON ${ponSummary['PON ID']}`} />
+            <div style={{ padding: '4px 18px 16px' }}>
+              <InfoRow label="Total ONUs" value={ponSummary['Total ONUs']} />
+              <InfoRow label="Autorizadas" value={<Badge color="green">{ponSummary.Autorizadas}</Badge>} />
+              <InfoRow label="Pedindo autenticacao" value={ponSummary.Desautorizadas > 0 ? <Badge color="red">{ponSummary.Desautorizadas}</Badge> : '0'} />
+              <InfoRow label="Sinal RX médio" value={<RxBadge value={ponSummary['Sinal RX médio']} />} />
+              <InfoRow label="Pior RX" value={<RxBadge value={ponSummary['Pior RX']} />} />
+              <InfoRow label="Sem leitura RX" value={ponSummary['Sem leitura RX/zero']} />
+            </div>
+          </Card>
+        )}
+      </div>
+
+      {/* Sibling ONUs */}
+      {siblings?.length > 0 && (
+        <Card>
+          <CardHeader title={`Outras ONUs na mesma PON (${siblings.length} mostradas)`} />
+          <div style={{ overflowX: 'auto' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
+              <thead>
+                <tr>
+                  {['Cliente', 'Login', 'MAC/Serial', 'Status', 'Sinal RX', 'Potência'].map(h => (
+                    <th key={h} style={{ padding: '9px 12px', textAlign: 'left', fontSize: 11, color: 'var(--text-secondary)', background: 'var(--bg-secondary)', borderBottom: '1px solid var(--border)', textTransform: 'uppercase', letterSpacing: '.05em', fontWeight: 500 }}>{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {siblings.map((s, i) => (
+                  <tr key={i} onClick={() => navigate(`/onus/${encodeURIComponent(s['MAC/Serial'])}`)}
+                    style={{ cursor: 'pointer' }}
+                    onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-hover)'}
+                    onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
+                    <td style={td}>{s['Nome Cliente'] || '—'}</td>
+                    <td style={{ ...td, fontFamily: 'var(--font-mono)', fontSize: 12 }}>{s.Login || '—'}</td>
+                    <td style={{ ...td, fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--text-secondary)' }}>{s['MAC/Serial'] || '—'}</td>
+                    <td style={td}><StatusBadge status={s['Status ONU']} /></td>
+                    <td style={td}><RxBadge value={s['Sinal RX']} /></td>
+                    <td style={td}><PotenciaBadge value={s['Potência']} /></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </Card>
+      )}
+    </div>
+  )
+}
+
+const td = { padding: '9px 12px', borderBottom: '1px solid var(--border-subtle)', color: 'var(--text-primary)' }
