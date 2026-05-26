@@ -66,7 +66,7 @@ export default function OnuDetailPage() {
           <CardHeader title="Rede / Sinal" icon={Signal} />
           <div style={{ padding: '4px 18px 16px' }}>
             <InfoRow label="OLT" value={<Badge color="blue">{onu.OLT}</Badge>} />
-            <InfoRow label="Slot" value={onu.Slot} mono />
+            <InfoRow label="GBOC" value={onu.Slot} mono />
             <InfoRow label="PON" value={onu.PON} mono />
             <InfoRow label="PON ID" value={onu['PON ID']} mono />
             <InfoRow label="PON Grupo" value={onu['PON Grupo']} />

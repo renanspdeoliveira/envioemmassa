@@ -200,10 +200,10 @@ export default function EnvioMassaPage() {
               </Select>
             </div>
             <div>
-              <label style={lbl}>Slot</label>
+              <label style={lbl}>GBOC</label>
               <Select value={filters.slot} onChange={e => setFilters(f=>({...f, slot:e.target.value, pon:''}))} style={{ width:'100%' }} disabled={!filters.olt}>
                 <option value="">Todos</option>
-                {[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18].map(s => <option key={s} value={s}>Slot {s}</option>)}
+                {[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18].map(s => <option key={s} value={s}>GBOC {s}</option>)}
               </Select>
             </div>
             <div>
@@ -250,7 +250,7 @@ export default function EnvioMassaPage() {
               <X size={14} /> Limpar
             </Btn>
             {filters.olt && filters.slot && filters.pon && (
-              <Badge color="blue">{filters.olt} — Slot {filters.slot} — PON {filters.pon}</Badge>
+              <Badge color="blue">{filters.olt} — GBOC {filters.slot} — PON {filters.pon}</Badge>
             )}
             {filters.bairro && <Badge color="green">{filters.bairro}</Badge>}
           </div>
@@ -287,7 +287,7 @@ export default function EnvioMassaPage() {
             <Send size={32} style={{ color:'var(--text-tertiary)', margin:'0 auto 12px', display:'block' }} />
             <div style={{ fontSize:14, fontWeight:500, color:'var(--text-secondary)', marginBottom:6 }}>Selecione os filtros acima</div>
             <div style={{ fontSize:13, color:'var(--text-tertiary)' }}>
-              Filtre por <strong>OLT + Slot + PON</strong> ou por <strong>Bairro</strong> para listar os clientes
+              Filtre por <strong>OLT + GBOC + PON</strong> ou por <strong>Bairro</strong> para listar os clientes
             </div>
           </div>
         </Card>
@@ -331,7 +331,7 @@ export default function EnvioMassaPage() {
                     <th style={th}>WhatsApp</th>
                     <th style={th}>Login</th>
                     <th style={th}>Bairro</th>
-                    <th style={th}>OLT / Slot / PON</th>
+                    <th style={th}>OLT / GBOC / PON</th>
                     <th style={th}>Status</th>
                     <th style={th}>CTO</th>
                     <th style={th}></th>
@@ -363,7 +363,7 @@ export default function EnvioMassaPage() {
                             : <span style={{ color:'var(--text-tertiary)', fontSize:11 }}>—</span>}
                         </td>
                         <td style={{ ...td, fontFamily:'var(--font-mono)', fontSize:12 }}>
-                          {row.olt} / S{row.slot} / P{row.pon}
+                          {row.olt} / G{row.slot} / P{row.pon}
                         </td>
                         <td style={td}><StatusBadge status={row.status}/></td>
                         <td style={{ ...td, fontSize:12, color:'var(--text-secondary)' }}>{row.cto||'—'}</td>

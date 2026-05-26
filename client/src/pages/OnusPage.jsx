@@ -77,7 +77,7 @@ export default function OnusPage() {
 
   const cols = [
     { key:'OLT',          label:'OLT' },
-    { key:'Slot',         label:'Slot' },
+    { key:'Slot',         label:'GBOC' },
     { key:'PON',          label:'PON' },
     { key:'Nome Cliente', label:'Cliente' },
     { key:'Login',        label:'Login' },

@@ -120,7 +120,7 @@ export default function DashboardPage() {
         </Card>
 
         <Card>
-          <CardHeader title="Sinal RX medio por Slot" subtitle="Saude optica por segmento" />
+          <CardHeader title="Sinal RX medio por GBOC" subtitle="Saude optica por segmento" />
           <div style={{ padding: '12px 8px' }}>
             <ResponsiveContainer width="100%" height={240}>
               <BarChart data={rxData || []} margin={{ top: 4, right: 16, left: -10, bottom: 60 }}>

@@ -35,7 +35,7 @@ export default function PonsPage() {
 
   const grouped = {}
   ;(data?.data || []).forEach(row => {
-    const key = `${row.OLT}-Slot ${row.Slot}`
+    const key = `${row.OLT} - GBOC ${row.Slot}`
     if (!grouped[key]) grouped[key] = []
     grouped[key].push(row)
   })
@@ -52,8 +52,8 @@ export default function PonsPage() {
               {(stats?.olts || []).map(o => <option key={o}>{o}</option>)}
             </Select>
             <Select value={slot} onChange={e => setSlot(e.target.value)} disabled={!olt}>
-              <option value="">Todos Slots</option>
-              {slots.map(s => <option key={s} value={s}>Slot {s}</option>)}
+              <option value="">Todos GBOCs</option>
+              {slots.map(s => <option key={s} value={s}>GBOC {s}</option>)}
             </Select>
           </div>
         }

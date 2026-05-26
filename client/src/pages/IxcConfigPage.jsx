@@ -187,9 +187,9 @@ export default function IxcConfigPage() {
               </Select>
             </div>
             <div>
-              <label style={lbl}>Slot</label>
+              <label style={lbl}>GBOC</label>
               <Select value={ponSlot} onChange={e => setPonSlot(e.target.value)} style={{ width: 100 }} disabled={!ponOlt}>
-                <option value="">Slot</option>
+                <option value="">GBOC</option>
                 {[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18].map(s => <option key={s} value={s}>{s}</option>)}
               </Select>
             </div>

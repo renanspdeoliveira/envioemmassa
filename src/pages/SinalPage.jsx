@@ -101,7 +101,7 @@ export default function SinalPage() {
 
       {/* RX by slot - full width */}
       <Card style={{ marginBottom: 16 }}>
-        <CardHeader title="Sinal RX médio por Slot / OLT" subtitle="Identificação de segmentos com degradação óptica" />
+        <CardHeader title="Sinal RX medio por GBOC / OLT" subtitle="Identificacao de segmentos com degradacao optica" />
         <div style={{ padding: '12px 8px' }}>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={rxData || []} margin={{ top: 8, right: 16, left: -10, bottom: 80 }}>
@@ -125,12 +125,12 @@ export default function SinalPage() {
 
       {/* Summary table */}
       <Card>
-        <CardHeader title="Tabela de médias por Slot" />
+        <CardHeader title="Tabela de medias por GBOC" />
         <div style={{ overflowX: 'auto' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
             <thead>
               <tr>
-                {['OLT', 'Slot', 'RX médio', 'Classificação'].map(h => (
+                {['OLT', 'GBOC', 'RX medio', 'Classificacao'].map(h => (
                   <th key={h} style={{ padding: '9px 16px', textAlign: 'left', fontSize: 11, color: 'var(--text-secondary)', background: 'var(--bg-secondary)', borderBottom: '1px solid var(--border)', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '.05em' }}>{h}</th>
                 ))}
               </tr>

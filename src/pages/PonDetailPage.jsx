@@ -25,7 +25,7 @@ export default function PonDetailPage() {
         <h1 style={{ fontSize: 20, fontWeight: 600 }}>PON {pon['PON ID']}</h1>
         <div style={{ display: 'flex', gap: 8, marginTop: 8, flexWrap: 'wrap' }}>
           <Badge color="blue">{pon.OLT}</Badge>
-          <Badge color="gray">Slot {pon.Slot}</Badge>
+          <Badge color="gray">GBOC {pon.Slot}</Badge>
           <Badge color="gray">PON {pon.PON}</Badge>
           <Badge color="green">{pon.Autorizadas} autorizadas</Badge>
           {pon.Desautorizadas > 0 && <Badge color="red">{pon.Desautorizadas} pedindo autenticacao</Badge>}
