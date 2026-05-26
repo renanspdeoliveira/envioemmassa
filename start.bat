@@ -21,6 +21,9 @@ start "ISP Backend" cmd /k "cd /d %~dp0server && node index.js"
 echo Aguardando servidor iniciar...
 timeout /t 3 /nobreak > nul
 
+echo Iniciando atualizador da base IXC...
+start "ISP Data Sync" cmd /k "cd /d %~dp0 && python script_data.py --interval 300"
+
 echo Iniciando frontend (porta 5173)...
 start "ISP Frontend" cmd /k "cd /d %~dp0 && npm run dev"
 
