@@ -87,6 +87,16 @@ function parseIntSafe(value) {
   return Number.isFinite(parsed) ? parsed : null;
 }
 
+function formatOltLabel(value, rawMatch) {
+  const current = String(value || '').trim();
+  if (current && current !== 'OLT') return current;
+
+  const transmitterId = parseIntSafe(rawMatch?.id_transmissor);
+  if (transmitterId !== null) return `OLT ${transmitterId}`;
+
+  return current || null;
+}
+
 function buildRawOnuIndex(records) {
   const byMac = new Map();
   const byLoginId = new Map();
@@ -197,6 +207,7 @@ function hydrateOnu(r) {
   const rawByMac = rawOnuIndex.byMac.get((r['MAC/Serial'] || '').trim().toUpperCase());
   const rawByLoginId = rawOnuIndex.byLoginId.get(String(r['ID Login'] || ''));
   const rawMatch = rawByMac || rawByLoginId || null;
+  const olt = formatOltLabel(r.OLT, rawMatch);
   const slot = r.Slot ?? parseIntSafe(rawMatch?.slotno);
   const pon = r.PON ?? parseIntSafe(rawMatch?.ponno);
   const ponId = r['PON ID'] || rawMatch?.ponid || (slot !== null && pon !== null ? `1-1-${slot}-${pon}` : null);
@@ -212,10 +223,11 @@ function hydrateOnu(r) {
     '';
   const hydrated = enrichOnu({
     ...r,
+    OLT: olt,
     Slot: slot,
     PON: pon,
     'PON ID': ponId,
-    'PON Grupo': r['PON Grupo'] || (r.OLT && slot !== null && pon !== null ? `${r.OLT} | Slot ${slot} | PON ${pon}` : null),
+    'PON Grupo': r['PON Grupo'] || (olt && slot !== null && pon !== null ? `${olt} | Slot ${slot} | PON ${pon}` : null),
     Login: inferredLogin || null,
     'Nome Cliente': nomeOriginal || r['Nome Cliente'],
   });
@@ -272,6 +284,12 @@ app.get('/api/health', safe((req, res) => {
 
 app.get('/api/stats', safe((req, res) => {
   const hydratedOnus = baseOnus.map(hydrateOnu);
+  const slotsByOlt = hydratedOnus.reduce((acc, row) => {
+    if (!row.OLT || row.Slot === null || row.Slot === undefined || row.Slot === '') return acc;
+    if (!acc[row.OLT]) acc[row.OLT] = new Set();
+    acc[row.OLT].add(row.Slot);
+    return acc;
+  }, {});
   const rxVals  = baseOnus.map(r=>r['Sinal RX']).filter(v=>v&&v!==0);
   const onlineCount = baseOnus.filter(isOnlineOnu).length;
   res.json({
@@ -281,7 +299,11 @@ app.get('/api/stats', safe((req, res) => {
     autorizadas:     baseOnus.filter(r=>r['Status ONU']==='Autorizada').length,
     desautorizadas:  baseOnus.filter(r=>isPendingAuthStatus(r['Status ONU'])).length,
     semStatus:       baseOnus.filter(r=>r['Status ONU']==='Sem status').length,
-    oltCounts:       baseOnus.reduce((acc,r)=>{ acc[r.OLT]=(acc[r.OLT]||0)+1; return acc; },{}),
+    oltCounts:       hydratedOnus.reduce((acc, r) => {
+      if (!r.OLT) return acc;
+      acc[r.OLT] = (acc[r.OLT] || 0) + 1;
+      return acc;
+    }, {}),
     avgRx:           rxVals.length ? (rxVals.reduce((a,b)=>a+b,0)/rxVals.length).toFixed(2) : null,
     worstRx:         rxVals.length ? rxVals.reduce((a,b)=>Math.min(a,b)).toFixed(2)           : null,
     totalPons:       resumoPon.length,
@@ -289,6 +311,7 @@ app.get('/api/stats', safe((req, res) => {
     offlineAtencao:  Math.max(baseOnus.length - onlineCount, offlineList.length),
     olts:            [...new Set(hydratedOnus.map(r=>r.OLT))].filter(Boolean).sort(),
     slots:           [...new Set(hydratedOnus.map(r=>r.Slot))].filter(Boolean).sort((a,b)=>a-b),
+    slotsByOlt:      Object.fromEntries(Object.entries(slotsByOlt).map(([olt, slots]) => [olt, [...slots].sort((a,b)=>a-b)])),
     totalContratos:  Object.keys(relatorio.by_id).length,
     comTelefone:     Object.values(relatorio.by_login || relatorio.by_nome || {}).filter(v=>v.whatsapp).length,
   });
@@ -380,10 +403,10 @@ app.get('/api/envio-massa', safe((req, res) => {
   }
   res.json({
     data: list.map(r=>{
-      const e=enrichOnu(r);
-      return { nome_formatado:e.nome_formatado, login:r.Login||'', whatsapp:e.whatsapp, bairro:e.bairro,
-               olt:r.OLT, slot:r.Slot, pon:r.PON, pon_id:r['PON ID']||'',
-               mac_serial:r['MAC/Serial']||'', status:r['Status ONU']||'', cto:r['Caixa FTTH/CTO']||'',
+      const e=hydrateOnu(r);
+      return { nome_formatado:e.nome_formatado, login:e.Login||'', whatsapp:e.whatsapp, bairro:e.bairro,
+               olt:e.OLT, slot:e.Slot, pon:e.PON, pon_id:e['PON ID']||'',
+               mac_serial:e['MAC/Serial']||'', status:e['Status ONU']||'', cto:e['Caixa FTTH/CTO']||'',
                tem_contato:!!e.whatsapp };
     }),
     total: list.length

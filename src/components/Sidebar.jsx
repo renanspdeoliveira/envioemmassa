@@ -1,11 +1,9 @@
 import { NavLink } from 'react-router-dom'
-import { Activity, Database, LayoutDashboard, Radio, Send, WifiOff } from 'lucide-react'
+import { Activity, Database, LayoutDashboard, Send } from 'lucide-react'
 
 const links = [
   { to: '/', label: 'Dashboard', icon: LayoutDashboard },
-  { to: '/onus-desautorizadas', label: 'ONU Desautorizadas', icon: WifiOff },
   { to: '/onus', label: 'Base de ONUs', icon: Database },
-  { to: '/pons', label: 'PONs / OLTs', icon: Radio },
   { to: '/sinal', label: 'Analise de Sinal', icon: Activity },
 ]
 
