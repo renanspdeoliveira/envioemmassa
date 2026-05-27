@@ -4,10 +4,18 @@ import { api } from '../utils/api'
 import { Card, CardHeader, Spinner, ErrorMsg, StatusBadge, RxBadge, PotenciaBadge, Badge, Btn } from '../components/UI'
 import { ArrowLeft } from 'lucide-react'
 
+function fmtPhone(d) {
+  if (!d) return '-'
+  const n = String(d).replace(/\D/g, '').replace(/^55/, '')
+  if (n.length === 11) return `(${n.slice(0, 2)}) ${n.slice(2, 7)}-${n.slice(7)}`
+  if (n.length === 10) return `(${n.slice(0, 2)}) ${n.slice(2, 6)}-${n.slice(6)}`
+  return d
+}
+
 export default function PonDetailPage() {
   const { ponId } = useParams()
   const navigate = useNavigate()
-  const { data, loading, error } = useApi(() => api.ponDetail(ponId), [ponId])
+  const { data, loading, error } = useApi(() => api.ponDetail(ponId), [ponId], { refreshInterval: 30000 })
 
   if (loading) return <Spinner />
   if (error) return <ErrorMsg message={error} />
@@ -37,8 +45,8 @@ export default function PonDetailPage() {
           { label: 'Total ONUs', value: pon['Total ONUs'] },
           { label: 'Autorizadas', value: pon.Autorizadas, color: 'var(--green-text)' },
           { label: 'Pedindo autenticacao', value: pon.Desautorizadas, color: pon.Desautorizadas > 0 ? 'var(--red-text)' : undefined },
-          { label: 'RX médio', value: pon['Sinal RX médio'] ? `${pon['Sinal RX médio']?.toFixed(2)} dBm` : '—' },
-          { label: 'Pior RX', value: pon['Pior RX'] ? `${pon['Pior RX']?.toFixed(2)} dBm` : '—', color: pon['Pior RX'] < -27 ? 'var(--red-text)' : 'var(--amber-text)' },
+          { label: 'RX medio', value: pon['Sinal RX mÃ©dio'] ? `${pon['Sinal RX mÃ©dio']?.toFixed(2)} dBm` : '-' },
+          { label: 'Pior RX', value: pon['Pior RX'] ? `${pon['Pior RX']?.toFixed(2)} dBm` : '-', color: pon['Pior RX'] < -27 ? 'var(--red-text)' : 'var(--amber-text)' },
           { label: 'Sem leitura', value: pon['Sem leitura RX/zero'] },
         ].map(s => (
           <div key={s.label} style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 8, padding: '12px 14px' }}>
@@ -49,31 +57,39 @@ export default function PonDetailPage() {
       </div>
 
       <Card>
-        <CardHeader title={`ONUs nesta PON (${onus.length})`} />
+        <CardHeader title={`ONUs nesta PON (${onus.length})`} subtitle="Nome, MAC, login e WhatsApp atualizados automaticamente" />
         <div style={{ overflowX: 'auto' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
             <thead>
               <tr>
-                {['#', 'Cliente', 'Login', 'MAC/Serial', 'Status', 'Sinal RX', 'Potência', 'Tipo ONU'].map(h => (
+                {['#', 'Cliente / MAC', 'Login / ID', 'WhatsApp', 'Status', 'Sinal RX', 'Potencia', 'Tipo ONU'].map(h => (
                   <th key={h} style={{ padding: '9px 12px', textAlign: 'left', fontSize: 11, color: 'var(--text-secondary)', background: 'var(--bg-secondary)', borderBottom: '1px solid var(--border)', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '.05em' }}>{h}</th>
                 ))}
               </tr>
             </thead>
             <tbody>
               {onus.map((o, i) => (
-                <tr key={i}
+                <tr
+                  key={i}
                   onClick={() => o['MAC/Serial'] && navigate(`/onus/${encodeURIComponent(o['MAC/Serial'])}`)}
                   style={{ cursor: 'pointer' }}
                   onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-hover)'}
-                  onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
+                  onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+                >
                   <td style={{ ...td, color: 'var(--text-tertiary)', fontFamily: 'var(--font-mono)', fontSize: 11 }}>{i + 1}</td>
-                  <td style={td}>{o['Nome Cliente'] || '—'}</td>
-                  <td style={{ ...td, fontFamily: 'var(--font-mono)', fontSize: 12 }}>{o.Login || '—'}</td>
-                  <td style={{ ...td, fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--text-secondary)' }}>{o['MAC/Serial'] || '—'}</td>
+                  <td style={{ ...td, minWidth: 260, whiteSpace: 'normal' }}>
+                    <div style={{ fontWeight: 500 }}>{o.nome_formatado || o['Nome Cliente'] || '-'}</div>
+                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--text-secondary)', marginTop: 2 }}>{o['MAC/Serial'] || '-'}</div>
+                  </td>
+                  <td style={{ ...td, minWidth: 130, whiteSpace: 'normal' }}>
+                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: 12 }}>{o.Login || '-'}</div>
+                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--text-secondary)', marginTop: 2 }}>ID {o['ID Login'] || '-'}</div>
+                  </td>
+                  <td style={{ ...td, fontFamily: 'var(--font-mono)', fontSize: 12, color: o.whatsapp ? 'var(--green-text)' : 'var(--text-tertiary)' }}>{fmtPhone(o.whatsapp)}</td>
                   <td style={td}><StatusBadge status={o['Status ONU']} /></td>
                   <td style={td}><RxBadge value={o['Sinal RX']} /></td>
-                  <td style={td}><PotenciaBadge value={o['Potência']} /></td>
-                  <td style={{ ...td, color: 'var(--text-secondary)', fontSize: 12 }}>{o['ONU Tipo'] || '—'}</td>
+                  <td style={td}><PotenciaBadge value={o['PotÃªncia']} /></td>
+                  <td style={{ ...td, color: 'var(--text-secondary)', fontSize: 12 }}>{o['ONU Tipo'] || '-'}</td>
                 </tr>
               ))}
             </tbody>

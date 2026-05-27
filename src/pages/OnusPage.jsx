@@ -18,7 +18,7 @@ const PAGE_SIZE = 50
 
 export default function OnusPage() {
   const navigate = useNavigate()
-  const { data: stats } = useApi(() => api.stats())
+  const { data: stats } = useApi(() => api.stats(), [], { refreshInterval: 30000 })
 
   const [filters, setFilters] = useState({ search:'', olt:'', status:'' })
   const [debouncedSearch, setDebouncedSearch] = useState('')
@@ -47,6 +47,10 @@ export default function OnusPage() {
 
   useEffect(() => { fetchOnus() }, [fetchOnus])
   useEffect(() => { setPage(1) }, [debouncedSearch, filters.olt, filters.status])
+  useEffect(() => {
+    const timer = setInterval(() => { fetchOnus() }, 30000)
+    return () => clearInterval(timer)
+  }, [fetchOnus])
 
   function handleSort(col) {
     setSort(s => s.by===col ? { by:col, dir: s.dir==='asc'?'desc':'asc' } : { by:col, dir:'asc' })

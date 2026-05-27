@@ -46,6 +46,7 @@ const rawData   = readJson(DATA_FILE, { base_onus:[], resumo_pon:[], offline:[] 
 let baseOnus    = rawData.base_onus  || [];
 let resumoPon   = rawData.resumo_pon || [];
 let offlineList = rawData.offline    || [];
+let lastUpdatedAt = rawData.updated_at || null;
 let relatorio   = readJson(REL_FILE, { by_nome:{}, by_id:{} });
 let bairroMap   = readJson(BRR_FILE, {});
 let clientesMap = readJson(CLI_FILE, {});
@@ -83,6 +84,20 @@ function isPendingAuthStatus(status) {
   return normalized === 'desautorizada' || normalized === 'pedindo autenticacao';
 }
 
+function hasOpticalSignal(row) {
+  return Number(row?.['Sinal RX']) !== 0 && Number.isFinite(Number(row?.['Sinal RX']))
+    || Number(row?.['Sinal TX']) !== 0 && Number.isFinite(Number(row?.['Sinal TX']));
+}
+
+function isOnlineStatus(status) {
+  const normalized = normStr(status);
+  return normalized === 'autorizada' || normalized === 'online';
+}
+
+function isOnlineOnu(row) {
+  return isOnlineStatus(row?.['Status ONU']) || hasOpticalSignal(row);
+}
+
 function isValidOnuRecord(row) {
   const mac = (row?.['MAC/Serial'] || '').trim();
   const name = (row?.['Nome Cliente'] || '').trim();
@@ -113,6 +128,7 @@ function enrichOnu(r) {
     nome_formatado: nomeFmt,
     whatsapp: manual.whatsapp || contrato.whatsapp || '',
     bairro:   bairroMap[loginKey] || contrato.bairro || '',
+    online: isOnlineOnu(r),
   };
 }
 
@@ -164,8 +180,11 @@ app.get('/api/health', safe((req, res) => {
 
 app.get('/api/stats', safe((req, res) => {
   const rxVals  = baseOnus.map(r=>r['Sinal RX']).filter(v=>v&&v!==0);
+  const onlineCount = baseOnus.filter(isOnlineOnu).length;
   res.json({
+    updatedAt:       lastUpdatedAt,
     total:           baseOnus.length,
+    online:          onlineCount,
     autorizadas:     baseOnus.filter(r=>r['Status ONU']==='Autorizada').length,
     desautorizadas:  baseOnus.filter(r=>isPendingAuthStatus(r['Status ONU'])).length,
     semStatus:       baseOnus.filter(r=>r['Status ONU']==='Sem status').length,
@@ -174,7 +193,7 @@ app.get('/api/stats', safe((req, res) => {
     worstRx:         rxVals.length ? rxVals.reduce((a,b)=>Math.min(a,b)).toFixed(2)           : null,
     totalPons:       resumoPon.length,
     semLeituraRx:    resumoPon.reduce((a,r)=>a+(r['Sem leitura RX/zero']||0),0),
-    offlineAtencao:  offlineList.length,
+    offlineAtencao:  Math.max(baseOnus.length - onlineCount, offlineList.length),
     olts:            [...new Set(baseOnus.map(r=>r.OLT))].filter(Boolean).sort(),
     slots:           [...new Set(baseOnus.map(r=>r.Slot))].filter(Boolean).sort((a,b)=>a-b),
     totalContratos:  Object.keys(relatorio.by_id).length,
@@ -385,6 +404,7 @@ app.post('/api/sync/onus', safe((req, res) => {
   baseOnus    = fresh.base_onus  || [];
   resumoPon   = fresh.resumo_pon || [];
   offlineList = fresh.offline    || [];
+  lastUpdatedAt = fresh.updated_at || null;
   applyOnuFilters();
   res.json({ok:true, total:baseOnus.length});
 }));

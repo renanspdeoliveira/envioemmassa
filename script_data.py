@@ -92,6 +92,15 @@ def normalize_status(value):
     return norm_text(value)
 
 
+def has_optical_signal(item=None, previous=None):
+    previous = previous or {}
+    rx_source = get_first_present(item, "sinal", "rx", "sinal_rx") if item else previous.get("Sinal RX")
+    tx_source = get_first_present(item, "tx", "sinal_tx") if item else previous.get("Sinal TX")
+    rx = parse_float(rx_source)
+    tx = parse_float(tx_source)
+    return rx not in (None, 0) or tx not in (None, 0)
+
+
 def split_pon_parts(item, previous):
     candidates = [
         item.get("porta_pon"),
@@ -140,11 +149,14 @@ def should_append_new_row(item):
     return bool(
         norm_text(item.get("mac"))
         and (
-            norm_text(item.get("cliente"))
+            norm_text(item.get("nome"))
+            or norm_text(item.get("cliente"))
             or norm_text(item.get("login"))
+            or norm_text(item.get("id_login"))
             or norm_text(item.get("olt"))
             or norm_text(item.get("porta_pon"))
             or parse_float(item.get("sinal")) is not None
+            or parse_float(item.get("sinal_rx")) is not None
         )
     )
 
@@ -154,16 +166,17 @@ def merge_onu(item, previous):
 
     slot, pon, pon_id = split_pon_parts(item, row)
     olt = get_first_present(item, "olt") or row.get("OLT")
-    login = get_first_present(item, "login") or row.get("Login")
+    login = get_first_present(item, "login", "usuario", "username", "login_pppoe") or row.get("Login")
+    login_id = parse_int(get_first_present(item, "id_login", "id_cliente_login", "id_cliente")) or row.get("ID Login")
     mac = get_first_present(item, "mac") or row.get("MAC/Serial")
-    client_name = get_first_present(item, "cliente", "nome_cliente") or row.get("Nome Cliente")
-    status = normalize_status(get_first_present(item, "status", "status_onu")) or row.get("Status ONU")
+    client_name = get_first_present(item, "nome", "cliente", "nome_cliente") or row.get("Nome Cliente")
+    status = normalize_status(get_first_present(item, "status", "status_onu", "status_cliente"))
     rx = parse_float(get_first_present(item, "sinal", "rx", "sinal_rx"))
     tx = parse_float(get_first_present(item, "tx", "sinal_tx"))
     id_onu = parse_int(get_first_present(item, "id", "id_onu_fibra")) or row.get("ID ONU Fibra")
     onu_number = parse_int(get_first_present(item, "onu", "numero_onu")) or row.get("ONU Nº")
     updated_at = (
-        get_first_present(item, "ultima_conexao", "ultima_atualizacao")
+        get_first_present(item, "data_sinal", "ultima_conexao", "ultima_atualizacao")
         or row.get("Última atualização")
         or datetime.now().strftime("%d/%m/%Y %H:%M:%S")
     )
@@ -174,19 +187,26 @@ def merge_onu(item, previous):
     row["PON ID"] = pon_id or row.get("PON ID")
     if row.get("OLT") and row.get("Slot") is not None and row.get("PON") is not None:
         row["PON Grupo"] = f"{row['OLT']} | Slot {row['Slot']} | PON {row['PON']}"
+    if not status:
+        status = "Autorizada" if has_optical_signal(item, row) else row.get("Status ONU") or "Offline"
+
     row["ID ONU Fibra"] = id_onu
+    row["ID Login"] = login_id
     row["Nome Cliente"] = client_name
     row["Login"] = login
     row["MAC/Serial"] = mac
-    row["Status ONU"] = status or row.get("Status ONU") or "Sem status"
+    row["Status ONU"] = status or row.get("Status ONU") or "Offline"
     if rx is not None:
         row["Sinal RX"] = round(rx, 2)
     if tx is not None:
         row["Sinal TX"] = round(tx, 2)
     row["Última atualização"] = updated_at
     row["ONU Nº"] = onu_number
-    row["ONU Tipo"] = get_first_present(item, "modelo", "tipo_onu") or row.get("ONU Tipo")
-    row["IP"] = get_first_present(item, "ip") or row.get("IP")
+    row["ONU Tipo"] = get_first_present(item, "modelo", "tipo_onu", "onu_tipo") or row.get("ONU Tipo")
+    row["IP"] = get_first_present(item, "ip", "ip_gerencia") or row.get("IP")
+    row["Porta FTTH"] = parse_int(get_first_present(item, "porta_ftth")) or row.get("Porta FTTH")
+    row["VLAN"] = parse_int(get_first_present(item, "vlan")) or row.get("VLAN")
+    row["Causa ??ltima queda"] = get_first_present(item, "causa_ultima_queda") or row.get("Causa ??ltima queda")
 
     return row
 
@@ -219,6 +239,7 @@ def build_base_onus(records, previous_rows):
             "PON ID": None,
             "PON Grupo": None,
             "ID ONU Fibra": None,
+            "ID Login": None,
             "Nome Cliente": None,
             "Login": None,
             "MAC/Serial": None,

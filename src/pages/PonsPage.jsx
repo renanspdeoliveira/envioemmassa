@@ -11,10 +11,11 @@ export default function PonsPage() {
 
   const { data, loading, error } = useApi(
     () => api.pons({ ...(olt && { olt }), ...(slot && { slot }), limit: 300 }),
-    [olt, slot]
+    [olt, slot],
+    { refreshInterval: 30000 }
   )
 
-  const { data: stats } = useApi(() => api.stats())
+  const { data: stats } = useApi(() => api.stats(), [], { refreshInterval: 30000 })
 
   const slots = [...new Set((data?.data || []).map(p => p.Slot))].sort((a, b) => a - b)
 

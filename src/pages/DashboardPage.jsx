@@ -24,9 +24,9 @@ function CustomTooltip({ active, payload, label }) {
 }
 
 export default function DashboardPage() {
-  const { data: stats, loading, error } = useApi(() => api.stats())
-  const { data: rxData } = useApi(() => api.chartRxSlot())
-  const { data: rxDist } = useApi(() => api.chartRxDist())
+  const { data: stats, loading, error } = useApi(() => api.stats(), [], { refreshInterval: 30000 })
+  const { data: rxData } = useApi(() => api.chartRxSlot(), [], { refreshInterval: 30000 })
+  const { data: rxDist } = useApi(() => api.chartRxDist(), [], { refreshInterval: 30000 })
 
   if (loading) return <Spinner />
   if (error) return <ErrorMsg message={error} />
@@ -49,7 +49,7 @@ export default function DashboardPage() {
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 12, marginBottom: 24 }}>
         <StatCard label="Total de ONUs" value={stats.total?.toLocaleString('pt-BR')} sub="todos os equipamentos" icon={Wifi} color="blue" />
-        <StatCard label="Autorizadas" value={stats.autorizadas?.toLocaleString('pt-BR')} sub={`${((stats.autorizadas / stats.total) * 100).toFixed(1)}% do total`} icon={CheckCircle} color="green" />
+        <StatCard label="ONU online" value={stats.online?.toLocaleString('pt-BR')} sub={`${stats.total ? ((stats.online / stats.total) * 100).toFixed(1) : '0.0'}% da base com sinal`} icon={CheckCircle} color="green" />
         <Link to="/onus-desautorizadas" style={{ textDecoration: 'none' }}>
           <StatCard label="Pedindo autenticacao" value={stats.desautorizadas?.toLocaleString('pt-BR')} sub="abrir lista de ONUs" icon={AlertTriangle} color="amber" />
         </Link>

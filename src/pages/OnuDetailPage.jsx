@@ -6,15 +6,15 @@ import { ArrowLeft, Router, Signal, Wifi } from 'lucide-react'
 
 function InfoRow({ label, value, mono = false }) {
   return (
-    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 0', borderBottom: '1px solid var(--border-subtle)' }}>
+    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, padding: '8px 0', borderBottom: '1px solid var(--border-subtle)' }}>
       <span style={{ fontSize: 12, color: 'var(--text-secondary)', fontWeight: 500 }}>{label}</span>
-      <span style={{ fontSize: 13, color: 'var(--text-primary)', fontFamily: mono ? 'var(--font-mono)' : 'inherit' }}>{value || '-'}</span>
+      <span style={{ fontSize: 13, color: 'var(--text-primary)', fontFamily: mono ? 'var(--font-mono)' : 'inherit', textAlign: 'right' }}>{value || '-'}</span>
     </div>
   )
 }
 
 function getDisplayClientName(onu) {
-  const name = onu?.['Nome Cliente']
+  const name = onu?.nome_formatado || onu?.['Nome Cliente']
   const mac = onu?.['MAC/Serial']
   if (!name) return 'ONU sem cliente vinculado'
   if (mac && String(name).trim().toUpperCase() === String(mac).trim().toUpperCase()) return 'ONU sem cliente vinculado'
@@ -28,10 +28,18 @@ function getDisplayOlt(onu) {
   return olt
 }
 
+function fmtPhone(d) {
+  if (!d) return '-'
+  const n = String(d).replace(/\D/g, '').replace(/^55/, '')
+  if (n.length === 11) return `(${n.slice(0, 2)}) ${n.slice(2, 7)}-${n.slice(7)}`
+  if (n.length === 10) return `(${n.slice(0, 2)}) ${n.slice(2, 6)}-${n.slice(6)}`
+  return d
+}
+
 export default function OnuDetailPage() {
   const { mac } = useParams()
   const navigate = useNavigate()
-  const { data, loading, error } = useApi(() => api.onuDetail(mac), [mac])
+  const { data, loading, error } = useApi(() => api.onuDetail(mac), [mac], { refreshInterval: 30000 })
 
   if (loading) return <Spinner />
   if (error) return <ErrorMsg message={error} />
@@ -56,9 +64,10 @@ export default function OnuDetailPage() {
           <h1 style={{ fontSize: 20, fontWeight: 600, color: 'var(--text-primary)' }}>{displayName}</h1>
           <div style={{ display: 'flex', gap: 8, marginTop: 6, flexWrap: 'wrap' }}>
             <StatusBadge status={onu['Status ONU']} />
-            <PotenciaBadge value={onu['Potência']} || onu['PotÃªncia']} />
+            <PotenciaBadge value={onu['PotÃªncia'] || onu['PotÃƒÂªncia']} />
             {displayOlt && <Badge color="blue">{displayOlt}</Badge>}
             {displayPonId && <Badge color="gray">PON {displayPonId}</Badge>}
+            {onu.online && <Badge color="green">Online</Badge>}
           </div>
         </div>
       </div>
@@ -68,12 +77,14 @@ export default function OnuDetailPage() {
           <CardHeader title="Dados do Cliente" icon={Router} />
           <div style={{ padding: '4px 18px 16px' }}>
             <InfoRow label="Nome" value={displayName} />
-            <InfoRow label="Login" value={onu['Login']} mono />
+            <InfoRow label="Login" value={onu.Login} mono />
+            <InfoRow label="ID Login" value={onu['ID Login']} mono />
+            <InfoRow label="WhatsApp" value={fmtPhone(onu.whatsapp)} mono />
             <InfoRow label="MAC / Serial" value={onu['MAC/Serial']} mono />
-            <InfoRow label="ONU Nº" value={onu['ONU Nº'] || onu['ONU NÂº']} mono />
+            <InfoRow label="ONU N" value={onu['ONU NÂº'] || onu['ONU NÃ‚Âº']} mono />
             <InfoRow label="Tipo ONU" value={onu['ONU Tipo']} />
             <InfoRow label="VLAN" value={onu.VLAN ? Math.round(onu.VLAN) : '-'} mono />
-            <InfoRow label="Última atualização" value={onu['Última atualização'] || onu['Ãšltima atualizaÃ§Ã£o']} />
+            <InfoRow label="Ultima atualizacao" value={onu['Ãšltima atualizaÃ§Ã£o'] || onu['ÃƒÅ¡ltima atualizaÃƒÂ§ÃƒÂ£o']} />
           </div>
         </Card>
 
@@ -87,20 +98,20 @@ export default function OnuDetailPage() {
             <InfoRow label="PON Grupo" value={onu['PON Grupo']} />
             <InfoRow label="Sinal RX" value={<RxBadge value={onu['Sinal RX']} />} />
             <InfoRow label="Sinal TX" value={<RxBadge value={onu['Sinal TX']} />} />
-            <InfoRow label="Potência" value={<PotenciaBadge value={onu['Potência'] || onu['PotÃªncia']} />} />
+            <InfoRow label="Potencia" value={<PotenciaBadge value={onu['PotÃªncia'] || onu['PotÃƒÂªncia']} />} />
           </div>
         </Card>
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16 }}>
         <Card>
-          <CardHeader title="Localização Física" />
+          <CardHeader title="Localizacao Fisica" />
           <div style={{ padding: '4px 18px 16px' }}>
             <InfoRow label="POP" value={onu.POP} />
             <InfoRow label="Caixa FTTH / CTO" value={onu['Caixa FTTH/CTO']} mono />
             <InfoRow label="Porta FTTH" value={onu['Porta FTTH']} />
             <InfoRow label="ID ONU Fibra" value={onu['ID ONU Fibra']} mono />
-            <InfoRow label="Causa última queda" value={onu['Causa última queda'] || onu['Causa Ãºltima queda'] || 'Sem registro'} />
+            <InfoRow label="Causa ultima queda" value={onu['Causa Ãºltima queda'] || onu['Causa ÃƒÂºltima queda'] || 'Sem registro'} />
           </div>
         </Card>
 
@@ -111,7 +122,7 @@ export default function OnuDetailPage() {
               <InfoRow label="Total ONUs" value={ponSummary['Total ONUs']} />
               <InfoRow label="Autorizadas" value={<Badge color="green">{ponSummary.Autorizadas}</Badge>} />
               <InfoRow label="Pedindo autenticacao" value={ponSummary.Desautorizadas > 0 ? <Badge color="red">{ponSummary.Desautorizadas}</Badge> : '0'} />
-              <InfoRow label="Sinal RX médio" value={<RxBadge value={ponSummary['Sinal RX médio'] || ponSummary['Sinal RX mÃ©dio']} />} />
+              <InfoRow label="Sinal RX medio" value={<RxBadge value={ponSummary['Sinal RX mÃ©dio'] || ponSummary['Sinal RX mÃƒÂ©dio']} />} />
               <InfoRow label="Pior RX" value={<RxBadge value={ponSummary['Pior RX']} />} />
               <InfoRow label="Sem leitura RX" value={ponSummary['Sem leitura RX/zero']} />
             </div>
@@ -121,12 +132,12 @@ export default function OnuDetailPage() {
 
       {siblings?.length > 0 && (
         <Card>
-          <CardHeader title={`Outras ONUs na mesma PON (${siblings.length} mostradas)`} />
+          <CardHeader title={`Outras ONUs na mesma PON (${siblings.length} mostradas)`} subtitle="Nome, MAC e WhatsApp da mesma PON" />
           <div style={{ overflowX: 'auto' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
               <thead>
                 <tr>
-                  {['Cliente', 'Login', 'MAC/Serial', 'Status', 'Sinal RX', 'Potência'].map(h => (
+                  {['Cliente / MAC', 'Login', 'WhatsApp', 'Status', 'Sinal RX', 'Potencia'].map(h => (
                     <th key={h} style={{ padding: '9px 12px', textAlign: 'left', fontSize: 11, color: 'var(--text-secondary)', background: 'var(--bg-secondary)', borderBottom: '1px solid var(--border)', textTransform: 'uppercase', letterSpacing: '.05em', fontWeight: 500 }}>{h}</th>
                   ))}
                 </tr>
@@ -140,12 +151,15 @@ export default function OnuDetailPage() {
                     onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-hover)'}
                     onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
                   >
-                    <td style={td}>{getDisplayClientName(s)}</td>
+                    <td style={{ ...td, minWidth: 240, whiteSpace: 'normal' }}>
+                      <div style={{ fontWeight: 500 }}>{getDisplayClientName(s)}</div>
+                      <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--text-secondary)', marginTop: 2 }}>{s['MAC/Serial'] || '-'}</div>
+                    </td>
                     <td style={{ ...td, fontFamily: 'var(--font-mono)', fontSize: 12 }}>{s.Login || '-'}</td>
-                    <td style={{ ...td, fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--text-secondary)' }}>{s['MAC/Serial'] || '-'}</td>
+                    <td style={{ ...td, fontFamily: 'var(--font-mono)', fontSize: 12, color: s.whatsapp ? 'var(--green-text)' : 'var(--text-tertiary)' }}>{fmtPhone(s.whatsapp)}</td>
                     <td style={td}><StatusBadge status={s['Status ONU']} /></td>
                     <td style={td}><RxBadge value={s['Sinal RX']} /></td>
-                    <td style={td}><PotenciaBadge value={s['Potência'] || s['PotÃªncia']} /></td>
+                    <td style={td}><PotenciaBadge value={s['PotÃªncia'] || s['PotÃƒÂªncia']} /></td>
                   </tr>
                 ))}
               </tbody>
