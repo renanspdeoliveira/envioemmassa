@@ -49,7 +49,6 @@ export default function LoginPage() {
             <img src="./Logo-Futuranet.png" alt="Logo Futuranet" style={logo} />
           </div>
           
-          <div style={subline}>Entre com seu usuario para acessar a operacao da rede.</div>
         </div>
 
         <form onSubmit={handleSubmit} style={form}>
