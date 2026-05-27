@@ -1,9 +1,8 @@
-import { Link } from 'react-router-dom'
 import { useApi } from '../hooks/useApi'
 import { api } from '../utils/api'
 import { StatCard, Card, CardHeader, Spinner, ErrorMsg, Badge } from '../components/UI'
 import { PageHeader } from '../components/UI'
-import { Activity, AlertTriangle, CheckCircle, Radio, Server, Wifi, WifiOff } from 'lucide-react'
+import { CheckCircle, Radio, Server, Wifi, WifiOff } from 'lucide-react'
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell
@@ -50,13 +49,8 @@ export default function DashboardPage() {
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 12, marginBottom: 24 }}>
         <StatCard label="Total de ONUs" value={stats.total?.toLocaleString('pt-BR')} sub="todos os equipamentos" icon={Wifi} color="blue" />
         <StatCard label="ONU online" value={stats.online?.toLocaleString('pt-BR')} sub={`${stats.total ? ((stats.online / stats.total) * 100).toFixed(1) : '0.0'}% da base com sinal`} icon={CheckCircle} color="green" />
-        <Link to="/onus-desautorizadas" style={{ textDecoration: 'none' }}>
-          <StatCard label="Pedindo autenticacao" value={stats.desautorizadas?.toLocaleString('pt-BR')} sub="abrir lista de ONUs" icon={AlertTriangle} color="amber" />
-        </Link>
-        <StatCard label="Irregulares" value={stats.irregulares?.toLocaleString('pt-BR')} sub="sinal fora do padrao" icon={AlertTriangle} color="amber" />
         <StatCard label="Alertas offline" value={stats.offlineAtencao} sub="ONUs para atencao" icon={WifiOff} color="red" />
         <StatCard label="Total de PONs" value={stats.totalPons} sub={`${stats.semLeituraRx} sem leitura RX`} icon={Radio} color="blue" />
-        <StatCard label="RX medio" value={stats.avgRx ? `${stats.avgRx} dBm` : '-'} sub={`pior: ${stats.worstRx} dBm`} icon={Activity} />
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16 }}>

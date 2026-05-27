@@ -77,6 +77,15 @@ def parse_int(value):
     return int(match.group(0)) if match else None
 
 
+def looks_like_customer_login(value):
+    text = norm_text(value)
+    if not text:
+        return False
+    if text.isdigit():
+        return False
+    return bool(re.search(r"[a-zA-Z]", text))
+
+
 def normalize_status(value):
     status = norm_text(value).lower()
     if not status:
@@ -107,6 +116,8 @@ def split_pon_parts(item, previous):
         item.get("pon"),
         item.get("slot_pon"),
         item.get("interface_pon"),
+        item.get("ponid"),
+        f"{item.get('slotno', '')}-{item.get('ponno', '')}",
         previous.get("PON ID"),
     ]
 
@@ -119,6 +130,10 @@ def split_pon_parts(item, previous):
             return numbers[-2], numbers[-1], f"1-1-{numbers[-2]}-{numbers[-1]}"
         if len(numbers) >= 2:
             return numbers[-2], numbers[-1], None
+    slot = parse_int(item.get("slotno"))
+    pon = parse_int(item.get("ponno"))
+    if slot is not None and pon is not None:
+        return slot, pon, item.get("ponid") or f"1-1-{slot}-{pon}"
 
     return previous.get("Slot"), previous.get("PON"), previous.get("PON ID")
 
@@ -166,7 +181,8 @@ def merge_onu(item, previous):
 
     slot, pon, pon_id = split_pon_parts(item, row)
     olt = get_first_present(item, "olt") or row.get("OLT")
-    login = get_first_present(item, "login", "usuario", "username", "login_pppoe") or row.get("Login")
+    login_candidate = get_first_present(item, "login", "usuario", "username", "login_pppoe", "login_onu_cliente")
+    login = login_candidate if looks_like_customer_login(login_candidate) else row.get("Login")
     login_id = parse_int(get_first_present(item, "id_login", "id_cliente_login", "id_cliente")) or row.get("ID Login")
     mac = get_first_present(item, "mac") or row.get("MAC/Serial")
     client_name = get_first_present(item, "nome", "cliente", "nome_cliente") or row.get("Nome Cliente")
