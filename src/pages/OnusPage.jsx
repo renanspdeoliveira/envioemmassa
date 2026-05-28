@@ -80,7 +80,7 @@ export default function OnusPage() {
     return sort.dir === 'asc' ? <ChevronUp size={12} /> : <ChevronDown size={12} />
   }
 
-  const th = (col) => ({
+  const th = () => ({
     padding: '10px 12px',
     textAlign: 'left',
     fontWeight: 500,
@@ -105,8 +105,6 @@ export default function OnusPage() {
     { key: 'Status ONU', label: 'Status' },
     { key: 'Sinal RX', label: 'Sinal RX' },
     { key: 'whatsapp', label: 'WhatsApp' },
-    { key: 'bairro', label: 'Bairro' },
-    { key: 'Caixa FTTH/CTO', label: 'CTO' },
   ]
 
   const slotOptions = filters.olt ? (stats?.slotsByOlt?.[filters.olt] || []) : []
@@ -147,7 +145,7 @@ export default function OnusPage() {
           <div style={{ position: 'relative', flex: '0 0 280px' }}>
             <Search size={14} style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-tertiary)', pointerEvents: 'none' }} />
             <Input
-              placeholder="Buscar nome, login, MAC, CTO... (qualquer letra)"
+              placeholder="Buscar nome, login, ID ou MAC..."
               style={{ paddingLeft: 32, width: '100%' }}
               value={filters.search}
               onChange={e => { setFilters(f => ({ ...f, search: e.target.value })); debSearch(e.target.value) }}
@@ -226,12 +224,6 @@ export default function OnusPage() {
                           ? <span style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--green-text)' }}>{fmtPhone(row.whatsapp)}</span>
                           : <span style={{ fontSize: 11, color: 'var(--text-tertiary)' }}>—</span>}
                       </td>
-                      <td style={td}>
-                        {row.bairro
-                          ? <Badge color="green" size="sm">{row.bairro}</Badge>
-                          : <span style={{ fontSize: 11, color: 'var(--text-tertiary)' }}>—</span>}
-                      </td>
-                      <td style={{ ...td, fontSize: 12, color: 'var(--text-secondary)' }}>{row['Caixa FTTH/CTO'] || '—'}</td>
                     </tr>
                   ))}
                 </tbody>

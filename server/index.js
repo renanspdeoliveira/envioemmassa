@@ -69,6 +69,24 @@ function formatClientName(raw) {
     .toUpperCase();
 }
 
+function canonicalClientName(raw) {
+  if (!raw) return '';
+  return normStr(
+    String(raw)
+      .replace(/^\s*[\d./-]+\s*/g, '')
+      .replace(/[_-]/g, ' ')
+      .replace(/\bPONTO\s*(?:\d+|[IVXLCDM]+)\b/gi, ' ')
+      .replace(/\bPONTO\b/gi, ' ')
+      .replace(/\bPONO\s*(?:\d+|[IVXLCDM]+)\b/gi, ' ')
+      .replace(/\bESCRITORIO\b/gi, ' ')
+      .replace(/\bCASA\b/gi, ' ')
+      .replace(/\bONT\b/gi, ' ')
+      .replace(/[^\p{L}\p{N}\s]/gu, ' ')
+      .replace(/\s+/g, ' ')
+      .trim()
+  );
+}
+
 function formatPhone(raw) {
   if (!raw) return '';
   const d = String(raw).replace(/\D/g, '');
@@ -131,37 +149,48 @@ function buildBaseOnuIndex(records) {
 function buildLoginIndex(report) {
   const exactByName = new Map();
   const uniqueByFormattedName = new Map();
+  const uniqueByCanonicalName = new Map();
   const duplicateFormattedNames = new Set();
+  const duplicateCanonicalNames = new Set();
   const byContractId = new Map();
   const duplicateContractIds = new Set();
 
   for (const [login, info] of Object.entries(report?.by_login || {})) {
     const exactName = normStr(info?.nome);
     const formattedName = normStr(formatClientName(info?.nome));
+    const canonicalName = canonicalClientName(info?.nome);
     const contractId = String(info?.id_contrato || '').trim();
 
     if (exactName && !exactByName.has(exactName)) exactByName.set(exactName, login);
-    if (!formattedName) continue;
-
-    if (uniqueByFormattedName.has(formattedName) && uniqueByFormattedName.get(formattedName) !== login) {
-      duplicateFormattedNames.add(formattedName);
-      uniqueByFormattedName.delete(formattedName);
-      continue;
+    if (formattedName) {
+      if (uniqueByFormattedName.has(formattedName) && uniqueByFormattedName.get(formattedName) !== login) {
+        duplicateFormattedNames.add(formattedName);
+        uniqueByFormattedName.delete(formattedName);
+      } else if (!duplicateFormattedNames.has(formattedName)) {
+        uniqueByFormattedName.set(formattedName, login);
+      }
     }
 
-    if (!duplicateFormattedNames.has(formattedName)) uniqueByFormattedName.set(formattedName, login);
-
-    if (!contractId) continue;
-    if (byContractId.has(contractId) && byContractId.get(contractId) !== login) {
-      duplicateContractIds.add(contractId);
-      byContractId.delete(contractId);
-      continue;
+    if (canonicalName) {
+      if (uniqueByCanonicalName.has(canonicalName) && uniqueByCanonicalName.get(canonicalName) !== login) {
+        duplicateCanonicalNames.add(canonicalName);
+        uniqueByCanonicalName.delete(canonicalName);
+      } else if (!duplicateCanonicalNames.has(canonicalName)) {
+        uniqueByCanonicalName.set(canonicalName, login);
+      }
     }
 
-    if (!duplicateContractIds.has(contractId)) byContractId.set(contractId, login);
+    if (contractId) {
+      if (byContractId.has(contractId) && byContractId.get(contractId) !== login) {
+        duplicateContractIds.add(contractId);
+        byContractId.delete(contractId);
+      } else if (!duplicateContractIds.has(contractId)) {
+        byContractId.set(contractId, login);
+      }
+    }
   }
 
-  return { exactByName, uniqueByFormattedName, byContractId };
+  return { exactByName, uniqueByFormattedName, uniqueByCanonicalName, byContractId };
 }
 
 let rawOnuIndex = buildRawOnuIndex(rawIxcData.registros || []);
@@ -208,16 +237,21 @@ baseOnuIndex = buildBaseOnuIndex(baseOnus);
 function enrichOnu(r) {
   const loginKey = (r.Login || '').toLowerCase();
   const nomeFmt  = formatClientName(r['Nome Cliente'] || '');
+  const idLoginKey = String(r['ID Login'] || '').trim();
   const manual   = clientesMap[loginKey]              || {};
   // Priority: by_login (exact) → by_nome (fallback for unmatched)
   const byLogin  = relatorio.by_login?.[loginKey]     || {};
   const byNome   = relatorio.by_nome?.[nomeFmt]        || {};
-  const contrato = Object.keys(byLogin).length ? byLogin : byNome;
+  const byId     = relatorio.by_id?.[idLoginKey]       || {};
+  const contrato = Object.keys(byLogin).length ? byLogin : (Object.keys(byNome).length ? byNome : byId);
   return {
     ...r,
     nome_formatado: nomeFmt,
     whatsapp: manual.whatsapp || contrato.whatsapp || '',
     bairro:   bairroMap[loginKey] || contrato.bairro || '',
+    cliente_nome_ixc: manual.name || contrato.nome || '',
+    cliente_id_ixc: manual.id_cliente || '',
+    contrato_id_ixc: manual.id_contrato || contrato.id_contrato || '',
     online: isOnlineOnu(r),
   };
 }
@@ -232,12 +266,19 @@ function hydrateOnu(r) {
   const ponId = r['PON ID'] || rawMatch?.ponid || (slot !== null && pon !== null ? `1-1-${slot}-${pon}` : null);
   const nomeOriginal = r['Nome Cliente'] || rawMatch?.nome || '';
   const nomeFmt = formatClientName(nomeOriginal);
+  const nomeCanonical = canonicalClientName(nomeOriginal);
   const byNome = relatorio.by_nome?.[nomeFmt] || {};
+  const byId = relatorio.by_id?.[String(r['ID Login'] || '').trim()] || {};
   const contractLogin = loginIndex.byContractId.get(String(byNome.id_contrato || '').trim());
+  const directContractLogin = loginIndex.byContractId.get(String(r['ID Login'] || '').trim());
+  const byIdContractLogin = loginIndex.byContractId.get(String(byId.id_contrato || '').trim());
   const inferredLogin =
     r.Login ||
+    directContractLogin ||
     loginIndex.exactByName.get(normStr(nomeOriginal)) ||
     loginIndex.uniqueByFormattedName.get(normStr(nomeFmt)) ||
+    loginIndex.uniqueByCanonicalName.get(nomeCanonical) ||
+    byIdContractLogin ||
     contractLogin ||
     '';
   const hydrated = enrichOnu({
@@ -253,6 +294,51 @@ function hydrateOnu(r) {
 
   if (!hydrated.nome_formatado) hydrated.nome_formatado = nomeFmt;
   return hydrated;
+}
+
+function matchesOnuSearch(row, rawQuery) {
+  const query = String(rawQuery || '').trim();
+  if (!query) return true;
+
+  const s = normStr(query);
+  const numericQuery = query.replace(/\D/g, '');
+  const fields = [
+    String(row['ID Login'] || ''),
+    String(row['ID ONU Fibra'] || ''),
+    String(row.cliente_id_ixc || ''),
+    String(row.contrato_id_ixc || ''),
+    String(row['MAC/Serial'] || ''),
+    String(row['PON ID'] || ''),
+    String(row.Login || ''),
+    String(row['Nome Cliente'] || ''),
+    String(row.nome_formatado || ''),
+    String(row.cliente_nome_ixc || ''),
+    `${row['ID Login'] || ''} ${row['Nome Cliente'] || ''}`,
+    `${row['ID Login'] || ''} - ${row['Nome Cliente'] || ''}`,
+    `${row.cliente_id_ixc || ''} ${row.cliente_nome_ixc || ''}`,
+    `${row.cliente_id_ixc || ''} - ${row.cliente_nome_ixc || ''}`,
+    `${row['ID ONU Fibra'] || ''} ${row['Nome Cliente'] || ''}`,
+    `${row['ID ONU Fibra'] || ''} - ${row['Nome Cliente'] || ''}`,
+    String(row['Caixa FTTH/CTO'] || ''),
+  ];
+
+  if (fields.some(value => normStr(value).includes(s))) return true;
+  if (canonicalClientName(row['Nome Cliente'] || '').includes(s)) return true;
+  if (canonicalClientName(row.cliente_nome_ixc || '').includes(s)) return true;
+
+  if (numericQuery) {
+    const numericFields = [
+      String(row['ID Login'] || '').replace(/\D/g, ''),
+      String(row['ID ONU Fibra'] || '').replace(/\D/g, ''),
+      String(row.cliente_id_ixc || '').replace(/\D/g, ''),
+      String(row.contrato_id_ixc || '').replace(/\D/g, ''),
+      String(row['MAC/Serial'] || '').replace(/\D/g, ''),
+    ].filter(Boolean);
+
+    if (numericFields.some(value => value === numericQuery || value.includes(numericQuery))) return true;
+  }
+
+  return false;
 }
 
 function paginate(arr, page, limit) {
@@ -574,21 +660,7 @@ function filterOnus(q) {
   }
   if (q.ponId)  list = list.filter(r => r['PON ID']    === q.ponId);
   if (q.search) {
-    const s = normStr(q.search);
-    list = list.filter(r =>
-      normStr(String(r['ID Login'] || '')).includes(s) ||
-      normStr(String(r['ID ONU Fibra'] || '')).includes(s) ||
-      normStr(`${r['ID Login'] || ''} ${r['Nome Cliente'] || ''}`).includes(s) ||
-      normStr(`${r['ID Login'] || ''} - ${r['Nome Cliente'] || ''}`).includes(s) ||
-      normStr(`${r['ID ONU Fibra'] || ''} ${r['Nome Cliente'] || ''}`).includes(s) ||
-      normStr(`${r['ID ONU Fibra'] || ''} - ${r['Nome Cliente'] || ''}`).includes(s) ||
-      normStr(r['Nome Cliente']).includes(s) ||
-      normStr(formatClientName(r['Nome Cliente'] || '')).includes(s) ||
-      normStr(r.Login).includes(s) ||
-      normStr(r['MAC/Serial']).includes(s) ||
-      normStr(r['PON ID']).includes(s) ||
-      normStr(r['Caixa FTTH/CTO']).includes(s)
-    );
+    list = list.filter(r => matchesOnuSearch(r, q.search));
   }
   if (q.sortBy) {
     const dir = q.sortDir === 'desc' ? -1 : 1;
@@ -597,6 +669,29 @@ function filterOnus(q) {
       return typeof va === 'number' ? dir*(va-vb) : dir*String(va).localeCompare(String(vb));
     });
   }
+  return list;
+}
+
+async function resolveOnusSearch(q) {
+  let list = filterOnus(q);
+  const search = String(q?.search || '').trim();
+  const numericSearch = search.replace(/\D/g, '');
+
+  if (!list.length && numericSearch && ixc?.lookupClientById) {
+    const { data } = await ixc.lookupClientById(numericSearch);
+    if (data) {
+      const hydrated = baseOnus.map(hydrateOnu);
+      const candidateLogins = new Set((data.logins || []).map(login => String(login).toLowerCase()));
+      list = hydrated.filter(row =>
+        String(row.cliente_id_ixc || '') === String(data.id_cliente || '') ||
+        String(row.contrato_id_ixc || '') === String(data.id_contrato || '') ||
+        candidateLogins.has(String(row.Login || '').toLowerCase()) ||
+        canonicalClientName(row.cliente_nome_ixc || '').includes(canonicalClientName(data.name || '')) ||
+        canonicalClientName(row['Nome Cliente'] || '').includes(canonicalClientName(data.name || ''))
+      );
+    }
+  }
+
   return list;
 }
 
@@ -689,8 +784,8 @@ app.get('/api/clients-24h-offline', safe(async (req, res) => {
   }
 }));
 
-app.get('/api/onus', safe((req, res) => {
-  res.json(paginate(filterOnus(req.query), req.query.page, req.query.limit));
+app.get('/api/onus', safe(async (req, res) => {
+  res.json(paginate(await resolveOnusSearch(req.query), req.query.page, req.query.limit));
 }));
 
 app.get('/api/onus/export', safe((req, res) => {
@@ -917,28 +1012,28 @@ app.post('/api/ixc/config', safe((req,res)=>{
 }));
 app.post('/api/ixc/test',    safe(async(req,res)=>{ res.json(await ixc.testConnection()); }));
 app.post('/api/ixc/sync',    safe(async(req,res)=>{
-  const logins=[...new Set(baseOnus.map(r=>(r.Login||'').toLowerCase()).filter(Boolean))];
+  const logins=[...new Set(baseOnus.map(hydrateOnu).map(r=>(r.Login||'').toLowerCase()).filter(Boolean))];
   const {results,errors}=await ixc.syncContactsByLogins(logins);
   let updated=0;
-  Object.entries(results).forEach(([l,d])=>{ clientesMap[l]={name:d.name||'',whatsapp:d.whatsapp||''}; if(d.whatsapp)updated++; });
+  Object.entries(results).forEach(([l,d])=>{ clientesMap[l]={name:d.name||'',whatsapp:d.whatsapp||'',id_cliente:d.id_cliente||'',id_contrato:d.id_contrato||''}; if(d.whatsapp)updated++; });
   saveClientes();
   res.json({ok:true,loginsProcessed:logins.length,matched:Object.keys(results).length,withPhone:updated,errors:errors.length?errors:undefined});
 }));
 app.post('/api/ixc/sync-pon', safe(async(req,res)=>{
   const {olt,slot,pon}=req.body;
   if (!olt||!slot||!pon) return res.status(400).json({error:'olt, slot, pon obrigatórios'});
-  const logins=[...new Set(baseOnus.filter(r=>r.OLT===olt&&String(r.Slot)===String(slot)&&String(r.PON)===String(pon)).map(r=>(r.Login||'').toLowerCase()).filter(Boolean))];
+  const logins=[...new Set(baseOnus.map(hydrateOnu).filter(r=>r.OLT===olt&&String(r.Slot)===String(slot)&&String(r.PON)===String(pon)).map(r=>(r.Login||'').toLowerCase()).filter(Boolean))];
   if (!logins.length) return res.json({ok:true,matched:0});
   const {results,errors}=await ixc.syncContactsByLogins(logins);
   let updated=0;
-  Object.entries(results).forEach(([l,d])=>{ clientesMap[l]={name:d.name||'',whatsapp:d.whatsapp||''}; if(d.whatsapp)updated++; });
+  Object.entries(results).forEach(([l,d])=>{ clientesMap[l]={name:d.name||'',whatsapp:d.whatsapp||'',id_cliente:d.id_cliente||'',id_contrato:d.id_contrato||''}; if(d.whatsapp)updated++; });
   saveClientes();
   res.json({ok:true,ponLabel:`${olt} Slot ${slot} PON ${pon}`,loginsFound:logins.length,matched:Object.keys(results).length,withPhone:updated,errors:errors.length?errors:undefined});
 }));
 app.get('/api/ixc/lookup/:login', safe(async(req,res)=>{
   const login=decodeURIComponent(req.params.login).toLowerCase();
   const {data,errors}=await ixc.lookupLogin(login);
-  if (data){clientesMap[login]={name:data.name||'',whatsapp:data.whatsapp||''};saveClientes();}
+  if (data){clientesMap[login]={name:data.name||'',whatsapp:data.whatsapp||'',id_cliente:data.id_cliente||'',id_contrato:data.id_contrato||''};saveClientes();}
   res.json({data,errors,login});
 }));
 
