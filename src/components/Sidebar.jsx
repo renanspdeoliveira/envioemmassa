@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom'
-import { Activity, ChevronRight, Database, LayoutDashboard, LogOut, Send } from 'lucide-react'
+import { Activity, ChevronRight, Database, LayoutDashboard, LogOut, Send, WifiOff } from 'lucide-react'
 import { useAuth } from '../auth/AuthProvider'
 import { supabase } from '../lib/supabase'
 
@@ -7,6 +7,7 @@ const links = [
   { to: '/', label: 'Dashboard', icon: LayoutDashboard, description: 'Visao geral da rede' },
   { to: '/onus', label: 'Base de ONUs', icon: Database, description: 'Consulta e acompanhamento' },
   { to: '/sinal', label: 'Analise de Sinal', icon: Activity, description: 'Faixas e qualidade optica' },
+  { to: '/clientes-24h-offline', label: 'Clientes 24h Offline', icon: WifiOff, description: 'Ativos e nao ativos com 24h+' },
 ]
 
 const bottom = [

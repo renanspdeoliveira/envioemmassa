@@ -33,6 +33,7 @@ const REL_FILE  = path.join(__dirname, 'relatorio_clientes.json');
 const BRR_FILE  = path.join(__dirname, 'bairros.json');
 const CLI_FILE  = path.join(__dirname, 'clientes.json');
 const RAW_IXC_FILE = path.join(__dirname, 'ixc_radpop_raw.json');
+const SCRIPT_24H_FILE = path.join(__dirname, '..', 'script_24horas_cliente.py');
 const REMOVED_ONU_MACS = new Set([
   'FHTT03dd9700',
   'FHTT91f3d050',
@@ -111,6 +112,22 @@ function buildRawOnuIndex(records) {
   return { byMac, byLoginId };
 }
 
+function buildBaseOnuIndex(records) {
+  const byLogin = new Map();
+  const byLoginId = new Map();
+
+  for (const row of records || []) {
+    const hydrated = hydrateOnu(row);
+    const login = String(hydrated?.Login || '').trim().toLowerCase();
+    const loginId = parseIntSafe(hydrated?.['ID Login']);
+
+    if (login && !byLogin.has(login)) byLogin.set(login, hydrated);
+    if (loginId !== null && !byLoginId.has(String(loginId))) byLoginId.set(String(loginId), hydrated);
+  }
+
+  return { byLogin, byLoginId };
+}
+
 function buildLoginIndex(report) {
   const exactByName = new Map();
   const uniqueByFormattedName = new Map();
@@ -149,6 +166,7 @@ function buildLoginIndex(report) {
 
 let rawOnuIndex = buildRawOnuIndex(rawIxcData.registros || []);
 let loginIndex = buildLoginIndex(relatorio);
+let baseOnuIndex = { byLogin: new Map(), byLoginId: new Map() };
 
 function isPendingAuthStatus(status) {
   const normalized = normStr(status);
@@ -185,6 +203,7 @@ function applyOnuFilters() {
 }
 
 applyOnuFilters();
+baseOnuIndex = buildBaseOnuIndex(baseOnus);
 
 function enrichOnu(r) {
   const loginKey = (r.Login || '').toLowerCase();
@@ -242,6 +261,290 @@ function paginate(arr, page, limit) {
   return { data: arr.slice((page-1)*limit, page*limit), total: arr.length, pages: Math.ceil(arr.length/limit)||1, page, limit };
 }
 
+function parseIxcDate(value) {
+  if (!value || value === '0000-00-00 00:00:00') return null;
+  const normalized = String(value).replace(' ', 'T');
+  const parsed = new Date(normalized);
+  return Number.isNaN(parsed.getTime()) ? null : parsed;
+}
+
+function formatOfflineDuration(lastConnectionAt, now = new Date()) {
+  const diffMs = Math.max(0, now.getTime() - lastConnectionAt.getTime());
+  const totalHours = Math.floor(diffMs / 3_600_000);
+  const days = Math.floor(totalHours / 24);
+  const hours = totalHours % 24;
+  return `${String(hours).padStart(2, '0')}h${String(days).padStart(2, '0')}d`;
+}
+
+function formatDateTimePtBr(value) {
+  return value.toLocaleString('pt-BR', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+}
+
+function extractPythonString(source, varName) {
+  const match = source.match(new RegExp(`${varName}\\s*=\\s*["']([^"']+)["']`));
+  return match ? match[1].trim() : '';
+}
+
+function load24hOfflineConfig() {
+  const envConfig = {
+    url: process.env.IXC_URL || '',
+    token: process.env.IXC_TOKEN || '',
+    apiKey: process.env.IXC_API_KEY || '',
+  };
+
+  if (envConfig.url && envConfig.token && envConfig.apiKey) {
+    return envConfig;
+  }
+
+  try {
+    const scriptContents = fs.readFileSync(SCRIPT_24H_FILE, 'utf8');
+    const scriptConfig = {
+      url: extractPythonString(scriptContents, 'IXC_URL'),
+      token: extractPythonString(scriptContents, 'IXC_TOKEN'),
+      apiKey: extractPythonString(scriptContents, 'IXC_API_KEY'),
+    };
+
+    if (scriptConfig.url && scriptConfig.token && scriptConfig.apiKey) {
+      return scriptConfig;
+    }
+  } catch (error) {
+    console.warn('[24h-offline] unable to read python config:', error.message);
+  }
+
+  return {
+    url: '',
+    token: '',
+    apiKey: '',
+  };
+}
+
+function normalizeAtivo(value) {
+  const normalized = normStr(value);
+  if (normalized === 's' || normalized === 'sim' || normalized === 'ativo') return 'Ativo';
+  if (normalized === 'n' || normalized === 'nao' || normalized === 'inativo') return 'Nao ativo';
+  return value || 'Indefinido';
+}
+
+function normalizeOnlineFlag(value) {
+  const normalized = normStr(value);
+  if (normalized === 's' || normalized === 'sim' || normalized === 'online') return 'Online';
+  if (normalized === 'n' || normalized === 'nao' || normalized === 'offline') return 'Offline';
+  return value || 'Indefinido';
+}
+
+let clients24hOfflineCache = {
+  data: [],
+  summary: null,
+  fetchedAt: 0,
+  source: 'unavailable',
+};
+
+async function getClients24hOffline() {
+  const now = Date.now();
+  if (now - clients24hOfflineCache.fetchedAt < 120_000) {
+    return clients24hOfflineCache;
+  }
+
+  const configuredIxc = ixc.ixcConfig?.host && ixc.ixcConfig?.token
+    ? {
+        source: 'ixc-config',
+        promise: ixc.ixcRequest('radusuarios', {
+          qtype: 'radusuarios.online',
+          query: 'N',
+          oper: '=',
+          page: '1',
+          rp: '5000',
+          sortname: 'radusuarios.ultima_conexao_final',
+          sortorder: 'desc',
+          limit: '5000',
+        }),
+      }
+    : null;
+
+  const pythonConfig = load24hOfflineConfig();
+  const configuredScript = pythonConfig.url && pythonConfig.token && pythonConfig.apiKey
+    ? {
+        source: 'python-script',
+        promise: new Promise((resolve, reject) => {
+          const endpoint = new URL('/webservice/v1/radusuarios', pythonConfig.url);
+          const transport = endpoint.protocol === 'http:' ? require('http') : require('https');
+          const auth = 'Basic ' + Buffer.from(`${pythonConfig.token}:${pythonConfig.apiKey}`).toString('base64');
+          const payload = JSON.stringify({
+            qtype: 'radusuarios.online',
+            query: 'N',
+            oper: '=',
+            page: '1',
+            rp: '5000',
+            sortname: 'radusuarios.ultima_conexao_final',
+            sortorder: 'desc',
+          });
+
+          const req = transport.request({
+            protocol: endpoint.protocol,
+            hostname: endpoint.hostname,
+            port: endpoint.port || (endpoint.protocol === 'http:' ? 80 : 443),
+            path: `${endpoint.pathname}${endpoint.search}`,
+            method: 'GET',
+            headers: {
+              'Authorization': auth,
+              'ixcsoft': 'listar',
+              'Content-Type': 'application/json',
+              'Content-Length': Buffer.byteLength(payload),
+            },
+            rejectUnauthorized: false,
+          }, (response) => {
+            let body = '';
+            response.on('data', chunk => body += chunk);
+            response.on('end', () => {
+              try {
+                resolve(JSON.parse(body));
+              } catch (error) {
+                reject(new Error(`Resposta invalida: ${body.slice(0, 200)}`));
+              }
+            });
+          });
+
+          req.on('error', reject);
+          req.setTimeout(20000, () => {
+            req.destroy(new Error('Timeout ao consultar clientes 24h offline'));
+          });
+          req.write(payload);
+          req.end();
+        }),
+      }
+    : null;
+
+  const offlineSource = configuredIxc || configuredScript;
+  if (!offlineSource) {
+    return {
+      data: [],
+      fetchedAt: now,
+      source: 'unconfigured',
+    };
+  }
+
+  const response = await offlineSource.promise;
+
+  const nowDate = new Date();
+  const cutoff = nowDate.getTime() - (24 * 3_600_000);
+  const cutoff20h = nowDate.getTime() - (20 * 3_600_000);
+  const cutoffDate = new Date(cutoff);
+  const startOfDay = new Date(nowDate);
+  startOfDay.setHours(0, 0, 0, 0);
+  const registros = response?.registros || [];
+  const countByAtivo = registros.reduce((acc, cliente) => {
+    const key = normalizeAtivo(cliente?.ativo);
+    acc[key] = (acc[key] || 0) + 1;
+    return acc;
+  }, {});
+
+  const data = registros
+    .map((cliente) => {
+      const lastConnectionAt = parseIxcDate(cliente?.ultima_conexao_final);
+      if (!lastConnectionAt) return null;
+
+      const login = String(cliente?.login || '').trim();
+      const loginId = parseIntSafe(cliente?.id_login);
+      const matchedOnu =
+        (login && baseOnuIndex.byLogin.get(login.toLowerCase())) ||
+        (loginId !== null ? baseOnuIndex.byLoginId.get(String(loginId)) : null) ||
+        null;
+      const loginKey = login.toLowerCase();
+      const fallbackContato = clientesMap[loginKey] || relatorio.by_login?.[loginKey] || {};
+
+      return {
+        id: String(cliente?.id || cliente?.id_cliente || ''),
+        login,
+        idLogin: loginId !== null ? String(loginId) : '',
+        contrato: String(cliente?.id_contrato || ''),
+        ativo: normalizeAtivo(cliente?.ativo),
+        onlineRadius: normalizeOnlineFlag(cliente?.online),
+        ultimaConexao: cliente?.ultima_conexao_final || '',
+        ultimaConexaoFmt: formatDateTimePtBr(lastConnectionAt),
+        tempoOffline: formatOfflineDuration(lastConnectionAt, nowDate),
+        offlineMs: nowDate.getTime() - lastConnectionAt.getTime(),
+        faixaOffline:
+          lastConnectionAt.getTime() >= startOfDay.getTime()
+            ? 'hoje'
+            : lastConnectionAt.getTime() <= cutoff
+              ? '24plus'
+              : lastConnectionAt.getTime() <= cutoff20h
+                ? '20plus'
+                : 'geral',
+        onuEncontrada: !!matchedOnu,
+        onuStatus: matchedOnu?.['Status ONU'] || 'Sem ONU vinculada',
+        ponId: matchedOnu?.['PON ID'] || null,
+        olt: matchedOnu?.OLT || null,
+        slot: matchedOnu?.Slot ?? null,
+        pon: matchedOnu?.PON ?? null,
+        macSerial: matchedOnu?.['MAC/Serial'] || null,
+        nomeCliente: matchedOnu?.nome_formatado || matchedOnu?.['Nome Cliente'] || formatClientName(cliente?.nome || ''),
+        whatsapp: matchedOnu?.whatsapp || fallbackContato?.whatsapp || '',
+      };
+    })
+    .filter(Boolean)
+    .sort((a, b) => b.offlineMs - a.offlineMs);
+
+  const summary = data.reduce((acc, item) => {
+    if (item.faixaOffline === 'hoje') {
+      acc.totalHoje += 1;
+    }
+
+    if (item.offlineMs >= 20 * 3_600_000) {
+      acc.total20h += 1;
+      if (item.ativo === 'Ativo') acc.ativos20h += 1;
+      if (item.ativo === 'Nao ativo') acc.naoAtivos20h += 1;
+    }
+
+    if (item.offlineMs >= 24 * 3_600_000) {
+      acc.total24h += 1;
+      if (item.ativo === 'Ativo') acc.ativos24h += 1;
+      if (item.ativo === 'Nao ativo') acc.naoAtivos24h += 1;
+      if (!acc.maisAntigo24h || item.offlineMs > acc.maisAntigo24h.offlineMs) {
+        acc.maisAntigo24h = {
+          login: item.login,
+          ultimaConexao: item.ultimaConexao,
+          ultimaConexaoFmt: item.ultimaConexaoFmt,
+          tempoOffline: item.tempoOffline,
+          offlineMs: item.offlineMs,
+        };
+      }
+    }
+    return acc;
+  }, {
+    totalGeralOfflineAgora: registros.length,
+    totalHoje: 0,
+    total20h: 0,
+    total24h: 0,
+    ativos20h: 0,
+    naoAtivos20h: 0,
+    ativos24h: 0,
+    naoAtivos24h: 0,
+    totalPorAtivoAgora: countByAtivo,
+    maisAntigo24h: null,
+    referenciaHoje: startOfDay.toLocaleDateString('pt-BR'),
+    referenciaHojeDataHora: formatDateTimePtBr(startOfDay),
+    referencia20hDataHora: formatDateTimePtBr(new Date(cutoff20h)),
+    referencia24hData: cutoffDate.toLocaleDateString('pt-BR'),
+    referencia24hDataHora: formatDateTimePtBr(cutoffDate),
+  });
+
+  clients24hOfflineCache = {
+    data,
+    summary,
+    fetchedAt: now,
+    source: offlineSource.source,
+  };
+
+  return clients24hOfflineCache;
+}
+
 function filterOnus(q) {
   let list = baseOnus.map(hydrateOnu);
   if (q.olt)    list = list.filter(r => r.OLT === q.olt);
@@ -282,7 +585,7 @@ app.get('/api/health', safe((req, res) => {
   res.json({ ok:true, onus:baseOnus.length, contratos:Object.keys(relatorio.by_nome).length });
 }));
 
-app.get('/api/stats', safe((req, res) => {
+app.get('/api/stats', safe(async (req, res) => {
   const hydratedOnus = baseOnus.map(hydrateOnu);
   const slotsByOlt = hydratedOnus.reduce((acc, row) => {
     if (!row.OLT || row.Slot === null || row.Slot === undefined || row.Slot === '') return acc;
@@ -315,6 +618,24 @@ app.get('/api/stats', safe((req, res) => {
     totalContratos:  Object.keys(relatorio.by_id).length,
     comTelefone:     Object.values(relatorio.by_login || relatorio.by_nome || {}).filter(v=>v.whatsapp).length,
   });
+}));
+
+app.get('/api/clients-24h-offline', safe(async (req, res) => {
+  try {
+    const result = await getClients24hOffline();
+    res.json({
+      data: result.data,
+      summary: result.summary,
+      source: result.source,
+      count: result.data.length,
+    });
+  } catch (error) {
+    console.warn('[clients-24h-offline]', error.message);
+    res.status(502).json({
+      error: 'Nao foi possivel consultar clientes 24h offline.',
+      detail: error.message,
+    });
+  }
 }));
 
 app.get('/api/onus', safe((req, res) => {
@@ -504,6 +825,7 @@ app.post('/api/relatorio/upload', upload.fields([
 
   relatorio = { by_login: byLogin, by_id: byId, by_nome: byNome };
   loginIndex = buildLoginIndex(relatorio);
+  baseOnuIndex = buildBaseOnuIndex(baseOnus);
   fs.writeFileSync(REL_FILE, JSON.stringify(relatorio, null, 2));
 
   const comTelLogin = Object.values(byLogin).filter(v=>v.whatsapp).length;
@@ -524,7 +846,9 @@ app.post('/api/sync/onus', safe((req, res) => {
   lastUpdatedAt = fresh.updated_at || null;
   rawIxcData = readJson(RAW_IXC_FILE, { registros:[] });
   rawOnuIndex = buildRawOnuIndex(rawIxcData.registros || []);
+  baseOnuIndex = buildBaseOnuIndex(baseOnus);
   applyOnuFilters();
+  baseOnuIndex = buildBaseOnuIndex(baseOnus);
   res.json({ok:true, total:baseOnus.length});
 }));
 

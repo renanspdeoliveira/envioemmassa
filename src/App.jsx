@@ -9,6 +9,7 @@ import PonDetailPage from './pages/PonDetailPage'
 import SinalPage from './pages/SinalPage'
 import EnvioMassaPage from './pages/EnvioMassaPage'
 import IxcConfigPage from './pages/IxcConfigPage'
+import Clientes24hOfflinePage from './pages/Clientes24hOfflinePage'
 import LoginPage from './pages/LoginPage'
 import ProtectedRoute from './auth/ProtectedRoute'
 
@@ -25,6 +26,7 @@ function AppShell() {
           <Route path="/pons" element={<PonsPage />} />
           <Route path="/pons/:ponId" element={<PonDetailPage />} />
           <Route path="/sinal" element={<SinalPage />} />
+          <Route path="/clientes-24h-offline" element={<Clientes24hOfflinePage />} />
           <Route path="/envio" element={<EnvioMassaPage />} />
           <Route path="/ixc" element={<IxcConfigPage />} />
           <Route path="*" element={<Navigate to="/" replace />} />
