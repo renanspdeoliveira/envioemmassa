@@ -28,7 +28,8 @@ export default function Clientes24hOfflinePage() {
     return rows.filter((row) => {
       if (ativo && row.ativo !== ativo) return false
       if (onuStatus && row.onuStatus !== onuStatus) return false
-      if (faixaOffline === 'hoje' && row.faixaOffline !== 'hoje') return false
+      if (faixaOffline === 'hoje' && row.faixaOffline !== 'hoje' && row.faixaOffline !== 'hoje20plus') return false
+      if (faixaOffline === 'diaAnterior24h' && row.faixaOffline !== 'diaAnterior24h') return false
       if (faixaOffline === '20plus' && row.offlineMs < MS_20H) return false
       if (faixaOffline === '24plus' && row.offlineMs < MS_24H) return false
       if (!query) return true
@@ -115,6 +116,15 @@ export default function Clientes24hOfflinePage() {
               onClick={() => { setFaixaOffline('hoje'); setPage(1) }}
             />
             <SummaryCard
+              label="Dia Anterior 24h"
+              value={summary.totalDiaAnterior24h ?? 0}
+              sub={`somente clientes com data ${summary.referenciaDiaAnterior || '-'}`}
+              icon={Database}
+              color="green"
+              active={faixaOffline === 'diaAnterior24h'}
+              onClick={() => { setFaixaOffline('diaAnterior24h'); setPage(1) }}
+            />
+            <SummaryCard
               label="Offline"
               value={summary.total20h ?? 0}
               sub={`mais de 20h offline · ativos ${summary.ativos20h ?? 0}`}
@@ -147,11 +157,20 @@ export default function Clientes24hOfflinePage() {
             <div style={highlightWrap}>
               <div>
                 <div style={highlightLabel}>
-                  {faixaOffline === 'hoje' ? 'Offline Hoje' : faixaOffline === '20plus' ? 'Offline' : 'Clientes 24+'}
+                  {faixaOffline === 'hoje'
+                    ? 'Offline Hoje'
+                    : faixaOffline === 'diaAnterior24h'
+                      ? 'Dia Anterior 24h'
+                      : faixaOffline === '20plus'
+                        ? 'Offline'
+                        : 'Clientes 24+'}
                 </div>
                 <div style={highlightText}>
                   {faixaOffline === 'hoje' && (
                     <>Esta lista mostra apenas clientes offline cuja ultima conexao foi hoje, desde <strong>{summary.referenciaHojeDataHora || '-'}</strong>.</>
+                  )}
+                  {faixaOffline === 'diaAnterior24h' && (
+                    <>Esta lista mostra apenas clientes cuja <strong>data original</strong> pertence ao dia anterior, em <strong>{summary.referenciaDiaAnterior || '-'}</strong>.</>
                   )}
                   {faixaOffline === '20plus' && (
                     <>Esta lista mostra apenas clientes com mais de <strong>20 horas offline</strong>, desde <strong>{summary.referencia20hDataHora || '-'}</strong>.</>
@@ -161,9 +180,11 @@ export default function Clientes24hOfflinePage() {
                   )}
                 </div>
               </div>
-              <Badge color={faixaOffline === 'hoje' ? 'red' : faixaOffline === '20plus' ? 'blue' : 'amber'}>
+              <Badge color={faixaOffline === 'hoje' ? 'red' : faixaOffline === 'diaAnterior24h' ? 'green' : faixaOffline === '20plus' ? 'blue' : 'amber'}>
                 {(faixaOffline === 'hoje'
                   ? (summary.totalHoje ?? 0)
+                  : faixaOffline === 'diaAnterior24h'
+                    ? (summary.totalDiaAnterior24h ?? 0)
                   : faixaOffline === '20plus'
                     ? (summary.total20h ?? 0)
                     : (summary.total24h ?? rows.length)

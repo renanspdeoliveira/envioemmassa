@@ -270,10 +270,11 @@ function parseIxcDate(value) {
 
 function formatOfflineDuration(lastConnectionAt, now = new Date()) {
   const diffMs = Math.max(0, now.getTime() - lastConnectionAt.getTime());
-  const totalHours = Math.floor(diffMs / 3_600_000);
-  const days = Math.floor(totalHours / 24);
-  const hours = totalHours % 24;
-  return `${String(hours).padStart(2, '0')}h${String(days).padStart(2, '0')}d`;
+  const totalMinutes = Math.floor(diffMs / 60_000);
+  const days = Math.floor(totalMinutes / (24 * 60));
+  const hours = Math.floor((totalMinutes % (24 * 60)) / 60);
+  const minutes = totalMinutes % 60;
+  return `${String(days).padStart(2, '0')}d${String(hours).padStart(2, '0')}h${String(minutes).padStart(2, '0')}m`;
 }
 
 function formatDateTimePtBr(value) {
@@ -437,6 +438,8 @@ async function getClients24hOffline() {
   const cutoffDate = new Date(cutoff);
   const startOfDay = new Date(nowDate);
   startOfDay.setHours(0, 0, 0, 0);
+  const startOfYesterday = new Date(startOfDay);
+  startOfYesterday.setDate(startOfYesterday.getDate() - 1);
   const registros = response?.registros || [];
   const countByAtivo = registros.reduce((acc, cliente) => {
     const key = normalizeAtivo(cliente?.ativo);
@@ -458,6 +461,8 @@ async function getClients24hOffline() {
       const loginKey = login.toLowerCase();
       const fallbackContato = clientesMap[loginKey] || relatorio.by_login?.[loginKey] || {};
 
+      const offlineMs = nowDate.getTime() - lastConnectionAt.getTime();
+
       return {
         id: String(cliente?.id || cliente?.id_cliente || ''),
         login,
@@ -468,17 +473,21 @@ async function getClients24hOffline() {
         ultimaConexao: cliente?.ultima_conexao_final || '',
         ultimaConexaoFmt: formatDateTimePtBr(lastConnectionAt),
         tempoOffline: formatOfflineDuration(lastConnectionAt, nowDate),
-        offlineMs: nowDate.getTime() - lastConnectionAt.getTime(),
+        offlineMs,
         faixaOffline:
-          lastConnectionAt.getTime() >= startOfDay.getTime()
+          offlineMs >= 20 * 60 * 60 * 1000 && lastConnectionAt.getTime() >= startOfDay.getTime()
+            ? 'hoje20plus'
+            : lastConnectionAt.getTime() >= startOfDay.getTime()
             ? 'hoje'
+            : (lastConnectionAt.getTime() >= startOfYesterday.getTime() && lastConnectionAt.getTime() < startOfDay.getTime())
+              ? 'diaAnterior24h'
             : lastConnectionAt.getTime() <= cutoff
               ? '24plus'
               : lastConnectionAt.getTime() <= cutoff20h
                 ? '20plus'
                 : 'geral',
         onuEncontrada: !!matchedOnu,
-        onuStatus: matchedOnu?.['Status ONU'] || 'Sem ONU vinculada',
+        onuStatus: matchedOnu?.['Status ONU'] || 'ONU SEM INFORMACAO',
         ponId: matchedOnu?.['PON ID'] || null,
         olt: matchedOnu?.OLT || null,
         slot: matchedOnu?.Slot ?? null,
@@ -492,8 +501,12 @@ async function getClients24hOffline() {
     .sort((a, b) => b.offlineMs - a.offlineMs);
 
   const summary = data.reduce((acc, item) => {
-    if (item.faixaOffline === 'hoje') {
+    if (item.faixaOffline === 'hoje' || item.faixaOffline === 'hoje20plus') {
       acc.totalHoje += 1;
+    }
+
+    if (item.faixaOffline === 'diaAnterior24h') {
+      acc.totalDiaAnterior24h += 1;
     }
 
     if (item.offlineMs >= 20 * 3_600_000) {
@@ -520,6 +533,7 @@ async function getClients24hOffline() {
   }, {
     totalGeralOfflineAgora: registros.length,
     totalHoje: 0,
+    totalDiaAnterior24h: 0,
     total20h: 0,
     total24h: 0,
     ativos20h: 0,
@@ -530,6 +544,7 @@ async function getClients24hOffline() {
     maisAntigo24h: null,
     referenciaHoje: startOfDay.toLocaleDateString('pt-BR'),
     referenciaHojeDataHora: formatDateTimePtBr(startOfDay),
+    referenciaDiaAnterior: startOfYesterday.toLocaleDateString('pt-BR'),
     referencia20hDataHora: formatDateTimePtBr(new Date(cutoff20h)),
     referencia24hData: cutoffDate.toLocaleDateString('pt-BR'),
     referencia24hDataHora: formatDateTimePtBr(cutoffDate),
@@ -561,6 +576,12 @@ function filterOnus(q) {
   if (q.search) {
     const s = normStr(q.search);
     list = list.filter(r =>
+      normStr(String(r['ID Login'] || '')).includes(s) ||
+      normStr(String(r['ID ONU Fibra'] || '')).includes(s) ||
+      normStr(`${r['ID Login'] || ''} ${r['Nome Cliente'] || ''}`).includes(s) ||
+      normStr(`${r['ID Login'] || ''} - ${r['Nome Cliente'] || ''}`).includes(s) ||
+      normStr(`${r['ID ONU Fibra'] || ''} ${r['Nome Cliente'] || ''}`).includes(s) ||
+      normStr(`${r['ID ONU Fibra'] || ''} - ${r['Nome Cliente'] || ''}`).includes(s) ||
       normStr(r['Nome Cliente']).includes(s) ||
       normStr(formatClientName(r['Nome Cliente'] || '')).includes(s) ||
       normStr(r.Login).includes(s) ||
@@ -579,6 +600,32 @@ function filterOnus(q) {
   return list;
 }
 
+function buildOfflinePonSummary() {
+  const offlinePons = resumoPon
+    .filter((row) => Number(row?.['Total ONUs'] || 0) > 0 && Number(row?.Autorizadas || 0) === 0)
+    .map((row) => ({
+      olt: row.OLT || 'OLT',
+      slot: row.Slot ?? null,
+      pon: row.PON ?? null,
+      ponId: row['PON ID'] || null,
+      totalOnus: Number(row['Total ONUs'] || 0),
+      desautorizadas: Number(row.Desautorizadas || 0),
+      semStatus: Number(row['Sem status'] || 0),
+    }));
+
+  const byOlt = offlinePons.reduce((acc, row) => {
+    if (!acc[row.olt]) acc[row.olt] = [];
+    acc[row.olt].push(row);
+    return acc;
+  }, {});
+
+  return {
+    total: offlinePons.length,
+    byOlt,
+    items: offlinePons,
+  };
+}
+
 // ── Routes ────────────────────────────────────────────────────────────────────
 
 app.get('/api/health', safe((req, res) => {
@@ -587,6 +634,7 @@ app.get('/api/health', safe((req, res) => {
 
 app.get('/api/stats', safe(async (req, res) => {
   const hydratedOnus = baseOnus.map(hydrateOnu);
+  const offlinePonSummary = buildOfflinePonSummary();
   const slotsByOlt = hydratedOnus.reduce((acc, row) => {
     if (!row.OLT || row.Slot === null || row.Slot === undefined || row.Slot === '') return acc;
     if (!acc[row.OLT]) acc[row.OLT] = new Set();
@@ -617,6 +665,9 @@ app.get('/api/stats', safe(async (req, res) => {
     slotsByOlt:      Object.fromEntries(Object.entries(slotsByOlt).map(([olt, slots]) => [olt, [...slots].sort((a,b)=>a-b)])),
     totalContratos:  Object.keys(relatorio.by_id).length,
     comTelefone:     Object.values(relatorio.by_login || relatorio.by_nome || {}).filter(v=>v.whatsapp).length,
+    offlinePonCount: offlinePonSummary.total,
+    offlinePonsByOlt: offlinePonSummary.byOlt,
+    offlinePons: offlinePonSummary.items,
   });
 }));
 

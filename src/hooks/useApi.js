@@ -3,32 +3,41 @@ import { useState, useEffect, useCallback, useRef } from 'react'
 export function useApi(fetchFn, deps = [], options = {}) {
   const [data, setData] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [refreshing, setRefreshing] = useState(false)
   const [error, setError] = useState(null)
-  const abortRef = useRef(null)
+  const hasDataRef = useRef(false)
   const { refreshInterval = 0 } = options
 
-  const load = useCallback(async () => {
-    setLoading(true)
-    setError(null)
+  const load = useCallback(async (mode = 'initial') => {
+    const hasData = hasDataRef.current
+    const isBackgroundRefresh = mode === 'refresh' && hasData
+
+    if (isBackgroundRefresh) setRefreshing(true)
+    else setLoading(true)
+
+    if (mode !== 'refresh') setError(null)
+
     try {
       const result = await fetchFn()
       setData(result)
+      hasDataRef.current = true
     } catch (e) {
       if (e.name !== 'AbortError') setError(e.message)
     } finally {
-      setLoading(false)
+      if (isBackgroundRefresh) setRefreshing(false)
+      else setLoading(false)
     }
   }, deps) // eslint-disable-line
 
-  useEffect(() => { load() }, [load])
+  useEffect(() => { load('initial') }, [load])
 
   useEffect(() => {
     if (!refreshInterval) return undefined
-    const timer = setInterval(() => { load() }, refreshInterval)
+    const timer = setInterval(() => { load('refresh') }, refreshInterval)
     return () => clearInterval(timer)
   }, [load, refreshInterval])
 
-  return { data, loading, error, refetch: load }
+  return { data, loading, refreshing, error, refetch: load }
 }
 
 export function useLazyApi() {

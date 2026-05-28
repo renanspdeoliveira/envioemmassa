@@ -107,6 +107,7 @@ export default function EnvioMassaPage() {
   const comContato = result?.data?.filter(row => row.whatsapp).length || 0
   const semContato = (result?.data?.length || 0) - comContato
   const slotOptions = filters.olt ? (stats?.slotsByOlt?.[filters.olt] || []) : []
+  const offlinePonsByOlt = stats?.offlinePonsByOlt || {}
 
   return (
     <div>
@@ -125,6 +126,46 @@ export default function EnvioMassaPage() {
 
       <Card style={{ marginBottom: 16 }}>
         <div style={{ padding: '14px 16px' }}>
+          {stats?.offlinePonCount > 0 && (
+            <div style={{ marginBottom: 14, padding: 12, borderRadius: 10, border: '1px solid rgba(248,81,73,.22)', background: 'rgba(248,81,73,.08)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+                <AlertTriangle size={14} style={{ color: 'var(--red-text)' }} />
+                <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)' }}>
+                  PONs offline por OLT: {stats.offlinePonCount}
+                </span>
+              </div>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                {Object.entries(offlinePonsByOlt).map(([oltName, pons]) => (
+                  pons.map((ponInfo) => (
+                    <button
+                      key={`${oltName}-${ponInfo.ponId || `${ponInfo.slot}-${ponInfo.pon}`}`}
+                      type="button"
+                      onClick={() => setFilters(f => ({
+                        ...f,
+                        olt: oltName,
+                        slot: String(ponInfo.slot || ''),
+                        pon: String(ponInfo.pon || ''),
+                        bairro: '',
+                        status: '',
+                      }))}
+                      style={{
+                        border: '1px solid rgba(248,81,73,.26)',
+                        background: 'rgba(22,27,34,.92)',
+                        color: 'var(--text-primary)',
+                        borderRadius: 999,
+                        padding: '6px 10px',
+                        fontSize: 12,
+                        cursor: 'pointer',
+                      }}
+                    >
+                      {oltName} · G{ponInfo.slot ?? '-'} · P{ponInfo.pon ?? '-'}
+                    </button>
+                  ))
+                ))}
+              </div>
+            </div>
+          )}
+
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
             <Filter size={14} style={{ color: 'var(--accent-blue-text)' }} />
             <span style={{ fontWeight: 500, fontSize: 13 }}>Filtrar Clientes</span>
