@@ -237,13 +237,11 @@ baseOnuIndex = buildBaseOnuIndex(baseOnus);
 function enrichOnu(r) {
   const loginKey = (r.Login || '').toLowerCase();
   const nomeFmt  = formatClientName(r['Nome Cliente'] || '');
-  const idLoginKey = String(r['ID Login'] || '').trim();
   const manual   = clientesMap[loginKey]              || {};
   // Priority: by_login (exact) → by_nome (fallback for unmatched)
   const byLogin  = relatorio.by_login?.[loginKey]     || {};
   const byNome   = relatorio.by_nome?.[nomeFmt]        || {};
-  const byId     = relatorio.by_id?.[idLoginKey]       || {};
-  const contrato = Object.keys(byLogin).length ? byLogin : (Object.keys(byNome).length ? byNome : byId);
+  const contrato = Object.keys(byLogin).length ? byLogin : byNome;
   return {
     ...r,
     nome_formatado: nomeFmt,
@@ -268,17 +266,12 @@ function hydrateOnu(r) {
   const nomeFmt = formatClientName(nomeOriginal);
   const nomeCanonical = canonicalClientName(nomeOriginal);
   const byNome = relatorio.by_nome?.[nomeFmt] || {};
-  const byId = relatorio.by_id?.[String(r['ID Login'] || '').trim()] || {};
   const contractLogin = loginIndex.byContractId.get(String(byNome.id_contrato || '').trim());
-  const directContractLogin = loginIndex.byContractId.get(String(r['ID Login'] || '').trim());
-  const byIdContractLogin = loginIndex.byContractId.get(String(byId.id_contrato || '').trim());
   const inferredLogin =
     r.Login ||
-    directContractLogin ||
     loginIndex.exactByName.get(normStr(nomeOriginal)) ||
     loginIndex.uniqueByFormattedName.get(normStr(nomeFmt)) ||
     loginIndex.uniqueByCanonicalName.get(nomeCanonical) ||
-    byIdContractLogin ||
     contractLogin ||
     '';
   const hydrated = enrichOnu({
@@ -431,6 +424,16 @@ let clients24hOfflineCache = {
   fetchedAt: 0,
   source: 'unavailable',
 };
+
+let derivedCacheVersion = 0;
+let derivedDashboardCache = null;
+let derivedAlertCache = null;
+
+function invalidateDerivedCaches() {
+  derivedCacheVersion += 1;
+  derivedDashboardCache = null;
+  derivedAlertCache = null;
+}
 
 async function getClients24hOffline() {
   const now = Date.now();
@@ -721,14 +724,16 @@ function buildOfflinePonSummary() {
   };
 }
 
-// ── Routes ────────────────────────────────────────────────────────────────────
+function getHydratedOnus() {
+  return baseOnus.map(hydrateOnu);
+}
 
-app.get('/api/health', safe((req, res) => {
-  res.json({ ok:true, onus:baseOnus.length, contratos:Object.keys(relatorio.by_nome).length });
-}));
+function getDashboardDerivedData() {
+  if (derivedDashboardCache?.version === derivedCacheVersion) {
+    return derivedDashboardCache.value;
+  }
 
-app.get('/api/stats', safe(async (req, res) => {
-  const hydratedOnus = baseOnus.map(hydrateOnu);
+  const hydratedOnus = getHydratedOnus();
   const offlinePonSummary = buildOfflinePonSummary();
   const slotsByOlt = hydratedOnus.reduce((acc, row) => {
     if (!row.OLT || row.Slot === null || row.Slot === undefined || row.Slot === '') return acc;
@@ -736,34 +741,123 @@ app.get('/api/stats', safe(async (req, res) => {
     acc[row.OLT].add(row.Slot);
     return acc;
   }, {});
-  const rxVals  = baseOnus.map(r=>r['Sinal RX']).filter(v=>v&&v!==0);
+  const rxVals = baseOnus.map(r => r['Sinal RX']).filter(v => v && v !== 0);
   const onlineCount = baseOnus.filter(isOnlineOnu).length;
-  res.json({
-    updatedAt:       lastUpdatedAt,
-    total:           baseOnus.length,
-    online:          onlineCount,
-    autorizadas:     baseOnus.filter(r=>r['Status ONU']==='Autorizada').length,
-    desautorizadas:  baseOnus.filter(r=>isPendingAuthStatus(r['Status ONU'])).length,
-    semStatus:       baseOnus.filter(r=>r['Status ONU']==='Sem status').length,
-    oltCounts:       hydratedOnus.reduce((acc, r) => {
-      if (!r.OLT) return acc;
-      acc[r.OLT] = (acc[r.OLT] || 0) + 1;
+
+  const stats = {
+    updatedAt: lastUpdatedAt,
+    total: baseOnus.length,
+    online: onlineCount,
+    autorizadas: baseOnus.filter(r => r['Status ONU'] === 'Autorizada').length,
+    desautorizadas: baseOnus.filter(r => isPendingAuthStatus(r['Status ONU'])).length,
+    semStatus: baseOnus.filter(r => r['Status ONU'] === 'Sem status').length,
+    oltCounts: hydratedOnus.reduce((acc, row) => {
+      if (!row.OLT) return acc;
+      acc[row.OLT] = (acc[row.OLT] || 0) + 1;
       return acc;
     }, {}),
-    avgRx:           rxVals.length ? (rxVals.reduce((a,b)=>a+b,0)/rxVals.length).toFixed(2) : null,
-    worstRx:         rxVals.length ? rxVals.reduce((a,b)=>Math.min(a,b)).toFixed(2)           : null,
-    totalPons:       resumoPon.length,
-    semLeituraRx:    resumoPon.reduce((a,r)=>a+(r['Sem leitura RX/zero']||0),0),
-    offlineAtencao:  Math.max(baseOnus.length - onlineCount, offlineList.length),
-    olts:            [...new Set(hydratedOnus.map(r=>r.OLT))].filter(Boolean).sort(),
-    slots:           [...new Set(hydratedOnus.map(r=>r.Slot))].filter(Boolean).sort((a,b)=>a-b),
-    slotsByOlt:      Object.fromEntries(Object.entries(slotsByOlt).map(([olt, slots]) => [olt, [...slots].sort((a,b)=>a-b)])),
-    totalContratos:  Object.keys(relatorio.by_id).length,
-    comTelefone:     Object.values(relatorio.by_login || relatorio.by_nome || {}).filter(v=>v.whatsapp).length,
+    avgRx: rxVals.length ? (rxVals.reduce((a, b) => a + b, 0) / rxVals.length).toFixed(2) : null,
+    worstRx: rxVals.length ? rxVals.reduce((a, b) => Math.min(a, b)).toFixed(2) : null,
+    totalPons: resumoPon.length,
+    semLeituraRx: resumoPon.reduce((acc, row) => acc + (row['Sem leitura RX/zero'] || 0), 0),
+    offlineAtencao: Math.max(baseOnus.length - onlineCount, offlineList.length),
+    olts: [...new Set(hydratedOnus.map(row => row.OLT))].filter(Boolean).sort(),
+    slots: [...new Set(hydratedOnus.map(row => row.Slot))].filter(Boolean).sort((a, b) => a - b),
+    slotsByOlt: Object.fromEntries(Object.entries(slotsByOlt).map(([olt, slots]) => [olt, [...slots].sort((a, b) => a - b)])),
+    totalContratos: Object.keys(relatorio.by_id).length,
+    comTelefone: Object.values(relatorio.by_login || relatorio.by_nome || {}).filter(row => row.whatsapp).length,
     offlinePonCount: offlinePonSummary.total,
     offlinePonsByOlt: offlinePonSummary.byOlt,
     offlinePons: offlinePonSummary.items,
+  };
+
+  const groupedRxBySlot = {};
+  resumoPon.forEach(row => {
+    const avgRxValue = row['Sinal RX médio'] ?? row['Sinal RX mÃ©dio'];
+    if (avgRxValue == null) return;
+    const key = `${row.OLT}-${row.Slot}`;
+    if (!groupedRxBySlot[key]) groupedRxBySlot[key] = { olt: row.OLT, slot: row.Slot, vals: [] };
+    groupedRxBySlot[key].vals.push(avgRxValue);
   });
+
+  const chartRxSlot = Object.values(groupedRxBySlot)
+    .map(item => ({
+      label: `${item.olt} / Slot ${item.slot}`,
+      olt: item.olt,
+      slot: item.slot,
+      avgRx: +(item.vals.reduce((a, b) => a + b, 0) / item.vals.length).toFixed(2),
+    }))
+    .sort((a, b) => a.olt.localeCompare(b.olt) || a.slot - b.slot);
+
+  const distribution = {
+    'Excelente (> -20)': 0,
+    'Bom (-20 a -24)': 0,
+    'Regular (-24 a -27)': 0,
+    'Ruim (< -27)': 0,
+    'Sem leitura': 0,
+  };
+  baseOnus.forEach(row => {
+    const rx = row['Sinal RX'];
+    if (!rx || rx === 0) distribution['Sem leitura'] += 1;
+    else if (rx > -20) distribution['Excelente (> -20)'] += 1;
+    else if (rx >= -24) distribution['Bom (-20 a -24)'] += 1;
+    else if (rx >= -27) distribution['Regular (-24 a -27)'] += 1;
+    else distribution['Ruim (< -27)'] += 1;
+  });
+
+  const chartRxDistribution = Object.entries(distribution).map(([label, count]) => ({ label, count }));
+  const chartOnusPorVlan = Object.entries(
+    baseOnus.reduce((acc, row) => {
+      const vlan = row.VLAN ? String(Math.round(row.VLAN)) : 'N/A';
+      acc[vlan] = (acc[vlan] || 0) + 1;
+      return acc;
+    }, {})
+  )
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 15)
+    .map(([vlan, count]) => ({ vlan, count }));
+
+  const value = { hydratedOnus, stats, chartRxSlot, chartRxDistribution, chartOnusPorVlan };
+  derivedDashboardCache = { version: derivedCacheVersion, value };
+  return value;
+}
+
+function getAlertDerivedData() {
+  if (derivedAlertCache?.version === derivedCacheVersion) {
+    return derivedAlertCache.value;
+  }
+
+  const offline = offlineList.filter(isValidOnuRecord).map(hydrateOnu);
+  const desautorizadas = baseOnus.filter(r => isValidOnuRecord(r) && isPendingAuthStatus(r['Status ONU'])).map(hydrateOnu);
+  const semStatus = baseOnus.filter(r => isValidOnuRecord(r) && r['Status ONU'] === 'Sem status').map(hydrateOnu);
+  const baixoSinal = baseOnus.filter(r => isValidOnuRecord(r) && r['Sinal RX'] && r['Sinal RX'] < -27).map(hydrateOnu);
+
+  const value = {
+    offline,
+    desautorizadas,
+    semStatus,
+    baixoSinal,
+    pioresPons: resumoPon.filter(r => r['Pior RX'] != null).sort((a, b) => a['Pior RX'] - b['Pior RX']).slice(0, 10),
+    counts: {
+      offline: offline.length,
+      desautorizadas: desautorizadas.length,
+      semStatus: semStatus.length,
+      baixoSinal: baixoSinal.length,
+    },
+  };
+
+  derivedAlertCache = { version: derivedCacheVersion, value };
+  return value;
+}
+
+// ── Routes ────────────────────────────────────────────────────────────────────
+
+app.get('/api/health', safe((req, res) => {
+  res.json({ ok:true, onus:baseOnus.length, contratos:Object.keys(relatorio.by_nome).length });
+}));
+
+app.get('/api/stats', safe(async (req, res) => {
+  res.json(getDashboardDerivedData().stats);
 }));
 
 app.get('/api/clients-24h-offline', safe(async (req, res) => {
@@ -819,47 +913,19 @@ app.get('/api/pons/:ponId', safe((req, res) => {
 }));
 
 app.get('/api/alertas', safe((req, res) => {
-  const desaut   = baseOnus.filter(r=>isValidOnuRecord(r) && isPendingAuthStatus(r['Status ONU'])).map(hydrateOnu);
-  const semSt    = baseOnus.filter(r=>isValidOnuRecord(r) && r['Status ONU']==='Sem status').map(hydrateOnu);
-  const baixoSin = baseOnus.filter(r=>isValidOnuRecord(r) && r['Sinal RX']&&r['Sinal RX']<-27).map(hydrateOnu);
-  res.json({
-    offline: offlineList.filter(isValidOnuRecord).map(hydrateOnu),
-    desautorizadas:desaut, semStatus:semSt, baixoSinal:baixoSin,
-    pioresPons: resumoPon.filter(r=>r['Pior RX']!=null).sort((a,b)=>a['Pior RX']-b['Pior RX']).slice(0,10),
-    counts: { offline:offlineList.length, desautorizadas:desaut.length, semStatus:semSt.length, baixoSinal:baixoSin.length }
-  });
+  res.json(getAlertDerivedData());
 }));
 
 app.get('/api/charts/rx-por-slot', safe((req, res) => {
-  const g = {};
-  resumoPon.forEach(r=>{
-    if (r['Sinal RX médio']==null) return;
-    const k=`${r.OLT}-${r.Slot}`;
-    if (!g[k]) g[k]={olt:r.OLT,slot:r.Slot,vals:[]};
-    g[k].vals.push(r['Sinal RX médio']);
-  });
-  res.json(Object.values(g).map(x=>({
-    label:`${x.olt} / Slot ${x.slot}`, olt:x.olt, slot:x.slot,
-    avgRx:+(x.vals.reduce((a,b)=>a+b,0)/x.vals.length).toFixed(2)
-  })).sort((a,b)=>a.olt.localeCompare(b.olt)||a.slot-b.slot));
+  res.json(getDashboardDerivedData().chartRxSlot);
 }));
 
 app.get('/api/charts/rx-distribution', safe((req, res) => {
-  const b={'Excelente (> -20)':0,'Bom (-20 a -24)':0,'Regular (-24 a -27)':0,'Ruim (< -27)':0,'Sem leitura':0};
-  baseOnus.forEach(r=>{
-    const rx=r['Sinal RX'];
-    if (!rx||rx===0) b['Sem leitura']++;
-    else if (rx>-20) b['Excelente (> -20)']++;
-    else if (rx>=-24) b['Bom (-20 a -24)']++;
-    else if (rx>=-27) b['Regular (-24 a -27)']++;
-    else b['Ruim (< -27)']++;
-  });
-  res.json(Object.entries(b).map(([label,count])=>({label,count})));
+  res.json(getDashboardDerivedData().chartRxDistribution);
 }));
 
 app.get('/api/charts/onus-por-vlan', safe((req, res) => {
-  const c=baseOnus.reduce((acc,r)=>{const v=r.VLAN?String(Math.round(r.VLAN)):'N/A';acc[v]=(acc[v]||0)+1;return acc;},{});
-  res.json(Object.entries(c).sort((a,b)=>b[1]-a[1]).slice(0,15).map(([vlan,count])=>({vlan,count})));
+  res.json(getDashboardDerivedData().chartOnusPorVlan);
 }));
 
 app.get('/api/envio-massa', safe((req, res) => {
@@ -892,6 +958,7 @@ app.post('/api/bairros/manual', safe((req, res) => {
   const {login,bairro}=req.body;
   if (!login) return res.status(400).json({error:'login obrigatório'});
   bairro ? bairroMap[login.toLowerCase()]=bairro : delete bairroMap[login.toLowerCase()];
+  invalidateDerivedCaches();
   saveBairros(); res.json({ok:true});
 }));
 
@@ -903,6 +970,7 @@ app.post('/api/clientes/manual', safe((req, res) => {
   const {login,name,whatsapp}=req.body;
   if (!login) return res.status(400).json({error:'login obrigatório'});
   clientesMap[login.toLowerCase()]={name:name||'',whatsapp:formatPhone(whatsapp)||''};
+  invalidateDerivedCaches();
   saveClientes(); res.json({ok:true});
 }));
 
@@ -972,6 +1040,7 @@ app.post('/api/relatorio/upload', upload.fields([
   relatorio = { by_login: byLogin, by_id: byId, by_nome: byNome };
   loginIndex = buildLoginIndex(relatorio);
   baseOnuIndex = buildBaseOnuIndex(baseOnus);
+  invalidateDerivedCaches();
   fs.writeFileSync(REL_FILE, JSON.stringify(relatorio, null, 2));
 
   const comTelLogin = Object.values(byLogin).filter(v=>v.whatsapp).length;
@@ -995,6 +1064,7 @@ app.post('/api/sync/onus', safe((req, res) => {
   baseOnuIndex = buildBaseOnuIndex(baseOnus);
   applyOnuFilters();
   baseOnuIndex = buildBaseOnuIndex(baseOnus);
+  invalidateDerivedCaches();
   res.json({ok:true, total:baseOnus.length});
 }));
 
@@ -1016,6 +1086,7 @@ app.post('/api/ixc/sync',    safe(async(req,res)=>{
   const {results,errors}=await ixc.syncContactsByLogins(logins);
   let updated=0;
   Object.entries(results).forEach(([l,d])=>{ clientesMap[l]={name:d.name||'',whatsapp:d.whatsapp||'',id_cliente:d.id_cliente||'',id_contrato:d.id_contrato||''}; if(d.whatsapp)updated++; });
+  invalidateDerivedCaches();
   saveClientes();
   res.json({ok:true,loginsProcessed:logins.length,matched:Object.keys(results).length,withPhone:updated,errors:errors.length?errors:undefined});
 }));
@@ -1027,13 +1098,14 @@ app.post('/api/ixc/sync-pon', safe(async(req,res)=>{
   const {results,errors}=await ixc.syncContactsByLogins(logins);
   let updated=0;
   Object.entries(results).forEach(([l,d])=>{ clientesMap[l]={name:d.name||'',whatsapp:d.whatsapp||'',id_cliente:d.id_cliente||'',id_contrato:d.id_contrato||''}; if(d.whatsapp)updated++; });
+  invalidateDerivedCaches();
   saveClientes();
   res.json({ok:true,ponLabel:`${olt} Slot ${slot} PON ${pon}`,loginsFound:logins.length,matched:Object.keys(results).length,withPhone:updated,errors:errors.length?errors:undefined});
 }));
 app.get('/api/ixc/lookup/:login', safe(async(req,res)=>{
   const login=decodeURIComponent(req.params.login).toLowerCase();
   const {data,errors}=await ixc.lookupLogin(login);
-  if (data){clientesMap[login]={name:data.name||'',whatsapp:data.whatsapp||'',id_cliente:data.id_cliente||'',id_contrato:data.id_contrato||''};saveClientes();}
+  if (data){clientesMap[login]={name:data.name||'',whatsapp:data.whatsapp||'',id_cliente:data.id_cliente||'',id_contrato:data.id_contrato||''};invalidateDerivedCaches();saveClientes();}
   res.json({data,errors,login});
 }));
 

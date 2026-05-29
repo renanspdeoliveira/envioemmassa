@@ -14,7 +14,7 @@ export default function HomeHubPage() {
   return (
     <div>
       <style>{hubResponsiveCss}</style>
-      <PageHeader title="Central FuturaNet" subtitle="Escolha um painel para entrar no fluxo operacional" />
+      <PageHeader title="Central FuturaNet" subtitle="Escolha um painel para entrar no fluxo operacional" align="center" />
 
       <section style={hubSection}>
         <div style={hubBackdropGlowA} />
@@ -31,7 +31,7 @@ export default function HomeHubPage() {
         <div style={hubStage} className="hub-stage">
           <div style={hubAstronautGlow} />
           <div style={hubAstronautWrap}>
-            <img src="./astronauta-app-bg.png" alt="Astronauta FuturaNet" style={hubAstronautImage} />
+            <img src="./astronauta-pronto.png" alt="Astronauta FuturaNet" style={hubAstronautImage} />
           </div>
 
           {hubLinks.map(({ to, label, icon: Icon, accent, description, position }) => (
@@ -100,7 +100,8 @@ const hubIntro = {
   position: 'relative',
   zIndex: 2,
   maxWidth: 560,
-  marginBottom: 10,
+  margin: '0 auto 10px',
+  textAlign: 'center',
 }
 
 const hubEyebrow = {
@@ -126,6 +127,7 @@ const hubText = {
   lineHeight: 1.7,
   color: 'rgba(230,237,243,.74)',
   maxWidth: 500,
+  marginInline: 'auto',
 }
 
 const hubStage = {
@@ -153,11 +155,15 @@ const hubAstronautWrap = {
   top: '51%',
   width: 620,
   transform: 'translate(-50%, -50%)',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
   pointerEvents: 'none',
+  animation: 'hubAstronautFloat 7.5s ease-in-out infinite',
 }
 
 const hubAstronautImage = {
-  width: '100%',
+  width: '40%',
   display: 'block',
   filter: 'drop-shadow(0 0 42px rgba(56, 208, 255, 0.18))',
   opacity: 0.96,
@@ -204,6 +210,16 @@ const hubCardText = {
 }
 
 const hubResponsiveCss = `
+  .hub-stage::before {
+    content: '';
+    position: absolute;
+    inset: 21% 28%;
+    border-radius: 50%;
+    border: 1px solid rgba(142, 197, 255, 0.08);
+    box-shadow: inset 0 0 40px rgba(88, 166, 255, 0.04);
+    pointer-events: none;
+  }
+
   .hub-card {
     animation: hubFloat 6.2s ease-in-out infinite;
   }
@@ -212,11 +228,11 @@ const hubResponsiveCss = `
     transform: translateY(-6px) scale(1.02);
   }
 
-  .hub-card-top-left { left: 3%; top: 9%; animation-delay: .1s; }
-  .hub-card-top-right { right: 5%; top: 12%; animation-delay: .5s; }
-  .hub-card-bottom-left { left: 8%; bottom: 15%; animation-delay: .9s; }
-  .hub-card-bottom-right { right: 8%; bottom: 12%; animation-delay: 1.3s; }
-  .hub-card-center-right { right: 0; top: 50%; transform: translateY(-50%); animation-delay: 1.7s; }
+  .hub-card-top-left { left: 24%; top: 20%; animation-delay: .1s; }
+  .hub-card-top-right { right: 24%; top: 20%; animation-delay: .5s; }
+  .hub-card-bottom-left { left: 25%; bottom: 24%; animation-delay: .9s; }
+  .hub-card-bottom-right { right: 22%; bottom: 18%; animation-delay: 1.3s; }
+  .hub-card-center-right { right: 18%; top: 46%; transform: translateY(-50%); animation-delay: 1.7s; }
   .hub-card-center-right:hover { transform: translateY(calc(-50% - 6px)) scale(1.02); }
 
   @keyframes hubFloat {
@@ -224,7 +240,17 @@ const hubResponsiveCss = `
     50% { transform: translateY(-8px); }
   }
 
+  @keyframes hubAstronautFloat {
+    0%, 100% { transform: translate(-50%, -50%) rotate(-1deg); }
+    50% { transform: translate(-50%, calc(-50% - 14px)) rotate(1.5deg); }
+  }
+
   @media (max-width: 1180px) {
+    .hub-stage::before {
+      inset: 120px 18% auto;
+      height: 300px;
+    }
+
     .hub-stage {
       min-height: auto !important;
       display: grid !important;

@@ -1,0 +1,2 @@
+function l(e,n="export.csv"){if(!e.length)return;const t=Object.keys(e[0]),c=[t.join(","),...e.map(a=>t.map(i=>{const r=a[i]??"";return String(r).includes(",")?`"${r}"`:r}).join(","))].join(`
+`),u=new Blob(["\uFEFF"+c],{type:"text/csv;charset=utf-8;"}),s=URL.createObjectURL(u),o=document.createElement("a");o.href=s,o.download=n,o.click(),URL.revokeObjectURL(s)}function f(e,n){let t;return(...c)=>{clearTimeout(t),t=setTimeout(()=>e(...c),n)}}export{f as d,l as e};

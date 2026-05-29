@@ -230,9 +230,11 @@ export function Btn({ children, variant = 'default', style = {}, ...props }) {
   )
 }
 
-export function PageHeader({ title, subtitle, action }) {
+export function PageHeader({ title, subtitle, action, align = 'left' }) {
+  const isCenter = align === 'center'
+
   return (
-    <div style={{ marginBottom: 24, display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
+    <div style={{ marginBottom: 24, display: 'flex', alignItems: isCenter ? 'center' : 'flex-start', justifyContent: isCenter ? 'center' : 'space-between', flexDirection: isCenter ? 'column' : 'row', textAlign: isCenter ? 'center' : 'left' }}>
       <div>
         <h1 style={{ fontSize: 20, fontWeight: 600, color: 'var(--text-primary)', letterSpacing: '-.02em' }}>{title}</h1>
         {subtitle && <p style={{ fontSize: 13, color: 'var(--text-secondary)', marginTop: 4 }}>{subtitle}</p>}

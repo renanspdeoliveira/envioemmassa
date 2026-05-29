@@ -1,43 +1,51 @@
-import { BrowserRouter, Navigate, Routes, Route } from 'react-router-dom'
+import { Suspense, lazy } from 'react'
+import { BrowserRouter, Navigate, Routes, Route, useLocation } from 'react-router-dom'
 import AppHeader from './components/AppHeader'
 import AppFooter from './components/AppFooter'
-import HomeHubPage from './pages/HomeHubPage'
-import DashboardPage from './pages/DashboardPage'
-import OnusPage from './pages/OnusPage'
-import OnuDetailPage from './pages/OnuDetailPage'
-import OnuDesautorizadasPage from './pages/OnuDesautorizadasPage'
-import PonsPage from './pages/PonsPage'
-import PonDetailPage from './pages/PonDetailPage'
-import SinalPage from './pages/SinalPage'
-import EnvioMassaPage from './pages/EnvioMassaPage'
-import IxcConfigPage from './pages/IxcConfigPage'
-import Clientes24hOfflinePage from './pages/Clientes24hOfflinePage'
-import LoginPage from './pages/LoginPage'
 import ProtectedRoute from './auth/ProtectedRoute'
+import { Spinner } from './components/UI'
+
+const HomeHubPage = lazy(() => import('./pages/HomeHubPage'))
+const DashboardPage = lazy(() => import('./pages/DashboardPage'))
+const OnusPage = lazy(() => import('./pages/OnusPage'))
+const OnuDetailPage = lazy(() => import('./pages/OnuDetailPage'))
+const OnuDesautorizadasPage = lazy(() => import('./pages/OnuDesautorizadasPage'))
+const PonsPage = lazy(() => import('./pages/PonsPage'))
+const PonDetailPage = lazy(() => import('./pages/PonDetailPage'))
+const SinalPage = lazy(() => import('./pages/SinalPage'))
+const EnvioMassaPage = lazy(() => import('./pages/EnvioMassaPage'))
+const IxcConfigPage = lazy(() => import('./pages/IxcConfigPage'))
+const Clientes24hOfflinePage = lazy(() => import('./pages/Clientes24hOfflinePage'))
+const LoginPage = lazy(() => import('./pages/LoginPage'))
 
 function AppShell() {
+  const location = useLocation()
+  const showHeader = location.pathname !== '/'
+
   return (
     <div style={shell}>
       <div style={shellGlowA} />
       <div style={shellGlowB} />
       <div style={shellAstronaut} />
       <div style={shellMesh} />
-      <AppHeader />
+      {showHeader && <AppHeader />}
       <main style={main}>
-        <Routes>
-          <Route path="/" element={<HomeHubPage />} />
-          <Route path="/dashboard" element={<DashboardPage />} />
-          <Route path="/onus-desautorizadas" element={<OnuDesautorizadasPage />} />
-          <Route path="/onus" element={<OnusPage />} />
-          <Route path="/onus/:mac" element={<OnuDetailPage />} />
-          <Route path="/pons" element={<PonsPage />} />
-          <Route path="/pons/:ponId" element={<PonDetailPage />} />
-          <Route path="/sinal" element={<SinalPage />} />
-          <Route path="/clientes-24h-offline" element={<Clientes24hOfflinePage />} />
-          <Route path="/envio" element={<EnvioMassaPage />} />
-          <Route path="/ixc" element={<IxcConfigPage />} />
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
+        <Suspense fallback={<Spinner size={24} />}>
+          <Routes>
+            <Route path="/" element={<HomeHubPage />} />
+            <Route path="/dashboard" element={<DashboardPage />} />
+            <Route path="/onus-desautorizadas" element={<OnuDesautorizadasPage />} />
+            <Route path="/onus" element={<OnusPage />} />
+            <Route path="/onus/:mac" element={<OnuDetailPage />} />
+            <Route path="/pons" element={<PonsPage />} />
+            <Route path="/pons/:ponId" element={<PonDetailPage />} />
+            <Route path="/sinal" element={<SinalPage />} />
+            <Route path="/clientes-24h-offline" element={<Clientes24hOfflinePage />} />
+            <Route path="/envio" element={<EnvioMassaPage />} />
+            <Route path="/ixc" element={<IxcConfigPage />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </Suspense>
       </main>
       <AppFooter />
     </div>
@@ -47,17 +55,19 @@ function AppShell() {
 export default function App() {
   return (
     <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-      <Routes>
-        <Route path="/login" element={<LoginPage />} />
-        <Route
-          path="*"
-          element={(
-            <ProtectedRoute>
-              <AppShell />
-            </ProtectedRoute>
-          )}
-        />
-      </Routes>
+      <Suspense fallback={<Spinner size={24} />}>
+        <Routes>
+          <Route path="/login" element={<LoginPage />} />
+          <Route
+            path="*"
+            element={(
+              <ProtectedRoute>
+                <AppShell />
+              </ProtectedRoute>
+            )}
+          />
+        </Routes>
+      </Suspense>
     </BrowserRouter>
   )
 }

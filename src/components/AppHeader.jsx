@@ -1,13 +1,21 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import {
-  ArrowLeft,
   Camera,
   LogOut,
   User,
 } from 'lucide-react'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { NavLink } from 'react-router-dom'
 import { useAuth } from '../auth/AuthProvider'
 import { supabase } from '../lib/supabase'
+
+const navLinks = [
+  { to: '/dashboard', label: 'Dashboard' },
+  { to: '/onus', label: 'ONUs' },
+  { to: '/sinal', label: 'Sinal' },
+  { to: '/onus-desautorizadas', label: 'Desautorizadas' },
+  { to: '/clientes-24h-offline', label: 'Clientes 24h' },
+  { to: '/envio', label: 'Envio' },
+]
 
 function getAvatarKey(userId) {
   return `futuranet-avatar:${userId}`
@@ -15,12 +23,9 @@ function getAvatarKey(userId) {
 
 export default function AppHeader() {
   const { user } = useAuth()
-  const location = useLocation()
-  const navigate = useNavigate()
   const [avatarUrl, setAvatarUrl] = useState('')
   const [menuOpen, setMenuOpen] = useState(false)
   const fileInputRef = useRef(null)
-  const isHomeHub = location.pathname === '/'
 
   useEffect(() => {
     if (!user?.id) {
@@ -61,24 +66,9 @@ export default function AppHeader() {
     reader.readAsDataURL(file)
   }
 
-  function handleBack() {
-    if (window.history.length > 1) {
-      navigate(-1)
-      return
-    }
-    navigate('/')
-  }
-
   return (
     <header style={header}>
       <div style={headerLeft}>
-        {!isHomeHub && (
-          <button type="button" onClick={handleBack} style={backBtn}>
-            <ArrowLeft size={16} />
-            Voltar
-          </button>
-        )}
-
         <div style={brandArea}>
           <img src="./Logo-Futuranet.png" alt="Logo Futuranet" style={brandLogo} />
           <div>
@@ -87,6 +77,15 @@ export default function AppHeader() {
           </div>
         </div>
       </div>
+
+      <nav style={nav}>
+        {navLinks.map(({ to, label, end }) => (
+          <NavLink key={to} to={to} end={end} style={({ isActive }) => navLink(isActive)}>
+            {label}
+          </NavLink>
+        ))}
+      </nav>
+
       <div style={userArea}>
         <input
           ref={fileInputRef}
@@ -132,9 +131,9 @@ const header = {
   position: 'sticky',
   top: 0,
   zIndex: 40,
-  display: 'flex',
+  display: 'grid',
+  gridTemplateColumns: 'max-content minmax(0, 1fr) max-content',
   alignItems: 'center',
-  justifyContent: 'space-between',
   gap: 20,
   padding: '18px 28px',
   background:
@@ -142,7 +141,6 @@ const header = {
   borderBottom: '1px solid rgba(88, 166, 255, 0.14)',
   backdropFilter: 'blur(14px)',
   boxShadow: '0 10px 30px rgba(0, 0, 0, 0.16)',
-  flexWrap: 'wrap',
 }
 
 const brandArea = {
@@ -156,6 +154,7 @@ const headerLeft = {
   alignItems: 'center',
   gap: 14,
   flexWrap: 'wrap',
+  flexShrink: 0,
 }
 
 const brandLogo = {
@@ -178,23 +177,38 @@ const brandTitle = {
   letterSpacing: '-0.03em',
 }
 
-const backBtn = {
-  display: 'inline-flex',
+const nav = {
+  display: 'flex',
   alignItems: 'center',
+  justifyContent: 'center',
   gap: 8,
-  padding: '10px 14px',
+  flex: 1,
+  flexWrap: 'wrap',
+  minWidth: 0,
+  margin: '0 auto',
+  maxWidth: 920,
+}
+
+const navLink = isActive => ({
+  padding: '9px 14px',
   borderRadius: 999,
-  border: '1px solid rgba(88, 166, 255, 0.18)',
-  background: 'linear-gradient(180deg, rgba(18, 27, 39, 0.92), rgba(12, 18, 28, 0.96))',
-  color: 'var(--text-primary)',
+  border: `1px solid ${isActive ? 'rgba(88, 166, 255, 0.34)' : 'rgba(255,255,255,0.06)'}`,
+  background: isActive
+    ? 'linear-gradient(135deg, rgba(31, 111, 235, 0.92), rgba(88, 166, 255, 0.72))'
+    : 'linear-gradient(180deg, rgba(18, 27, 39, 0.72), rgba(12, 18, 28, 0.88))',
+  color: isActive ? '#fff' : 'var(--text-secondary)',
   fontSize: 13,
   fontWeight: 600,
-  cursor: 'pointer',
-  boxShadow: '0 12px 28px rgba(0, 0, 0, 0.18)',
-}
+  textDecoration: 'none',
+  boxShadow: isActive ? '0 12px 24px rgba(31, 111, 235, 0.18)' : 'none',
+  transition: 'all .18s ease',
+  whiteSpace: 'nowrap',
+})
 
 const userArea = {
   position: 'relative',
+  flexShrink: 0,
+  justifySelf: 'end',
 }
 
 const avatarButton = {

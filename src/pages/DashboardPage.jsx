@@ -25,7 +25,7 @@ function CustomTooltip({ active, payload, label }) {
   )
 }
 
-function MetricCard({ label, value, sub, icon: Icon, color, glow }) {
+function MetricCard({ label, value, sub, icon: Icon, color, glow, illustrationSrc }) {
   return (
     <div
       style={{
@@ -39,6 +39,14 @@ function MetricCard({ label, value, sub, icon: Icon, color, glow }) {
       }}
     >
       <div style={{ position: 'absolute', inset: 'auto -20px -26px auto', width: 90, height: 90, borderRadius: '50%', background: 'rgba(255,255,255,.04)' }} />
+      {illustrationSrc && (
+        <img
+          src={illustrationSrc}
+          alt=""
+          aria-hidden="true"
+          style={metricIllustration}
+        />
+      )}
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12 }}>
         <div>
           <div style={{ fontSize: 11, color: 'rgba(230,237,243,.76)', textTransform: 'uppercase', letterSpacing: '.08em', fontWeight: 700 }}>{label}</div>
@@ -108,8 +116,8 @@ export default function DashboardPage() {
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))', gap: 14, marginBottom: 24 }}>
         <MetricCard label="Total de ONUs" value={stats.total?.toLocaleString('pt-BR')} sub="todos os equipamentos da base" icon={Wifi} color="#7cc6ff" glow="rgba(31,111,235,0.28)" />
-        <MetricCard label="ONUs Online" value={stats.online?.toLocaleString('pt-BR')} sub={`${onlinePct}% da base com sinal`} icon={CheckCircle} color="#63df86" glow="rgba(63,185,80,0.24)" />
-        <MetricCard label="Alertas Offline" value={stats.offlineAtencao?.toLocaleString('pt-BR')} sub="equipamentos que pedem atencao" icon={WifiOff} color="#ff8d88" glow="rgba(248,81,73,0.24)" />
+        <MetricCard label="ONUs Online" value={stats.online?.toLocaleString('pt-BR')} sub={`${onlinePct}% da base com sinal`} icon={CheckCircle} color="#63df86" glow="rgba(63,185,80,0.24)" illustrationSrc="./astronauta-online.png" />
+        <MetricCard label="Alertas Offline" value={stats.offlineAtencao?.toLocaleString('pt-BR')} sub="equipamentos que pedem atencao" icon={WifiOff} color="#ff8d88" glow="rgba(248,81,73,0.24)" illustrationSrc="./astronauta_offline.png" />
         <MetricCard label="Total de PONs" value={stats.totalPons?.toLocaleString('pt-BR')} sub={`${stats.semLeituraRx} sem leitura RX`} icon={Radio} color="#77b9ff" glow="rgba(88,166,255,0.22)" />
       </div>
 
@@ -296,4 +304,15 @@ const heroGlowB = {
   bottom: -70,
   left: -40,
   filter: 'blur(16px)',
+}
+
+const metricIllustration = {
+  position: 'absolute',
+  right: 8,
+  bottom: 6,
+  width: 86,
+  height: 'auto',
+  opacity: 0.92,
+  pointerEvents: 'none',
+  filter: 'drop-shadow(0 10px 22px rgba(0,0,0,.18))',
 }

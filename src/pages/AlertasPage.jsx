@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useApi } from '../hooks/useApi'
 import { api } from '../utils/api'
@@ -28,6 +29,21 @@ function AlertCard({ title, count, color, icon: Icon, children, defaultOpen = fa
       </div>
       {open && <div>{children}</div>}
     </Card>
+  )
+}
+
+function OfflineAlertHero() {
+  return (
+    <div style={offlineHero}>
+      <img src="./astronauta_offline.png" alt="Astronauta offline" style={offlineHeroImage} />
+      <div style={offlineHeroText}>
+        <div style={offlineHeroEyebrow}>Monitoramento de quedas</div>
+        <div style={offlineHeroTitle}>ONUs e clientes que precisam de acao imediata.</div>
+        <div style={offlineHeroBody}>
+          Navegue direto pelos registros offline para priorizar atendimento, validacao de sinal e recuperacao do cliente.
+        </div>
+      </div>
+    </div>
   )
 }
 
@@ -93,6 +109,7 @@ export default function AlertasPage() {
       />
 
       <AlertCard title="ONUs Offline / Atenção" count={counts.offline} color="red" icon={WifiOff} defaultOpen>
+        <OfflineAlertHero />
         <OnuTable rows={offline} />
       </AlertCard>
 
@@ -147,4 +164,49 @@ export default function AlertasPage() {
       </Card>
     </div>
   )
+}
+
+const offlineHero = {
+  display: 'flex',
+  alignItems: 'center',
+  gap: 18,
+  padding: '18px 18px 10px',
+  borderBottom: '1px solid var(--border-subtle)',
+  background: 'linear-gradient(180deg, rgba(74,31,31,0.18), rgba(20,24,31,0))',
+}
+
+const offlineHeroImage = {
+  width: 118,
+  height: 'auto',
+  display: 'block',
+  flexShrink: 0,
+  filter: 'drop-shadow(0 10px 24px rgba(0,0,0,.22))',
+}
+
+const offlineHeroText = {
+  minWidth: 0,
+}
+
+const offlineHeroEyebrow = {
+  fontSize: 11,
+  textTransform: 'uppercase',
+  letterSpacing: '.1em',
+  color: 'var(--red-text)',
+  fontWeight: 700,
+  marginBottom: 6,
+}
+
+const offlineHeroTitle = {
+  fontSize: 18,
+  lineHeight: 1.15,
+  color: 'var(--text-primary)',
+  fontWeight: 700,
+  marginBottom: 6,
+}
+
+const offlineHeroBody = {
+  fontSize: 13,
+  lineHeight: 1.55,
+  color: 'var(--text-secondary)',
+  maxWidth: 620,
 }
