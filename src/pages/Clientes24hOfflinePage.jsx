@@ -1,14 +1,15 @@
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { api } from '../utils/api'
-import { useApi } from '../hooks/useApi'
-import { Card, Spinner, ErrorMsg, Empty, Input, Select, Btn, Badge, StatusBadge, PageHeader } from '../components/UI'
 import { Database, Download, Link as LinkIcon, RefreshCw, Search, WifiOff } from 'lucide-react'
+import { Card, Spinner, ErrorMsg, Empty, Input, Select, Btn, Badge, StatusBadge, PageHeader } from '../components/UI'
+import { useApi } from '../hooks/useApi'
+import { api } from '../utils/api'
 import { exportToCsv } from '../utils/helpers'
 
 const PAGE_SIZE = 50
 const MS_20H = 20 * 60 * 60 * 1000
 const MS_24H = 24 * 60 * 60 * 1000
+const MS_5D = 5 * 24 * 60 * 60 * 1000
 
 export default function Clientes24hOfflinePage() {
   const navigate = useNavigate()
@@ -22,6 +23,37 @@ export default function Clientes24hOfflinePage() {
   const rows = result?.data || []
   const summary = result?.summary || {}
 
+  const computedSummary = useMemo(() => {
+    const totalHoje = rows.filter(
+      (row) => row.faixaOffline === 'hoje' || row.faixaOffline === 'hoje20plus'
+    ).length
+
+    const diaAnteriorRows = rows.filter(
+      (row) => row.faixaOffline === 'diaAnterior24h' && row.offlineMs >= MS_20H
+    )
+
+    const recent20hRows = rows.filter(
+      (row) => row.offlineMs >= MS_20H && row.offlineMs <= MS_5D
+    )
+
+    const recent24hRows = rows.filter(
+      (row) => row.offlineMs >= MS_24H && row.offlineMs <= MS_5D
+    )
+
+    const avg24hMs = recent24hRows.length
+      ? Math.round(recent24hRows.reduce((acc, row) => acc + row.offlineMs, 0) / recent24hRows.length)
+      : 0
+
+    return {
+      totalHoje,
+      totalDiaAnterior24h: diaAnteriorRows.length,
+      total20hRecent: recent20hRows.length,
+      total24hRecent: recent24hRows.length,
+      ativos20hRecent: recent20hRows.filter((row) => row.ativo === 'Ativo').length,
+      avg24hLabel: avg24hMs ? formatDurationFromMs(avg24hMs) : '-',
+    }
+  }, [rows])
+
   const filteredRows = useMemo(() => {
     const query = search.trim().toLowerCase()
 
@@ -29,9 +61,9 @@ export default function Clientes24hOfflinePage() {
       if (ativo && row.ativo !== ativo) return false
       if (onuStatus && row.onuStatus !== onuStatus) return false
       if (faixaOffline === 'hoje' && row.faixaOffline !== 'hoje' && row.faixaOffline !== 'hoje20plus') return false
-      if (faixaOffline === 'diaAnterior24h' && row.faixaOffline !== 'diaAnterior24h') return false
-      if (faixaOffline === '20plus' && row.offlineMs < MS_20H) return false
-      if (faixaOffline === '24plus' && row.offlineMs < MS_24H) return false
+      if (faixaOffline === 'diaAnterior24h' && (row.faixaOffline !== 'diaAnterior24h' || row.offlineMs < MS_20H)) return false
+      if (faixaOffline === '20plus' && (row.offlineMs < MS_20H || row.offlineMs > MS_5D)) return false
+      if (faixaOffline === '24plus' && (row.offlineMs < MS_24H || row.offlineMs > MS_5D)) return false
       if (!query) return true
 
       return [
@@ -70,7 +102,7 @@ export default function Clientes24hOfflinePage() {
 
   function handleExportCsv() {
     const rowsToExport = rows
-      .filter((row) => row.offlineMs >= MS_24H)
+      .filter((row) => row.offlineMs >= MS_24H && row.offlineMs <= MS_5D)
       .filter((row) => row.whatsapp)
       .map((row) => ({
         name: row.nomeCliente || row.login || 'Sem nome',
@@ -94,10 +126,10 @@ export default function Clientes24hOfflinePage() {
             <Btn
               variant="primary"
               onClick={handleExportCsv}
-              disabled={!rows.some((row) => row.offlineMs >= MS_24H && row.whatsapp)}
+              disabled={!rows.some((row) => row.offlineMs >= MS_24H && row.offlineMs <= MS_5D && row.whatsapp)}
             >
               <Download size={14} />
-              Exportar CSV 24+
+              Exportar CSV 24h a 5d
             </Btn>
           </div>
         )}
@@ -108,8 +140,10 @@ export default function Clientes24hOfflinePage() {
           <div style={summaryGrid}>
             <SummaryCard
               label="Offline Hoje"
-              value={summary.totalHoje ?? 0}
-              sub={`ultima conexao desde ${summary.referenciaHoje || '-'}`}
+              value={computedSummary.totalHoje}
+              sub={computedSummary.totalHoje > 0
+                ? `ultima conexao desde ${summary.referenciaHoje || '-'}`
+                : 'sem informacao no momento'}
               icon={WifiOff}
               color="red"
               active={faixaOffline === 'hoje'}
@@ -117,37 +151,43 @@ export default function Clientes24hOfflinePage() {
             />
             <SummaryCard
               label="Dia Anterior 24h"
-              value={summary.totalDiaAnterior24h ?? 0}
-              sub={`somente clientes com data ${summary.referenciaDiaAnterior || '-'}`}
+              value={computedSummary.totalDiaAnterior24h}
+              sub={computedSummary.totalDiaAnterior24h > 0
+                ? `clientes de ${summary.referenciaDiaAnterior || '-'} com 20h+ offline`
+                : 'sem informacao no momento'}
               icon={Database}
               color="green"
               active={faixaOffline === 'diaAnterior24h'}
               onClick={() => { setFaixaOffline('diaAnterior24h'); setPage(1) }}
             />
             <SummaryCard
-              label="Offline"
-              value={summary.total20h ?? 0}
-              sub={`mais de 20h offline · ativos ${summary.ativos20h ?? 0}`}
+              label="Offline Recente"
+              value={computedSummary.total20hRecent}
+              sub={computedSummary.total20hRecent > 0
+                ? `de 20h ate 5 dias · ativos ${computedSummary.ativos20hRecent}`
+                : 'sem informacao no momento'}
               icon={LinkIcon}
               color="blue"
               active={faixaOffline === '20plus'}
               onClick={() => { setFaixaOffline('20plus'); setPage(1) }}
             />
             <SummaryCard
-              label="Clientes 24+"
-              value={summary.total24h ?? rows.length}
-              sub={`offline desde pelo menos ${summary.referencia24hData || '-'}`}
+              label="Clientes 24h+"
+              value={computedSummary.total24hRecent}
+              sub={computedSummary.total24hRecent > 0
+                ? 'faixa de 24h ate 5 dias offline'
+                : 'sem informacao no momento'}
               icon={Database}
               color="amber"
               active={faixaOffline === '24plus'}
               onClick={() => { setFaixaOffline('24plus'); setPage(1) }}
             />
             <SummaryCard
-              label="Mais Antigo 24h+"
-              value={summary.maisAntigo24h?.ultimaConexaoFmt || '-'}
-              sub={summary.maisAntigo24h
-                ? `${summary.maisAntigo24h.login || 'Sem login'} · ${summary.maisAntigo24h.tempoOffline}`
-                : 'sem cliente acima de 24h no momento'}
+              label="Media 24h+"
+              value={computedSummary.avg24hLabel}
+              sub={computedSummary.total24hRecent > 0
+                ? `${computedSummary.total24hRecent.toLocaleString('pt-BR')} clientes na janela recente`
+                : 'sem clientes recentes acima de 24h'}
               icon={Database}
               color="green"
             />
@@ -162,32 +202,40 @@ export default function Clientes24hOfflinePage() {
                     : faixaOffline === 'diaAnterior24h'
                       ? 'Dia Anterior 24h'
                       : faixaOffline === '20plus'
-                        ? 'Offline'
-                        : 'Clientes 24+'}
+                        ? 'Offline Recente'
+                        : 'Clientes 24h+'}
                 </div>
                 <div style={highlightText}>
                   {faixaOffline === 'hoje' && (
-                    <>Esta lista mostra apenas clientes offline cuja ultima conexao foi hoje, desde <strong>{summary.referenciaHojeDataHora || '-'}</strong>.</>
+                    <>
+                      {computedSummary.totalHoje > 0
+                        ? <>Esta lista mostra apenas clientes offline cuja ultima conexao foi hoje, desde <strong>{summary.referenciaHojeDataHora || '-'}</strong>.</>
+                        : <>Sem informacao de clientes offline hoje no momento.</>}
+                    </>
                   )}
                   {faixaOffline === 'diaAnterior24h' && (
-                    <>Esta lista mostra apenas clientes cuja <strong>data original</strong> pertence ao dia anterior, em <strong>{summary.referenciaDiaAnterior || '-'}</strong>.</>
+                    <>
+                      {computedSummary.totalDiaAnterior24h > 0
+                        ? <>Esta lista mostra apenas clientes cuja <strong>data original</strong> pertence ao dia anterior, em <strong>{summary.referenciaDiaAnterior || '-'}</strong>, e que tenham mais de <strong>20 horas offline</strong>.</>
+                        : <>Sem informacao de clientes do dia anterior com mais de <strong>20 horas offline</strong> no momento.</>}
+                    </>
                   )}
                   {faixaOffline === '20plus' && (
-                    <>Esta lista mostra apenas clientes com mais de <strong>20 horas offline</strong>, desde <strong>{summary.referencia20hDataHora || '-'}</strong>.</>
+                    <>Esta lista mostra apenas clientes com mais de <strong>20 horas offline</strong> e no maximo <strong>5 dias</strong> sem conexao, focando nos casos mais recentes.</>
                   )}
                   {faixaOffline === '24plus' && (
-                    <>Esta lista mostra apenas clientes que continuam offline desde <strong>{summary.referencia24hDataHora || '-'}</strong> ou antes.</>
+                    <>Esta lista mostra apenas clientes na faixa de <strong>24 horas ate 5 dias offline</strong>, sem misturar casos muito antigos nesta planilha.</>
                   )}
                 </div>
               </div>
               <Badge color={faixaOffline === 'hoje' ? 'red' : faixaOffline === 'diaAnterior24h' ? 'green' : faixaOffline === '20plus' ? 'blue' : 'amber'}>
                 {(faixaOffline === 'hoje'
-                  ? (summary.totalHoje ?? 0)
+                  ? computedSummary.totalHoje
                   : faixaOffline === 'diaAnterior24h'
-                    ? (summary.totalDiaAnterior24h ?? 0)
-                  : faixaOffline === '20plus'
-                    ? (summary.total20h ?? 0)
-                    : (summary.total24h ?? rows.length)
+                    ? computedSummary.totalDiaAnterior24h
+                    : faixaOffline === '20plus'
+                      ? computedSummary.total20hRecent
+                      : computedSummary.total24hRecent
                 ).toLocaleString('pt-BR')} clientes
               </Badge>
             </div>
@@ -307,6 +355,10 @@ function SummaryCard({ label, value, sub, icon: Icon, color, active = false, onC
     green: { bg: 'var(--green-subtle)', text: 'var(--green-text)' },
   }[color]
 
+  const formattedValue = typeof value === 'number'
+    ? value.toLocaleString('pt-BR')
+    : String(value || '-')
+
   return (
     <button
       type="button"
@@ -327,7 +379,7 @@ function SummaryCard({ label, value, sub, icon: Icon, color, active = false, onC
           <Icon size={15} color={palette.text} />
         </div>
       </div>
-      <div style={{ fontSize: 30, lineHeight: 1, fontWeight: 700, color: palette.text }}>{Number(value || 0).toLocaleString('pt-BR')}</div>
+      <div style={{ fontSize: 30, lineHeight: 1, fontWeight: 700, color: palette.text }}>{formattedValue}</div>
       <div style={{ fontSize: 12, color: 'var(--text-secondary)', marginTop: 8 }}>{sub}</div>
     </button>
   )
@@ -346,6 +398,15 @@ function fmtPhoneCsv(value) {
   if (digits.length === 11) return `${digits.slice(0, 2)} ${digits.slice(2, 7)}-${digits.slice(7)}`
   if (digits.length === 10) return `${digits.slice(0, 2)} ${digits.slice(2, 6)}-${digits.slice(6)}`
   return value || ''
+}
+
+function formatDurationFromMs(ms) {
+  const totalHours = Math.floor(ms / (60 * 60 * 1000))
+  const days = Math.floor(totalHours / 24)
+  const hours = totalHours % 24
+
+  if (days > 0) return `${days}d ${hours}h`
+  return `${hours}h`
 }
 
 const summaryGrid = {

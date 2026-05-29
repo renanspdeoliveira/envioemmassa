@@ -5,7 +5,7 @@ import { PageHeader } from '../components/UI'
 import { CheckCircle, Radio, Server, Wifi, WifiOff } from 'lucide-react'
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  PieChart, Pie, Cell
+  PieChart, Pie, Cell,
 } from 'recharts'
 
 const CHART_COLORS = ['#58a6ff', '#56d364', '#e3b341', '#ff7b72', '#8b949e']
@@ -107,38 +107,10 @@ export default function DashboardPage() {
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))', gap: 14, marginBottom: 24 }}>
-        <MetricCard
-          label="Total de ONUs"
-          value={stats.total?.toLocaleString('pt-BR')}
-          sub="todos os equipamentos da base"
-          icon={Wifi}
-          color="#7cc6ff"
-          glow="rgba(31,111,235,0.28)"
-        />
-        <MetricCard
-          label="ONUs Online"
-          value={stats.online?.toLocaleString('pt-BR')}
-          sub={`${onlinePct}% da base com sinal`}
-          icon={CheckCircle}
-          color="#63df86"
-          glow="rgba(63,185,80,0.24)"
-        />
-        <MetricCard
-          label="Alertas Offline"
-          value={stats.offlineAtencao?.toLocaleString('pt-BR')}
-          sub="equipamentos que pedem atencao"
-          icon={WifiOff}
-          color="#ff8d88"
-          glow="rgba(248,81,73,0.24)"
-        />
-        <MetricCard
-          label="Total de PONs"
-          value={stats.totalPons?.toLocaleString('pt-BR')}
-          sub={`${stats.semLeituraRx} sem leitura RX`}
-          icon={Radio}
-          color="#77b9ff"
-          glow="rgba(88,166,255,0.22)"
-        />
+        <MetricCard label="Total de ONUs" value={stats.total?.toLocaleString('pt-BR')} sub="todos os equipamentos da base" icon={Wifi} color="#7cc6ff" glow="rgba(31,111,235,0.28)" />
+        <MetricCard label="ONUs Online" value={stats.online?.toLocaleString('pt-BR')} sub={`${onlinePct}% da base com sinal`} icon={CheckCircle} color="#63df86" glow="rgba(63,185,80,0.24)" />
+        <MetricCard label="Alertas Offline" value={stats.offlineAtencao?.toLocaleString('pt-BR')} sub="equipamentos que pedem atencao" icon={WifiOff} color="#ff8d88" glow="rgba(248,81,73,0.24)" />
+        <MetricCard label="Total de PONs" value={stats.totalPons?.toLocaleString('pt-BR')} sub={`${stats.semLeituraRx} sem leitura RX`} icon={Radio} color="#77b9ff" glow="rgba(88,166,255,0.22)" />
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16 }}>
@@ -261,7 +233,7 @@ const heroWrap = {
   padding: 22,
   marginBottom: 18,
   border: '1px solid rgba(88,166,255,.12)',
-  background: 'linear-gradient(135deg, rgba(31,111,235,.22) 0%, rgba(22,27,34,.96) 42%, rgba(32,38,48,.98) 100%)',
+  background: 'linear-gradient(135deg, rgba(31,111,235,.14) 0%, rgba(22,27,34,.92) 42%, rgba(32,38,48,.95) 100%)',
   boxShadow: '0 26px 50px rgba(0,0,0,.22)',
 }
 
