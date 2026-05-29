@@ -1,6 +1,7 @@
-import { useParams, useNavigate } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { useParams, useNavigate, useLocation } from 'react-router-dom'
 import { useApi } from '../hooks/useApi'
-import { api } from '../utils/api'
+import { api, apiClientes } from '../utils/api'
 import { Card, CardHeader, Spinner, ErrorMsg, StatusBadge, PotenciaBadge, RxBadge, Badge, Btn } from '../components/UI'
 import { ArrowLeft, Router, Signal, Wifi } from 'lucide-react'
 
@@ -39,7 +40,16 @@ function fmtPhone(d) {
 export default function OnuDetailPage() {
   const { mac } = useParams()
   const navigate = useNavigate()
+  const location = useLocation()
+  const offlineContext = location.state?.offlineContext || null
   const { data, loading, error } = useApi(() => api.onuDetail(mac), [mac], { refreshInterval: 30000 })
+  const [savingPowerOff, setSavingPowerOff] = useState(false)
+  const persistedIgnoreOfflineAlways = !!data?.onu?.ignoreOfflineAlways
+  const [ignoreOfflineAlways, setIgnoreOfflineAlways] = useState(!!offlineContext?.ignoreOfflineAlways)
+
+  useEffect(() => {
+    setIgnoreOfflineAlways(!!offlineContext?.ignoreOfflineAlways || persistedIgnoreOfflineAlways)
+  }, [offlineContext?.ignoreOfflineAlways, persistedIgnoreOfflineAlways, mac])
 
   if (loading) return <Spinner />
   if (error) return <ErrorMsg message={error} />
@@ -49,6 +59,18 @@ export default function OnuDetailPage() {
   const displayName = getDisplayClientName(onu)
   const displayOlt = getDisplayOlt(onu)
   const displayPonId = onu['PON ID'] || null
+
+  async function handleToggleIgnoreOffline() {
+    if (!onu?.Login) return
+    try {
+      setSavingPowerOff(true)
+      const nextValue = !ignoreOfflineAlways
+      await apiClientes.offlineIgnore(onu.Login, nextValue)
+      setIgnoreOfflineAlways(nextValue)
+    } finally {
+      setSavingPowerOff(false)
+    }
+  }
 
   return (
     <div>
@@ -85,6 +107,25 @@ export default function OnuDetailPage() {
             <InfoRow label="Tipo ONU" value={onu['ONU Tipo']} />
             <InfoRow label="VLAN" value={onu.VLAN ? Math.round(onu.VLAN) : '-'} mono />
             <InfoRow label="Ultima atualizacao" value={onu['Ãšltima atualizaÃ§Ã£o'] || onu['ÃƒÅ¡ltima atualizaÃƒÂ§ÃƒÂ£o']} />
+            {offlineContext && <InfoRow label="Tempo offline" value={offlineContext.tempoOffline || '-'} mono />}
+            {offlineContext && <InfoRow label="Ultima conexao" value={offlineContext.ultimaConexao || '-'} mono />}
+            {offlineContext && <InfoRow label="Ultimo IP" value={offlineContext.ultimoIp || '-'} mono />}
+            <div style={offlineFlagBox}>
+              <label style={offlineFlagLabel}>
+                <input
+                  type="checkbox"
+                  checked={ignoreOfflineAlways}
+                  disabled={savingPowerOff || !onu?.Login}
+                  onChange={handleToggleIgnoreOffline}
+                />
+                <span>Sempre desliga da energia</span>
+              </label>
+              <div style={offlineFlagHint}>
+                {onu?.Login
+                  ? 'Quando marcado, esse cliente passa para a guia Sempre desligam.'
+                  : 'Associe um login a esta ONU para conseguir salvar essa preferencia.'}
+              </div>
+            </div>
           </div>
         </Card>
 
@@ -172,3 +213,27 @@ export default function OnuDetailPage() {
 }
 
 const td = { padding: '9px 12px', borderBottom: '1px solid var(--border-subtle)', color: 'var(--text-primary)' }
+
+const offlineFlagBox = {
+  marginTop: 14,
+  padding: '12px 14px',
+  borderRadius: 14,
+  border: '1px solid rgba(255,255,255,0.08)',
+  background: 'rgba(255,255,255,0.02)',
+}
+
+const offlineFlagLabel = {
+  display: 'flex',
+  alignItems: 'center',
+  gap: 10,
+  fontSize: 13,
+  color: 'var(--text-primary)',
+  fontWeight: 600,
+}
+
+const offlineFlagHint = {
+  marginTop: 8,
+  fontSize: 12,
+  color: 'var(--text-secondary)',
+  lineHeight: 1.5,
+}

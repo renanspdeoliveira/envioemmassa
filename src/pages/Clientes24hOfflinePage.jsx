@@ -40,30 +40,29 @@ export default function Clientes24hOfflinePage() {
       (row) => row.offlineMs >= MS_24H && row.offlineMs <= MS_5D
     )
 
-    const avg24hMs = recent24hRows.length
-      ? Math.round(recent24hRows.reduce((acc, row) => acc + row.offlineMs, 0) / recent24hRows.length)
-      : 0
-
     return {
+      totalOfflineAgora: Number(summary.totalGeralOfflineAgora || rows.length || 0),
       totalHoje,
       totalDiaAnterior24h: diaAnteriorRows.length,
       total20hRecent: recent20hRows.length,
       total24hRecent: recent24hRows.length,
       ativos20hRecent: recent20hRows.filter((row) => row.ativo === 'Ativo').length,
-      avg24hLabel: avg24hMs ? formatDurationFromMs(avg24hMs) : '-',
+      totalSempreDesligam: rows.filter((row) => row.sempreDesliga).length,
     }
-  }, [rows])
+  }, [rows, summary.totalGeralOfflineAgora])
 
   const filteredRows = useMemo(() => {
     const query = search.trim().toLowerCase()
 
     return rows.filter((row) => {
+      if (row.ignoreOfflineAlways && faixaOffline !== 'sempreDesligam') return false
       if (ativo && row.ativo !== ativo) return false
       if (onuStatus && row.onuStatus !== onuStatus) return false
       if (faixaOffline === 'hoje' && row.faixaOffline !== 'hoje' && row.faixaOffline !== 'hoje20plus') return false
       if (faixaOffline === 'diaAnterior24h' && (row.faixaOffline !== 'diaAnterior24h' || row.offlineMs < MS_20H)) return false
       if (faixaOffline === '20plus' && (row.offlineMs < MS_20H || row.offlineMs > MS_5D)) return false
       if (faixaOffline === '24plus' && (row.offlineMs < MS_24H || row.offlineMs > MS_5D)) return false
+      if (faixaOffline === 'sempreDesligam' && !row.sempreDesliga) return false
       if (!query) return true
 
       return [
@@ -97,7 +96,7 @@ export default function Clientes24hOfflinePage() {
 
   function handleOpenOnu(row) {
     if (!row.macSerial) return
-    navigate(`/onus/${encodeURIComponent(row.macSerial)}`)
+    navigate(`/onus/${encodeURIComponent(row.macSerial)}`, { state: { offlineContext: row } })
   }
 
   function handleExportCsv() {
@@ -138,6 +137,15 @@ export default function Clientes24hOfflinePage() {
       {loading ? <Spinner /> : error ? <ErrorMsg message={error} /> : (
         <>
           <div style={summaryGrid}>
+            <SummaryCard
+              label="Offline Agora"
+              value={computedSummary.totalOfflineAgora}
+              sub={computedSummary.totalOfflineAgora > 0
+                ? 'quantidade real offline neste momento'
+                : 'sem clientes offline no momento'}
+              icon={WifiOff}
+              color="amber"
+            />
             <SummaryCard
               label="Offline Hoje"
               value={computedSummary.totalHoje}
@@ -183,13 +191,15 @@ export default function Clientes24hOfflinePage() {
               onClick={() => { setFaixaOffline('24plus'); setPage(1) }}
             />
             <SummaryCard
-              label="Media 24h+"
-              value={computedSummary.avg24hLabel}
-              sub={computedSummary.total24hRecent > 0
-                ? `${computedSummary.total24hRecent.toLocaleString('pt-BR')} clientes na janela recente`
-                : 'sem clientes recentes acima de 24h'}
+              label="Sempre desligam"
+              value={computedSummary.totalSempreDesligam}
+              sub={computedSummary.totalSempreDesligam > 0
+                ? 'clientes marcados na lista recorrente'
+                : 'nenhum cliente marcado no momento'}
               icon={Database}
               color="green"
+              active={faixaOffline === 'sempreDesligam'}
+              onClick={() => { setFaixaOffline('sempreDesligam'); setPage(1) }}
             />
           </div>
 
@@ -203,7 +213,9 @@ export default function Clientes24hOfflinePage() {
                       ? 'Dia Anterior 24h'
                       : faixaOffline === '20plus'
                         ? 'Offline Recente'
-                        : 'Clientes 24h+'}
+                        : faixaOffline === 'sempreDesligam'
+                          ? 'Sempre desligam'
+                          : 'Clientes 24h+'}
                 </div>
                 <div style={highlightText}>
                   {faixaOffline === 'hoje' && (
@@ -226,16 +238,21 @@ export default function Clientes24hOfflinePage() {
                   {faixaOffline === '24plus' && (
                     <>Esta lista mostra apenas clientes na faixa de <strong>24 horas ate 5 dias offline</strong>, sem misturar casos muito antigos nesta planilha.</>
                   )}
+                  {faixaOffline === 'sempreDesligam' && (
+                    <>Esta lista mostra apenas clientes marcados como <strong>sempre desligam</strong>, com base na sua lista recorrente.</>
+                  )}
                 </div>
               </div>
-              <Badge color={faixaOffline === 'hoje' ? 'red' : faixaOffline === 'diaAnterior24h' ? 'green' : faixaOffline === '20plus' ? 'blue' : 'amber'}>
+              <Badge color={faixaOffline === 'hoje' ? 'red' : faixaOffline === 'diaAnterior24h' ? 'green' : faixaOffline === '20plus' ? 'blue' : faixaOffline === 'sempreDesligam' ? 'green' : 'amber'}>
                 {(faixaOffline === 'hoje'
                   ? computedSummary.totalHoje
                   : faixaOffline === 'diaAnterior24h'
                     ? computedSummary.totalDiaAnterior24h
                     : faixaOffline === '20plus'
                       ? computedSummary.total20hRecent
-                      : computedSummary.total24hRecent
+                      : faixaOffline === 'sempreDesligam'
+                        ? computedSummary.totalSempreDesligam
+                        : computedSummary.total24hRecent
                 ).toLocaleString('pt-BR')} clientes
               </Badge>
             </div>
@@ -278,14 +295,14 @@ export default function Clientes24hOfflinePage() {
               <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
                 <thead>
                   <tr>
-                    {['Login', 'Contrato', 'Ativo', 'Online', 'Status ONU', 'OLT/GBOC/PON', 'Tempo Offline', 'Data original', 'WhatsApp', 'MAC/Serial'].map((col) => (
+                    {['Login', 'Contrato', 'Ativo', 'Online', 'Status ONU', 'OLT/GBOC/PON', 'Tempo Offline', 'Data original', 'WhatsApp', 'MAC/Serial', 'Detalhes'].map((col) => (
                       <th key={col} style={th}>{col}</th>
                     ))}
                   </tr>
                 </thead>
                 <tbody>
                   {pageRows.length === 0 ? (
-                    <tr><td colSpan={10}><Empty message="Nenhum cliente offline encontrado com os filtros atuais" /></td></tr>
+                    <tr><td colSpan={11}><Empty message="Nenhum cliente offline encontrado com os filtros atuais" /></td></tr>
                   ) : pageRows.map((row) => (
                     <tr
                       key={`${row.id}-${row.login}-${row.ultimaConexao}`}
@@ -297,6 +314,14 @@ export default function Clientes24hOfflinePage() {
                       <td style={{ ...td, minWidth: 180, maxWidth: 220 }}>
                         <div style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{row.login || 'Sem login'}</div>
                         {row.nomeCliente ? <div style={{ fontSize: 11, color: 'var(--text-secondary)', marginTop: 3 }}>{row.nomeCliente}</div> : null}
+                        {row.sempreDesliga ? (
+                          <div
+                            style={{ fontSize: 11, color: '#f6c86f', marginTop: 4, fontWeight: 700, letterSpacing: '0.02em' }}
+                            title={row.sempreDesligaRelato || 'Cliente marcado na lista de sempre desliga'}
+                          >
+                            * SEMPRE DESLIGA?
+                          </div>
+                        ) : null}
                       </td>
                       <td style={td}><span style={mono}>{row.contrato || '-'}</span></td>
                       <td style={td}><Badge color={row.ativo === 'Ativo' ? 'green' : row.ativo === 'Nao ativo' ? 'red' : 'gray'}>{row.ativo}</Badge></td>
@@ -323,6 +348,17 @@ export default function Clientes24hOfflinePage() {
                         </span>
                       </td>
                       <td style={td}><span style={{ ...mono, color: row.macSerial ? 'var(--accent-blue-text)' : 'var(--text-tertiary)' }}>{row.macSerial || '-'}</span></td>
+                      <td style={td}>
+                        <Btn
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            handleOpenOnu(row)
+                          }}
+                          disabled={!row.macSerial}
+                        >
+                          Abrir
+                        </Btn>
+                      </td>
                     </tr>
                   ))}
                 </tbody>

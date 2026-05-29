@@ -71,10 +71,6 @@ export default function AppHeader() {
       <div style={headerLeft}>
         <div style={brandArea}>
           <img src="./Logo-Futuranet.png" alt="Logo Futuranet" style={brandLogo} />
-          <div>
-            <div style={brandEyebrow}>Painel</div>
-            <div style={brandTitle}>Monitoramento FuturaNet</div>
-          </div>
         </div>
       </div>
 
@@ -146,7 +142,6 @@ const header = {
 const brandArea = {
   display: 'flex',
   alignItems: 'center',
-  gap: 12,
 }
 
 const headerLeft = {
@@ -158,23 +153,8 @@ const headerLeft = {
 }
 
 const brandLogo = {
-  width: 44,
+  width: 48,
   display: 'block',
-}
-
-const brandEyebrow = {
-  fontSize: 10,
-  color: 'var(--accent-blue-text)',
-  textTransform: 'uppercase',
-  letterSpacing: '.12em',
-  fontWeight: 700,
-}
-
-const brandTitle = {
-  fontSize: 17,
-  color: 'var(--text-primary)',
-  fontWeight: 700,
-  letterSpacing: '-0.03em',
 }
 
 const nav = {

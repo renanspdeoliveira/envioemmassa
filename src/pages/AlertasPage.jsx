@@ -47,6 +47,11 @@ function OfflineAlertHero() {
   )
 }
 
+function hasRealMac(row) {
+  const mac = String(row?.['MAC/Serial'] || '').trim()
+  return !!mac && mac !== '-'
+}
+
 export default function AlertasPage() {
   const navigate = useNavigate()
   const { data, loading, error } = useApi(() => api.alertas())
@@ -67,21 +72,20 @@ export default function AlertasPage() {
         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
           <thead>
             <tr>
-              {['OLT', 'GCOB', 'PON', 'Cliente', 'Login', 'MAC/Serial', 'Status', 'Sinal RX', 'Potência'].map(h => <th key={h} style={th}>{h}</th>)}
+              {['OLT', 'GCOB', 'PON', 'Cliente', 'MAC/Serial', 'Status', 'Sinal RX', 'Potência'].map(h => <th key={h} style={th}>{h}</th>)}
             </tr>
           </thead>
           <tbody>
             {rows.map((r, i) => (
               <tr key={i}
-                onClick={() => r['MAC/Serial'] && navigate(`/onus/${encodeURIComponent(r['MAC/Serial'])}`)}
-                style={{ cursor: 'pointer' }}
+                onClick={() => hasRealMac(r) && navigate(`/onus/${encodeURIComponent(r['MAC/Serial'])}`)}
+                style={{ cursor: hasRealMac(r) ? 'pointer' : 'default' }}
                 onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-hover)'}
                 onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
                 <td style={td}><Badge color="blue" size="sm">{r.OLT}</Badge></td>
                 <td style={{ ...td, fontFamily: 'var(--font-mono)', fontSize: 12 }}>{r.GCOB || '—'}</td>
                 <td style={{ ...td, fontFamily: 'var(--font-mono)', fontSize: 12 }}>{r.PON}</td>
                 <td style={td}>{r['Nome Cliente'] || '—'}</td>
-                <td style={{ ...td, fontFamily: 'var(--font-mono)', fontSize: 12 }}>{r.Login || '—'}</td>
                 <td style={{ ...td, fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--text-secondary)' }}>{r['MAC/Serial'] || '—'}</td>
                 <td style={td}><StatusBadge status={r['Status ONU']} /></td>
                 <td style={td}><RxBadge value={r['Sinal RX']} /></td>

@@ -1,0 +1,23 @@
+[
+  {
+    "olt": "OLT 2",
+    "nome": "FABIANA APARECIDA CHUECO",
+    "mac": "FHTT072c6ea8",
+    "situacao": "SINAL ATENUADO",
+    "relato": "NAO QUER ORDEM DE SERVICO - NAO QUER QUE LIGAMOS PARA ELA"
+  },
+  {
+    "olt": "OLT 2",
+    "nome": "YOSHIFUMI PAULO UMEDA",
+    "mac": "FHTT10181a90",
+    "situacao": "AUTENTICACAO RADIUS",
+    "relato": "ELE ALTERA A CONEXAO PARA O SOBRINHO NAO USAR, FALOU QUE NAO PRECISAMOS LIGAR"
+  },
+  {
+    "olt": "OLT 1",
+    "nome": "FABIO ALEXANDRE DA SILVA",
+    "mac": "FHTT090a5548",
+    "situacao": "POSSIVEL LINK LOSS",
+    "relato": "SEM RETORNO"
+  }
+]

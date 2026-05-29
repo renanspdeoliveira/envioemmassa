@@ -33,6 +33,11 @@ export default function OnuDesautorizadasPage() {
     whiteSpace: 'nowrap',
   }
 
+  function hasRealMac(row) {
+    const mac = String(row?.['MAC/Serial'] || '').trim()
+    return !!mac && mac !== '-'
+  }
+
   return (
     <div>
       <PageHeader
@@ -55,7 +60,7 @@ export default function OnuDesautorizadasPage() {
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
               <thead>
                 <tr>
-                  {['OLT', 'PON', 'Cliente', 'Login', 'MAC/Serial', 'Status', 'Sinal RX', 'Potencia'].map(h => (
+                  {['OLT', 'PON', 'Cliente', 'MAC/Serial', 'Status', 'Sinal RX', 'Potencia'].map(h => (
                     <th key={h} style={th}>{h}</th>
                   ))}
                 </tr>
@@ -64,15 +69,14 @@ export default function OnuDesautorizadasPage() {
                 {rows.map((row, i) => (
                   <tr
                     key={i}
-                    onClick={() => row['MAC/Serial'] && navigate(`/onus/${encodeURIComponent(row['MAC/Serial'])}`)}
-                    style={{ cursor: 'pointer' }}
+                    onClick={() => hasRealMac(row) && navigate(`/onus/${encodeURIComponent(row['MAC/Serial'])}`)}
+                    style={{ cursor: hasRealMac(row) ? 'pointer' : 'default' }}
                     onMouseEnter={e => (e.currentTarget.style.background = 'var(--bg-hover)')}
                     onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
                   >
                     <td style={td}><Badge color="blue" size="sm">{row.OLT}</Badge></td>
                     <td style={{ ...td, fontFamily: 'var(--font-mono)', fontSize: 12 }}>{row['PON ID'] || '-'}</td>
                     <td style={td}>{row['Nome Cliente'] || '-'}</td>
-                    <td style={{ ...td, fontFamily: 'var(--font-mono)', fontSize: 12 }}>{row.Login || '-'}</td>
                     <td style={{ ...td, fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--text-secondary)' }}>{row['MAC/Serial'] || '-'}</td>
                     <td style={td}><StatusBadge status={row['Status ONU']} /></td>
                     <td style={td}><RxBadge value={row['Sinal RX']} /></td>

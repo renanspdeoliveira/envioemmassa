@@ -1,6 +1,7 @@
+import { useMemo, useState } from 'react'
 import { useApi } from '../hooks/useApi'
 import { api } from '../utils/api'
-import { Card, CardHeader, Spinner, PageHeader, Badge } from '../components/UI'
+import { Card, CardHeader, Spinner, PageHeader, Badge, RxBadge } from '../components/UI'
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell
 } from 'recharts'
@@ -27,6 +28,23 @@ const SIGNAL_COLORS = {
   semLeitura: '#8b949e',
 }
 
+const BAND_KEY_BY_LABEL = {
+  'Excelente (> -20)': 'excelente',
+  'Bom (-20 a -24)': 'bom',
+  'Regular (-24 a -27)': 'regular',
+  'Ruim (< -27)': 'ruim',
+  'Sem leitura': 'semLeitura',
+}
+
+function getSignalBand(value) {
+  const rx = Number(value)
+  if (!value || value === 0 || !Number.isFinite(rx)) return 'semLeitura'
+  if (rx > -20) return 'excelente'
+  if (rx >= -24) return 'bom'
+  if (rx >= -27) return 'regular'
+  return 'ruim'
+}
+
 function normalizeDistribution(data) {
   const map = {
     'Excelente (> -20)': { label: 'Excelente', hint: '> -20 dBm', color: SIGNAL_COLORS.excelente },
@@ -45,14 +63,31 @@ function normalizeDistribution(data) {
 }
 
 export default function SinalPage() {
+  const [activeBand, setActiveBand] = useState('')
   const { data: stats, loading: l0 } = useApi(() => api.stats())
   const { data: rxDist, loading: l1 } = useApi(() => api.chartRxDist())
   const { data: vlanData, loading: l2 } = useApi(() => api.chartVlan())
-
-  if (l0 || l1 || l2) return <Spinner />
+  const { data: onuExport, loading: l3 } = useApi(() => api.onuExport())
 
   const distData = normalizeDistribution(rxDist)
   const totalBase = stats?.total || distData.reduce((sum, item) => sum + (item.count || 0), 0)
+  const allOnus = onuExport?.data || []
+
+  const filteredOnus = useMemo(() => {
+    if (!activeBand) return []
+
+    return allOnus
+      .filter((row) => getSignalBand(row['Sinal RX']) === activeBand)
+      .sort((a, b) => {
+        const arx = Number(a['Sinal RX'] || 0)
+        const brx = Number(b['Sinal RX'] || 0)
+        if (activeBand === 'ruim') return arx - brx
+        if (activeBand === 'semLeitura') return String(a['Nome Cliente'] || '').localeCompare(String(b['Nome Cliente'] || ''))
+        return brx - arx
+      })
+  }, [activeBand, allOnus])
+
+  if (l0 || l1 || l2 || l3) return <Spinner />
 
   return (
     <div>
@@ -93,7 +128,22 @@ export default function SinalPage() {
           <CardHeader title="Resumo das faixas" subtitle={`Percentual sobre ${totalBase.toLocaleString('pt-BR')} ONUs`} />
           <div style={{ padding: 16, display: 'grid', gap: 10 }}>
             {distData.map(item => (
-              <div key={item.shortLabel} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, padding: '12px 14px', border: '1px solid var(--border)', borderRadius: 10, background: 'var(--bg-tertiary)' }}>
+              <button
+                key={item.shortLabel}
+                onClick={() => setActiveBand((current) => current === BAND_KEY_BY_LABEL[item.label] ? '' : BAND_KEY_BY_LABEL[item.label])}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  gap: 12,
+                  padding: '12px 14px',
+                  border: `1px solid ${activeBand === BAND_KEY_BY_LABEL[item.label] ? item.color : 'var(--border)'}`,
+                  borderRadius: 10,
+                  background: activeBand === BAND_KEY_BY_LABEL[item.label] ? 'rgba(255,255,255,0.04)' : 'var(--bg-tertiary)',
+                  cursor: 'pointer',
+                  textAlign: 'left',
+                }}
+              >
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                   <span style={{ width: 10, height: 10, borderRadius: '50%', background: item.color, display: 'inline-block' }} />
                   <div>
@@ -104,11 +154,49 @@ export default function SinalPage() {
                   </div>
                 </div>
                 <Badge color="blue" size="sm">{item.count.toLocaleString('pt-BR')} / {totalBase.toLocaleString('pt-BR')}</Badge>
-              </div>
+              </button>
             ))}
           </div>
         </Card>
       </div>
+
+      {activeBand && (
+        <Card style={{ marginTop: 16 }}>
+          <CardHeader
+            title={`Clientes - ${distData.find((item) => BAND_KEY_BY_LABEL[item.label] === activeBand)?.shortLabel || ''}`}
+            subtitle={`${filteredOnus.length.toLocaleString('pt-BR')} ONUs`}
+            action={<Badge color="blue">{filteredOnus.length.toLocaleString('pt-BR')}</Badge>}
+          />
+          <div style={{ overflowX: 'auto' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
+              <thead>
+                <tr>
+                  {['Cliente', 'PON', 'MAC/Serial', 'Sinal RX'].map((header) => (
+                    <th key={header} style={th}>{header}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {filteredOnus.slice(0, 300).map((row, index) => (
+                  <tr key={`${row['MAC/Serial'] || row.Login || index}`}>
+                    <td style={{ ...td, minWidth: 240 }}>
+                      <div style={{ color: 'var(--text-primary)', fontWeight: 600 }}>{row['Nome Cliente'] || 'Sem cliente'}</div>
+                    </td>
+                    <td style={{ ...td, fontFamily: 'var(--font-mono)', fontSize: 12 }}>{row['PON ID'] || '-'}</td>
+                    <td style={{ ...td, fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--text-secondary)' }}>{row['MAC/Serial'] || '-'}</td>
+                    <td style={td}><RxBadge value={row['Sinal RX']} /></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            {filteredOnus.length > 300 && (
+              <div style={{ padding: '12px 16px', fontSize: 12, color: 'var(--text-secondary)' }}>
+                Mostrando os primeiros 300 clientes da faixa selecionada.
+              </div>
+            )}
+          </div>
+        </Card>
+      )}
 
       <Card style={{ marginTop: 16 }}>
         <CardHeader title="ONUs por VLAN" subtitle="Top 15 VLANs mais utilizadas" />
@@ -128,4 +216,24 @@ export default function SinalPage() {
       </Card>
     </div>
   )
+}
+
+const th = {
+  padding: '9px 12px',
+  textAlign: 'left',
+  fontSize: 11,
+  color: 'var(--text-secondary)',
+  background: 'var(--bg-secondary)',
+  borderBottom: '1px solid var(--border)',
+  fontWeight: 500,
+  textTransform: 'uppercase',
+  letterSpacing: '.05em',
+  whiteSpace: 'nowrap',
+}
+
+const td = {
+  padding: '9px 12px',
+  borderBottom: '1px solid var(--border-subtle)',
+  color: 'var(--text-primary)',
+  whiteSpace: 'nowrap',
 }

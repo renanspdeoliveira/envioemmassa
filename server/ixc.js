@@ -45,7 +45,7 @@ function ixcRequest(endpoint, params = {}) {
       .replace(/\/+$/, '');
 
     const url = `/webservice/v1/${endpoint}?${qs}`;
-    const auth = 'Basic ' + Buffer.from(ixcConfig.token).toString('base64');
+    const auth = 'Basic ' + Buffer.from(`${ixcConfig.token}:${ixcConfig.apiKey || ''}`).toString('base64');
     const useHttps = !rawHost.startsWith('http://');
     const lib = useHttps ? https : http;
     const hostname = rawHost.replace(/^http:\/\//, '');
@@ -86,6 +86,60 @@ function ixcRequest(endpoint, params = {}) {
   });
 }
 
+function ixcRequestWithBody(endpoint, body = {}, options = {}) {
+  return new Promise((resolve, reject) => {
+    if (!ixcConfig.host || !ixcConfig.token) {
+      return reject(new Error('IXC nÃ£o configurado. Configure o host e token nas configuraÃ§Ãµes.'));
+    }
+
+    const rawHost = ixcConfig.host
+      .replace(/^https?:\/\//, '')
+      .replace(/\/+$/, '');
+
+    const method = options.method || 'POST';
+    const payload = JSON.stringify(body || {});
+    const url = `/webservice/v1/${endpoint}`;
+    const auth = 'Basic ' + Buffer.from(`${ixcConfig.token}:${ixcConfig.apiKey || ''}`).toString('base64');
+    const useHttps = !rawHost.startsWith('http://');
+    const lib = useHttps ? https : http;
+    const hostname = rawHost.replace(/^http:\/\//, '');
+
+    const req = lib.request({
+      hostname,
+      port: useHttps ? 443 : 80,
+      path: url,
+      method,
+      headers: {
+        Authorization: auth,
+        'Content-Type': 'application/json',
+        'Content-Length': Buffer.byteLength(payload),
+        ixcsoft: options.ixcsoft || 'listar',
+      },
+      rejectUnauthorized: false,
+    }, (res) => {
+      let data = '';
+      res.on('data', chunk => data += chunk);
+      res.on('end', () => {
+        try {
+          const parsed = JSON.parse(data);
+          if (parsed.type === 'error') return reject(new Error(parsed.message));
+          resolve(parsed);
+        } catch {
+          reject(new Error(`Resposta invÃ¡lida da API IXC: ${data.slice(0, 200)}`));
+        }
+      });
+    });
+
+    req.on('error', reject);
+    req.setTimeout(15000, () => {
+      req.destroy();
+      reject(new Error('Timeout na API IXC (15s)'));
+    });
+    req.write(payload);
+    req.end();
+  });
+}
+
 function formatPhone(raw) {
   if (!raw) return '';
   const digits = String(raw).replace(/\D/g, '');
@@ -93,6 +147,16 @@ function formatPhone(raw) {
   if (digits.length >= 12 && digits.startsWith('55')) return digits;
   if (digits.length === 11 || digits.length === 10) return '55' + digits;
   return digits;
+}
+
+function normalizeIxcRows(response) {
+  if (!response) return [];
+  if (Array.isArray(response)) return response;
+  if (Array.isArray(response.registros)) return response.registros;
+  if (Array.isArray(response.rows)) return response.rows;
+  if (Array.isArray(response.data)) return response.data;
+  if (typeof response === 'object') return [response];
+  return [];
 }
 
 async function syncContactsByLogins(logins) {
@@ -115,7 +179,7 @@ async function syncContactsByLogins(logins) {
           limit: String(batchSize),
         });
 
-        const rows = onuData.registros || onuData || [];
+        const rows = normalizeIxcRows(onuData);
         rows.forEach((row) => {
           if (!row.login || !row.id_cliente) return;
           loginMetaMap[String(row.login).toLowerCase()] = {
@@ -139,7 +203,7 @@ async function syncContactsByLogins(logins) {
           limit: String(batchSize),
         });
 
-        const rows = radData.registros || radData || [];
+        const rows = normalizeIxcRows(radData);
         rows.forEach((row) => {
           if (!row.login || !row.id_cliente) return;
           loginMetaMap[String(row.login).toLowerCase()] = {
@@ -170,7 +234,7 @@ async function syncContactsByLogins(logins) {
           limit: String(batchSize * 5),
         });
 
-        const rows = contractData.registros || contractData || [];
+        const rows = normalizeIxcRows(contractData);
         rows.forEach((row) => {
           const clientId = String(row.id_cliente || '');
           const contractId = String(row.id || '');
@@ -192,7 +256,7 @@ async function syncContactsByLogins(logins) {
           limit: String(batchSize),
         });
 
-        const rows = clientData.registros || clientData || [];
+        const rows = normalizeIxcRows(clientData);
         const clientById = {};
         rows.forEach((row) => {
           if (row.id) clientById[String(row.id)] = row;
@@ -247,7 +311,7 @@ async function lookupClientById(clientId) {
       limit: '1',
     });
 
-    const client = (clientResp.registros || clientResp || [])[0];
+    const client = normalizeIxcRows(clientResp)[0];
     if (!client) return { data: null, errors: ['Cliente não encontrado na IXC.'] };
 
     let logins = [];
@@ -258,7 +322,7 @@ async function lookupClientById(clientId) {
         oper: '=',
         limit: '100',
       });
-      logins = (onuResp.registros || onuResp || [])
+      logins = normalizeIxcRows(onuResp)
         .map(row => String(row.login || '').toLowerCase().trim())
         .filter(Boolean);
     } catch (e) {
@@ -273,7 +337,7 @@ async function lookupClientById(clientId) {
           oper: '=',
           limit: '100',
         });
-        logins = (radResp.registros || radResp || [])
+        logins = normalizeIxcRows(radResp)
           .map(row => String(row.login || '').toLowerCase().trim())
           .filter(Boolean);
       } catch (e) {
@@ -297,7 +361,7 @@ async function lookupClientById(clientId) {
 
 async function testConnection() {
   const data = await ixcRequest('cliente', { limit: '1' });
-  const rows = data.registros || data || [];
+  const rows = normalizeIxcRows(data);
   return {
     ok: true,
     sample: rows[0] ? Object.keys(rows[0]) : [],
@@ -305,4 +369,26 @@ async function testConnection() {
   };
 }
 
-module.exports = { ixcConfig, loadConfig, saveConfig, ixcRequest, syncContactsByLogins, lookupLogin, lookupClientById, testConnection };
+async function fetchUnauthorizedOnusByOlt(oltId) {
+  const payload = {
+    grid_param: JSON.stringify([{ TB: 'id_olt', P: String(oltId) }]),
+  };
+
+  const response = await ixcRequestWithBody('fh_onu_nao_autorizadas', payload, {
+    method: 'POST',
+    ixcsoft: 'listar',
+  });
+
+  return normalizeIxcRows(response);
+}
+
+async function fetchUnauthorizedOnus() {
+  const [olt1, olt2] = await Promise.all([
+    fetchUnauthorizedOnusByOlt(1),
+    fetchUnauthorizedOnusByOlt(2),
+  ]);
+
+  return [...olt1, ...olt2];
+}
+
+module.exports = { ixcConfig, loadConfig, saveConfig, ixcRequest, ixcRequestWithBody, syncContactsByLogins, lookupLogin, lookupClientById, testConnection, fetchUnauthorizedOnus };

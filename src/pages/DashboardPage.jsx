@@ -163,7 +163,7 @@ export default function DashboardPage() {
         </SurfaceCard>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: 16, marginBottom: 16 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 16, marginBottom: 16 }}>
         <SurfaceCard>
           <CardHeader title="Distribuicao de Sinal RX" subtitle="Qualidade optica por faixa" />
           <div style={{ padding: '12px 8px' }}>
@@ -175,26 +175,6 @@ export default function DashboardPage() {
                 <Tooltip content={<CustomTooltip />} />
                 <Bar dataKey="count" name="ONUs" radius={[0, 8, 8, 0]}>
                   {(rxDist || []).map((_, i) => <Cell key={i} fill={RX_DIST_COLORS[i]} />)}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        </SurfaceCard>
-
-        <SurfaceCard>
-          <CardHeader title="Sinal RX medio por GBOC" subtitle="Saude optica dos segmentos" />
-          <div style={{ padding: '12px 8px' }}>
-            <ResponsiveContainer width="100%" height={240}>
-              <BarChart data={rxData || []} margin={{ top: 8, right: 16, left: -10, bottom: 60 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,.06)" vertical={false} />
-                <XAxis dataKey="label" tick={{ fill: '#9fb0c2', fontSize: 10, angle: -45, textAnchor: 'end' }} axisLine={false} tickLine={false} interval={0} />
-                <YAxis tick={{ fill: '#9fb0c2', fontSize: 11 }} axisLine={false} tickLine={false} domain={['auto', 0]} />
-                <Tooltip content={<CustomTooltip />} formatter={(v) => [`${v} dBm`, 'RX medio']} />
-                <Bar dataKey="avgRx" name="RX medio" radius={[8, 8, 0, 0]}>
-                  {(rxData || []).map((d, i) => {
-                    const color = d.avgRx > -20 ? '#56d364' : d.avgRx >= -24 ? '#58a6ff' : d.avgRx >= -27 ? '#e3b341' : '#ff7b72'
-                    return <Cell key={i} fill={color} />
-                  })}
                 </Bar>
               </BarChart>
             </ResponsiveContainer>

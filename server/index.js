@@ -5,6 +5,7 @@ const rateLimit = require('express-rate-limit');
 const fs        = require('fs');
 const path      = require('path');
 const multer    = require('multer');
+const { execFile } = require('child_process');
 
 const app    = express();
 const PORT   = process.env.PORT || 3001;
@@ -32,8 +33,10 @@ const DATA_FILE = path.join(__dirname, 'data.json');
 const REL_FILE  = path.join(__dirname, 'relatorio_clientes.json');
 const BRR_FILE  = path.join(__dirname, 'bairros.json');
 const CLI_FILE  = path.join(__dirname, 'clientes.json');
+const ALWAYS_DISCONNECT_FILE = path.join(__dirname, 'clientes_sempre_desligam.json');
 const RAW_IXC_FILE = path.join(__dirname, 'ixc_radpop_raw.json');
 const SCRIPT_24H_FILE = path.join(__dirname, '..', 'script_24horas_cliente.py');
+const SCRIPT_UNAUTHORIZED_FILE = path.join(__dirname, '..', 'script_onu_nao_autroizada.py');
 const REMOVED_ONU_MACS = new Set([
   'FHTT03dd9700',
   'FHTT91f3d050',
@@ -52,6 +55,7 @@ let lastUpdatedAt = rawData.updated_at || null;
 let relatorio   = readJson(REL_FILE, { by_nome:{}, by_id:{} });
 let bairroMap   = readJson(BRR_FILE, {});
 let clientesMap = readJson(CLI_FILE, {});
+const alwaysDisconnectList = readJson(ALWAYS_DISCONNECT_FILE, []);
 let rawIxcData  = readJson(RAW_IXC_FILE, { registros:[] });
 
 function saveBairros()  { fs.writeFileSync(BRR_FILE, JSON.stringify(bairroMap,   null, 2)); }
@@ -116,6 +120,44 @@ function formatOltLabel(value, rawMatch) {
   return current || null;
 }
 
+function buildAlwaysDisconnectIndex(list) {
+  const byMac = new Map();
+  const byName = new Map();
+
+  (list || []).forEach((item) => {
+    const mac = String(item?.mac || '').trim().toUpperCase();
+    const name = canonicalClientName(item?.nome || '');
+    const normalized = {
+      ...item,
+      mac,
+      nome: formatClientName(item?.nome || ''),
+      relato: String(item?.relato || '').trim(),
+      situacao: String(item?.situacao || '').trim(),
+    };
+
+    if (mac) byMac.set(mac, normalized);
+    if (name && !byName.has(name)) byName.set(name, normalized);
+  });
+
+  return { byMac, byName };
+}
+
+const alwaysDisconnectIndex = buildAlwaysDisconnectIndex(alwaysDisconnectList);
+
+function findAlwaysDisconnectClient({ macSerial, nomeCliente }) {
+  const mac = String(macSerial || '').trim().toUpperCase();
+  if (mac && alwaysDisconnectIndex.byMac.has(mac)) {
+    return alwaysDisconnectIndex.byMac.get(mac);
+  }
+
+  const name = canonicalClientName(nomeCliente || '');
+  if (name && alwaysDisconnectIndex.byName.has(name)) {
+    return alwaysDisconnectIndex.byName.get(name);
+  }
+
+  return null;
+}
+
 function buildRawOnuIndex(records) {
   const byMac = new Map();
   const byLoginId = new Map();
@@ -133,17 +175,20 @@ function buildRawOnuIndex(records) {
 function buildBaseOnuIndex(records) {
   const byLogin = new Map();
   const byLoginId = new Map();
+  const byMac = new Map();
 
   for (const row of records || []) {
     const hydrated = hydrateOnu(row);
     const login = String(hydrated?.Login || '').trim().toLowerCase();
     const loginId = parseIntSafe(hydrated?.['ID Login']);
+    const mac = String(hydrated?.['MAC/Serial'] || '').trim().toUpperCase();
 
     if (login && !byLogin.has(login)) byLogin.set(login, hydrated);
     if (loginId !== null && !byLoginId.has(String(loginId))) byLoginId.set(String(loginId), hydrated);
+    if (mac && !byMac.has(mac)) byMac.set(mac, hydrated);
   }
 
-  return { byLogin, byLoginId };
+  return { byLogin, byLoginId, byMac };
 }
 
 function buildLoginIndex(report) {
@@ -195,7 +240,7 @@ function buildLoginIndex(report) {
 
 let rawOnuIndex = buildRawOnuIndex(rawIxcData.registros || []);
 let loginIndex = buildLoginIndex(relatorio);
-let baseOnuIndex = { byLogin: new Map(), byLoginId: new Map() };
+let baseOnuIndex = { byLogin: new Map(), byLoginId: new Map(), byMac: new Map() };
 
 function isPendingAuthStatus(status) {
   const normalized = normStr(status);
@@ -284,6 +329,21 @@ function hydrateOnu(r) {
     Login: inferredLogin || null,
     'Nome Cliente': nomeOriginal || r['Nome Cliente'],
   });
+
+  const alwaysDisconnectMatch = findAlwaysDisconnectClient({
+    macSerial: hydrated['MAC/Serial'],
+    nomeCliente: hydrated.nome_formatado || hydrated['Nome Cliente'],
+  });
+  hydrated.sempreDesliga = !!alwaysDisconnectMatch;
+  hydrated.sempreDesligaRelato = alwaysDisconnectMatch?.relato || '';
+
+  const loginKey = String(hydrated.Login || '').trim().toLowerCase();
+  if (loginKey) {
+    const contato = clientesMap[loginKey] || relatorio.by_login?.[loginKey] || {};
+    hydrated.ignoreOfflineAlways = !!contato.ignoreOfflineAlways;
+  } else {
+    hydrated.ignoreOfflineAlways = false;
+  }
 
   if (!hydrated.nome_formatado) hydrated.nome_formatado = nomeFmt;
   return hydrated;
@@ -418,6 +478,20 @@ function normalizeOnlineFlag(value) {
   return value || 'Indefinido';
 }
 
+function extractLastKnownIp(cliente) {
+  const candidates = [
+    cliente?.ip,
+    cliente?.ip_ultima_conexao,
+    cliente?.framed_ip_address,
+    cliente?.framedipaddress,
+    cliente?.endereco_ip,
+    cliente?.ip_address,
+    cliente?.nasipaddress,
+  ];
+
+  return candidates.find(value => String(value || '').trim()) || '';
+}
+
 let clients24hOfflineCache = {
   data: [],
   summary: null,
@@ -425,14 +499,31 @@ let clients24hOfflineCache = {
   source: 'unavailable',
 };
 
+function invalidate24hOfflineCache() {
+  clients24hOfflineCache = {
+    data: [],
+    summary: null,
+    fetchedAt: 0,
+    source: 'unavailable',
+  };
+}
+
 let derivedCacheVersion = 0;
 let derivedDashboardCache = null;
 let derivedAlertCache = null;
+let unauthorizedOnusCache = {
+  data: null,
+  fetchedAt: 0,
+};
 
 function invalidateDerivedCaches() {
   derivedCacheVersion += 1;
   derivedDashboardCache = null;
   derivedAlertCache = null;
+  unauthorizedOnusCache = {
+    data: null,
+    fetchedAt: 0,
+  };
 }
 
 async function getClients24hOffline() {
@@ -442,26 +533,26 @@ async function getClients24hOffline() {
   }
 
   const configuredIxc = ixc.ixcConfig?.host && ixc.ixcConfig?.token
-    ? {
-        source: 'ixc-config',
-        promise: ixc.ixcRequest('radusuarios', {
-          qtype: 'radusuarios.online',
-          query: 'N',
-          oper: '=',
-          page: '1',
-          rp: '5000',
-          sortname: 'radusuarios.ultima_conexao_final',
-          sortorder: 'desc',
-          limit: '5000',
-        }),
-      }
-    : null;
+  ? {
+      source: 'ixc-config',
+      promise: () => ixc.ixcRequest('radusuarios', {
+        qtype: 'radusuarios.online',
+        query: 'N',
+        oper: '=',
+        page: '1',
+        rp: '5000',
+        sortname: 'radusuarios.ultima_conexao_final',
+        sortorder: 'desc',
+        limit: '5000',
+      }).catch(() => null),  // ← adiciona isso
+    }
+  : null;
 
   const pythonConfig = load24hOfflineConfig();
   const configuredScript = pythonConfig.url && pythonConfig.token && pythonConfig.apiKey
     ? {
         source: 'python-script',
-        promise: new Promise((resolve, reject) => {
+        promise: () => new Promise((resolve, reject) => {
           const endpoint = new URL('/webservice/v1/radusuarios', pythonConfig.url);
           const transport = endpoint.protocol === 'http:' ? require('http') : require('https');
           const auth = 'Basic ' + Buffer.from(`${pythonConfig.token}:${pythonConfig.apiKey}`).toString('base64');
@@ -510,8 +601,8 @@ async function getClients24hOffline() {
       }
     : null;
 
-  const offlineSource = configuredIxc || configuredScript;
-  if (!offlineSource) {
+  const offlineSources = [configuredScript, configuredIxc].filter(Boolean);
+  if (!offlineSources.length) {
     return {
       data: [],
       fetchedAt: now,
@@ -519,7 +610,30 @@ async function getClients24hOffline() {
     };
   }
 
-  const response = await offlineSource.promise;
+  let response = null;
+  let offlineSource = null;
+  for (const source of offlineSources) {
+    try {
+      const candidate = await source.promise();
+      if (Array.isArray(candidate?.registros)) {
+        response = candidate;
+        offlineSource = source;
+        break;
+      }
+      console.warn('[24h-offline]', source.source, 'sem registros validos');
+    } catch (error) {
+      console.warn('[24h-offline]', source.source, error.message);
+    }
+  }
+
+    if (!response) {  // ← adiciona esse bloco
+      return {
+        data: [],
+        summary: null,
+        fetchedAt: now,
+        source: 'unavailable',
+      };
+    }
 
   const nowDate = new Date();
   const cutoff = nowDate.getTime() - (24 * 3_600_000);
@@ -549,6 +663,12 @@ async function getClients24hOffline() {
         null;
       const loginKey = login.toLowerCase();
       const fallbackContato = clientesMap[loginKey] || relatorio.by_login?.[loginKey] || {};
+      const ignoreOfflineAlways = !!fallbackContato?.ignoreOfflineAlways;
+      const nomeCliente = matchedOnu?.nome_formatado || matchedOnu?.['Nome Cliente'] || formatClientName(cliente?.nome || '');
+      const alwaysDisconnectMatch = findAlwaysDisconnectClient({
+        macSerial: matchedOnu?.['MAC/Serial'] || '',
+        nomeCliente,
+      });
 
       const offlineMs = nowDate.getTime() - lastConnectionAt.getTime();
 
@@ -561,6 +681,7 @@ async function getClients24hOffline() {
         onlineRadius: normalizeOnlineFlag(cliente?.online),
         ultimaConexao: cliente?.ultima_conexao_final || '',
         ultimaConexaoFmt: formatDateTimePtBr(lastConnectionAt),
+        ultimoIp: extractLastKnownIp(cliente),
         tempoOffline: formatOfflineDuration(lastConnectionAt, nowDate),
         offlineMs,
         faixaOffline:
@@ -582,8 +703,11 @@ async function getClients24hOffline() {
         slot: matchedOnu?.Slot ?? null,
         pon: matchedOnu?.PON ?? null,
         macSerial: matchedOnu?.['MAC/Serial'] || null,
-        nomeCliente: matchedOnu?.nome_formatado || matchedOnu?.['Nome Cliente'] || formatClientName(cliente?.nome || ''),
+        nomeCliente,
         whatsapp: matchedOnu?.whatsapp || fallbackContato?.whatsapp || '',
+        ignoreOfflineAlways,
+        sempreDesliga: !!alwaysDisconnectMatch || ignoreOfflineAlways,
+        sempreDesligaRelato: alwaysDisconnectMatch?.relato || '',
       };
     })
     .filter(Boolean)
@@ -850,6 +974,131 @@ function getAlertDerivedData() {
   return value;
 }
 
+function firstFilled(...values) {
+  for (const value of values) {
+    if (value === null || value === undefined) continue;
+    if (String(value).trim() === '') continue;
+    return value;
+  }
+  return '';
+}
+
+function normalizeUnauthorizedRow(row) {
+  const cell = Array.isArray(row?.cell) ? row.cell : [];
+  const macSerial = String(firstFilled(
+    row?.mac,
+    row?.mac_onu,
+    row?.serial,
+    row?.sn,
+    row?.login_mac,
+    cell[5],
+    row?.['MAC/Serial']
+  ) || '').trim().toUpperCase();
+  const localOnu = macSerial ? baseOnuIndex.byMac.get(macSerial) : null;
+
+  const nomeCliente = firstFilled(
+    localOnu?.['Nome Cliente'],
+    localOnu?.nome_formatado,
+    row?.nome_cliente,
+    row?.cliente,
+    row?.nome,
+    row?.razao
+  );
+  const login = firstFilled(localOnu?.Login, row?.login, row?.usuario, row?.user);
+  const slot = firstFilled(localOnu?.Slot, row?.slot, row?.id_slot, row?.gboc, cell[2]);
+  const pon = firstFilled(localOnu?.PON, row?.pon, row?.id_pon, cell[3]);
+  const olt = firstFilled(localOnu?.OLT, row?.olt_nome, row?.olt, row?.nome_olt, cell[0], row?.id_olt ? `OLT ${row.id_olt}` : '');
+  const ponId = firstFilled(localOnu?.['PON ID'], row?.ponid, row?.pon_id, cell[1] && cell[2] && cell[3] ? `1-1-${cell[2]}-${cell[3]}` : '');
+  const modelo = firstFilled(row?.modelo, cell[4]);
+
+  return {
+    ...(localOnu || {}),
+    OLT: olt || localOnu?.OLT || '-',
+    GCOB: slot || localOnu?.GCOB || localOnu?.Slot || '-',
+    Slot: slot || localOnu?.Slot || null,
+    PON: pon || localOnu?.PON || '-',
+    'PON ID': ponId || localOnu?.['PON ID'] || '-',
+    'Nome Cliente': nomeCliente || localOnu?.['Nome Cliente'] || '-',
+    Login: login || localOnu?.Login || '-',
+    'MAC/Serial': macSerial || localOnu?.['MAC/Serial'] || '-',
+    'ONU Tipo': firstFilled(localOnu?.['ONU Tipo'], modelo, '-'),
+    'Status ONU': 'Pedindo autenticacao',
+    'Sinal RX': firstFilled(localOnu?.['Sinal RX'], row?.sinal_rx, row?.rx, 0),
+    'PotÃƒÂªncia': firstFilled(localOnu?.['PotÃƒÂªncia'], localOnu?.['PotÃƒÆ’Ã‚Âªncia'], row?.potencia, row?.power, 0),
+  };
+}
+
+function execPythonScript(scriptPath) {
+  return new Promise((resolve, reject) => {
+    execFile('python', [scriptPath], { timeout: 40000, windowsHide: true }, (error, stdout, stderr) => {
+      if (error) {
+        const detail = stderr?.trim() || stdout?.trim() || error.message;
+        return reject(new Error(detail));
+      }
+
+      try {
+        resolve(JSON.parse(stdout));
+      } catch (parseError) {
+        reject(new Error(`Saida invalida do script: ${stdout.slice(0, 400)}`));
+      }
+    });
+  });
+}
+
+async function getUnauthorizedOnusFromIxc() {
+  const now = Date.now();
+  if (unauthorizedOnusCache.data && now - unauthorizedOnusCache.fetchedAt < 90_000) {
+    return unauthorizedOnusCache.data;
+  }
+
+  try {
+    const scriptResult = await execPythonScript(SCRIPT_UNAUTHORIZED_FILE);
+    const rows = Array.isArray(scriptResult?.registros) ? scriptResult.registros : [];
+    const normalized = (rows || [])
+      .map(normalizeUnauthorizedRow)
+      .filter((row) => row?.['MAC/Serial'] || row?.['Nome Cliente'] || row?.Login);
+
+    const deduped = [];
+    const seen = new Set();
+    normalized.forEach((row) => {
+      const key = String(row['MAC/Serial'] || row.Login || row['Nome Cliente'] || '').trim().toUpperCase();
+      if (!key || seen.has(key)) return;
+      seen.add(key);
+      deduped.push(row);
+    });
+    unauthorizedOnusCache = {
+      data: deduped,
+      fetchedAt: now,
+    };
+    return deduped;
+  } catch (error) {
+    console.warn('[unauthorized-onus-script]', error.message);
+    try {
+      const rows = await ixc.fetchUnauthorizedOnus();
+      const normalized = (rows || [])
+        .map(normalizeUnauthorizedRow)
+        .filter((row) => row?.['MAC/Serial'] || row?.['Nome Cliente'] || row?.Login);
+
+      const deduped = [];
+      const seen = new Set();
+      normalized.forEach((row) => {
+        const key = String(row['MAC/Serial'] || row.Login || row['Nome Cliente'] || '').trim().toUpperCase();
+        if (!key || seen.has(key)) return;
+        seen.add(key);
+        deduped.push(row);
+      });
+      unauthorizedOnusCache = {
+        data: deduped,
+        fetchedAt: now,
+      };
+      return deduped;
+    } catch (fallbackError) {
+      console.warn('[unauthorized-onus-ixc]', fallbackError.message);
+      return null;
+    }
+  }
+}
+
 // ── Routes ────────────────────────────────────────────────────────────────────
 
 app.get('/api/health', safe((req, res) => {
@@ -857,8 +1106,13 @@ app.get('/api/health', safe((req, res) => {
 }));
 
 app.get('/api/stats', safe(async (req, res) => {
-  res.json(getDashboardDerivedData().stats);
+  const stats = { ...getDashboardDerivedData().stats };
+  const remoteUnauthorized = await getUnauthorizedOnusFromIxc();
+  if (remoteUnauthorized) stats.desautorizadas = remoteUnauthorized.length;
+  res.json(stats);
 }));
+
+
 
 app.get('/api/clients-24h-offline', safe(async (req, res) => {
   try {
@@ -912,8 +1166,22 @@ app.get('/api/pons/:ponId', safe((req, res) => {
   res.json({ pon, onus: baseOnus.filter(r=>r['PON ID']===ponId).map(hydrateOnu) });
 }));
 
-app.get('/api/alertas', safe((req, res) => {
-  res.json(getAlertDerivedData());
+app.get('/api/alertas', safe(async (req, res) => {
+  const baseAlerts = getAlertDerivedData();
+  const remoteUnauthorized = await getUnauthorizedOnusFromIxc();
+
+  if (!remoteUnauthorized) {
+    return res.json(baseAlerts);
+  }
+
+  res.json({
+    ...baseAlerts,
+    desautorizadas: remoteUnauthorized,
+    counts: {
+      ...baseAlerts.counts,
+      desautorizadas: remoteUnauthorized.length,
+    },
+  });
 }));
 
 app.get('/api/charts/rx-por-slot', safe((req, res) => {
@@ -959,6 +1227,7 @@ app.post('/api/bairros/manual', safe((req, res) => {
   if (!login) return res.status(400).json({error:'login obrigatório'});
   bairro ? bairroMap[login.toLowerCase()]=bairro : delete bairroMap[login.toLowerCase()];
   invalidateDerivedCaches();
+  invalidate24hOfflineCache();
   saveBairros(); res.json({ok:true});
 }));
 
@@ -969,9 +1238,30 @@ app.get('/api/clientes/status', safe((req, res) => {
 app.post('/api/clientes/manual', safe((req, res) => {
   const {login,name,whatsapp}=req.body;
   if (!login) return res.status(400).json({error:'login obrigatório'});
-  clientesMap[login.toLowerCase()]={name:name||'',whatsapp:formatPhone(whatsapp)||''};
+  const key = login.toLowerCase();
+  const current = clientesMap[key] || {};
+  clientesMap[key] = {
+    ...current,
+    name: name || '',
+    whatsapp: formatPhone(whatsapp) || '',
+  };
   invalidateDerivedCaches();
+  invalidate24hOfflineCache();
   saveClientes(); res.json({ok:true});
+}));
+
+app.post('/api/clientes/offline-ignore', safe((req, res) => {
+  const { login, ignoreOfflineAlways } = req.body;
+  if (!login) return res.status(400).json({error:'login obrigatÃ³rio'});
+  const key = login.toLowerCase();
+  const current = clientesMap[key] || {};
+  clientesMap[key] = {
+    ...current,
+    ignoreOfflineAlways: !!ignoreOfflineAlways,
+  };
+  invalidateDerivedCaches();
+  invalidate24hOfflineCache();
+  saveClientes(); res.json({ ok:true, login:key, ignoreOfflineAlways: !!ignoreOfflineAlways });
 }));
 
 app.post('/api/relatorio/upload', upload.fields([

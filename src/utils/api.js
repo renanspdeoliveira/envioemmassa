@@ -39,6 +39,10 @@ export const apiClientes = {
     method: 'POST', headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ login, name, whatsapp }),
   }),
+  offlineIgnore: (login, ignoreOfflineAlways) => request('/clientes/offline-ignore', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ login, ignoreOfflineAlways }),
+  }),
 }
 
 export const apiRelatorio = {

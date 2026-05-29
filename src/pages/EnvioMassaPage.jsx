@@ -15,9 +15,8 @@ function fmtPhone(d) {
 
 export default function EnvioMassaPage() {
   const { data: stats } = useApi(() => api.stats())
-  const { data: bairros } = useApi(() => apiEnvio.bairrosList())
 
-  const [filters, setFilters] = useState({ olt: '', slot: '', pon: '', bairro: '', status: '', search: '' })
+  const [filters, setFilters] = useState({ olt: '', slot: '', pon: '', status: '', search: '' })
   const [dSearch, setDSearch] = useState('')
   const debSearch = useCallback(debounce(v => setDSearch(v), 350), [])
   const [somenteComContato, setSomenteComContato] = useState(false)
@@ -28,7 +27,7 @@ export default function EnvioMassaPage() {
   const [selected, setSelected] = useState(new Set())
   const [editModal, setEditModal] = useState(null)
 
-  const activeFilters = [filters.olt, filters.slot, filters.pon, filters.bairro, filters.status, dSearch].some(Boolean)
+  const activeFilters = [filters.olt, filters.slot, filters.pon, filters.status, dSearch].some(Boolean)
 
   const fetchData = useCallback(async () => {
     if (!activeFilters) {
@@ -42,7 +41,6 @@ export default function EnvioMassaPage() {
       if (filters.olt) params.olt = filters.olt
       if (filters.slot) params.slot = filters.slot
       if (filters.pon) params.pon = filters.pon
-      if (filters.bairro) params.bairro = filters.bairro
       if (filters.status) params.status = filters.status
       if (dSearch) params.search = dSearch
       const data = await apiEnvio.list(params)
@@ -53,7 +51,7 @@ export default function EnvioMassaPage() {
     } finally {
       setLoading(false)
     }
-  }, [filters.olt, filters.slot, filters.pon, filters.bairro, filters.status, dSearch, activeFilters])
+  }, [filters.olt, filters.slot, filters.pon, filters.status, dSearch, activeFilters])
 
   function rows() {
     if (!result?.data) return []
@@ -113,7 +111,7 @@ export default function EnvioMassaPage() {
     <div>
       <PageHeader
         title="Envio em Massa"
-        subtitle="Selecione clientes por PON ou bairro e exporte para disparos via WhatsApp"
+        subtitle="Selecione clientes por PON ou busca e exporte para disparos via WhatsApp"
         action={
           result && (
             <Btn onClick={exportRows} variant="primary">
@@ -145,7 +143,6 @@ export default function EnvioMassaPage() {
                         olt: oltName,
                         slot: String(ponInfo.slot || ''),
                         pon: String(ponInfo.pon || ''),
-                        bairro: '',
                         status: '',
                       }))}
                       style={{
@@ -194,13 +191,6 @@ export default function EnvioMassaPage() {
               </Select>
             </div>
             <div>
-              <label style={lbl}>Bairro</label>
-              <Select value={filters.bairro} onChange={e => setFilters(f => ({ ...f, bairro: e.target.value }))} style={{ width: '100%' }}>
-                <option value="">Todos</option>
-                {(bairros || []).map(b => <option key={b}>{b}</option>)}
-              </Select>
-            </div>
-            <div>
               <label style={lbl}>Status ONU</label>
               <Select value={filters.status} onChange={e => setFilters(f => ({ ...f, status: e.target.value }))} style={{ width: '100%' }}>
                 <option value="">Todos</option>
@@ -229,13 +219,12 @@ export default function EnvioMassaPage() {
             <Btn variant="primary" onClick={fetchData} disabled={!activeFilters}>
               <Search size={14} /> Buscar
             </Btn>
-            <Btn onClick={() => { setFilters({ olt: '', slot: '', pon: '', bairro: '', status: '', search: '' }); setDSearch(''); setResult(null) }}>
+            <Btn onClick={() => { setFilters({ olt: '', slot: '', pon: '', status: '', search: '' }); setDSearch(''); setResult(null) }}>
               <X size={14} /> Limpar
             </Btn>
             {filters.olt && filters.slot && filters.pon && (
               <Badge color="blue">{filters.olt} - GBOC {filters.slot} - PON {filters.pon}</Badge>
             )}
-            {filters.bairro && <Badge color="green">{filters.bairro}</Badge>}
           </div>
         </div>
       </Card>
@@ -270,7 +259,7 @@ export default function EnvioMassaPage() {
             <Send size={32} style={{ color: 'var(--text-tertiary)', margin: '0 auto 12px', display: 'block' }} />
             <div style={{ fontSize: 14, fontWeight: 500, color: 'var(--text-secondary)', marginBottom: 6 }}>Selecione os filtros acima</div>
             <div style={{ fontSize: 13, color: 'var(--text-tertiary)' }}>
-              Filtre por <strong>OLT + GBOC + PON</strong> ou por <strong>Bairro</strong> para listar os clientes
+              Filtre por <strong>OLT + GBOC + PON</strong> ou use a busca para listar os clientes
             </div>
           </div>
         </Card>
@@ -313,10 +302,8 @@ export default function EnvioMassaPage() {
                     <th style={th}>Nome</th>
                     <th style={th}>WhatsApp</th>
                     <th style={th}>Login</th>
-                    <th style={th}>Bairro</th>
                     <th style={th}>OLT / GBOC / PON</th>
                     <th style={th}>Status</th>
-                    <th style={th}>CTO</th>
                     <th style={th}></th>
                   </tr>
                 </thead>
@@ -343,16 +330,10 @@ export default function EnvioMassaPage() {
                             : <span style={{ fontSize: 11, color: 'var(--text-tertiary)', fontStyle: 'italic' }}>sem contato</span>}
                         </td>
                         <td style={{ ...td, fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--text-secondary)' }}>{row.login}</td>
-                        <td style={td}>
-                          {row.bairro
-                            ? <Badge color="green" size="sm">{row.bairro}</Badge>
-                            : <span style={{ color: 'var(--text-tertiary)', fontSize: 11 }}>-</span>}
-                        </td>
                         <td style={{ ...td, fontFamily: 'var(--font-mono)', fontSize: 12 }}>
                           {row.olt} / G{row.slot} / P{row.pon}
                         </td>
                         <td style={td}><StatusBadge status={row.status} /></td>
-                        <td style={{ ...td, fontSize: 12, color: 'var(--text-secondary)' }}>{row.cto || '-'}</td>
                         <td style={td}>
                           <button
                             onClick={e => { e.stopPropagation(); setEditModal({ login: row.login, nome: row.nome_formatado, whatsapp: row.whatsapp || '' }) }}
