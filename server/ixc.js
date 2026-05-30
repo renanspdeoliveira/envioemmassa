@@ -359,6 +359,82 @@ async function lookupClientById(clientId) {
   }
 }
 
+async function lookupByOnuSerial(serial) {
+  const normalized = String(serial || '').trim();
+  if (!normalized) return { data: null, errors: ['Serial da ONU invalido.'] };
+
+  const errors = [];
+  const qtypes = [
+    'fn_onu.mac',
+    'fn_onu.serial',
+    'fn_onu.onu_mac',
+    'fn_onu.login_mac',
+  ];
+
+  let onuRow = null;
+  for (const qtype of qtypes) {
+    try {
+      const resp = await ixcRequest('fn_onu', {
+        qtype,
+        query: normalized,
+        oper: '=',
+        limit: '1',
+      });
+      const row = normalizeIxcRows(resp)[0];
+      if (row) {
+        onuRow = row;
+        break;
+      }
+    } catch (e) {
+      errors.push(`${qtype}: ${e.message}`);
+    }
+  }
+
+  if (!onuRow) return { data: null, errors: errors.length ? errors : ['ONU nao encontrada pelo serial na IXC.'] };
+
+  const login = String(onuRow.login || '').toLowerCase().trim();
+  const idCliente = String(onuRow.id_cliente || '').trim();
+  const idContrato = String(onuRow.id_contrato || '').trim();
+
+  let clientName = '';
+  let whatsapp = '';
+  if (idCliente) {
+    try {
+      const clientResp = await ixcRequest('cliente', {
+        qtype: 'cliente.id',
+        query: idCliente,
+        oper: '=',
+        limit: '1',
+      });
+      const client = normalizeIxcRows(clientResp)[0];
+      if (client) {
+        clientName = client.razao || client.nome || '';
+        const phone =
+          client.ramal_celular ||
+          client.fone_celular ||
+          client.celular ||
+          client.fone ||
+          '';
+        whatsapp = formatPhone(phone);
+      }
+    } catch (e) {
+      errors.push(`cliente.id: ${e.message}`);
+    }
+  }
+
+  return {
+    data: {
+      serial: normalized,
+      login,
+      id_cliente: idCliente,
+      id_contrato: idContrato,
+      name: clientName,
+      whatsapp,
+    },
+    errors,
+  };
+}
+
 async function testConnection() {
   const data = await ixcRequest('cliente', { limit: '1' });
   const rows = normalizeIxcRows(data);
@@ -391,4 +467,4 @@ async function fetchUnauthorizedOnus() {
   return [...olt1, ...olt2];
 }
 
-module.exports = { ixcConfig, loadConfig, saveConfig, ixcRequest, ixcRequestWithBody, syncContactsByLogins, lookupLogin, lookupClientById, testConnection, fetchUnauthorizedOnus };
+module.exports = { ixcConfig, loadConfig, saveConfig, ixcRequest, ixcRequestWithBody, syncContactsByLogins, lookupLogin, lookupClientById, lookupByOnuSerial, testConnection, fetchUnauthorizedOnus };
