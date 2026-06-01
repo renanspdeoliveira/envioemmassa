@@ -36,6 +36,7 @@ const CLI_FILE  = path.join(__dirname, 'clientes.json');
 const ALWAYS_DISCONNECT_FILE = path.join(__dirname, 'clientes_sempre_desligam.json');
 const RAW_IXC_FILE = path.join(__dirname, 'ixc_radpop_raw.json');
 const LINKLOSS_HISTORY_FILE = path.join(__dirname, 'linkloss_history.json');
+const LINKLOSS_CACHE_FILE = path.join(__dirname, 'linkloss_cache.json');
 const SCRIPT_24H_FILE = path.join(__dirname, '..', 'script_24horas_cliente.py');
 const SCRIPT_UNAUTHORIZED_FILE = path.join(__dirname, '..', 'script_onu_nao_autroizada.py');
 const SCRIPT_ZABBIX_FILE = path.join(__dirname, '..', 'script_zabbix.py');
@@ -626,13 +627,35 @@ let clients24hOfflineCache = {
   fetchedAt: 0,
   source: 'unavailable',
 };
-let zabbixLinkLossCache = {
-  data: null,
-  fetchedAt: 0,
-  error: null,
-};
+let zabbixLinkLossCache = (() => {
+  const persisted = readJson(LINKLOSS_CACHE_FILE, null);
+  if (persisted?.data) {
+    return {
+      data: persisted.data,
+      fetchedAt: Number(persisted.fetchedAt || 0),
+      error: null,
+    };
+  }
+
+  return {
+    data: null,
+    fetchedAt: 0,
+    error: null,
+  };
+})();
 const zabbixSerialBindingCache = new Map();
 const offlineOnuLookupCache = new Map();
+
+function saveZabbixLinkLossCache() {
+  if (!zabbixLinkLossCache.data) return;
+  fs.writeFileSync(
+    LINKLOSS_CACHE_FILE,
+    JSON.stringify({
+      data: zabbixLinkLossCache.data,
+      fetchedAt: zabbixLinkLossCache.fetchedAt,
+    }, null, 2)
+  );
+}
 
 function invalidate24hOfflineCache() {
   clients24hOfflineCache = {
@@ -1011,7 +1034,45 @@ async function getZabbixLinkLossDashboard() {
   if (zabbixLinkLossCache.data && (now - zabbixLinkLossCache.fetchedAt) < 5_000) {
     return zabbixLinkLossCache.data;
   }
-  return refreshZabbixLinkLossCache();
+
+  try {
+    return await refreshZabbixLinkLossCache();
+  } catch (error) {
+    if (zabbixLinkLossCache.data) {
+      return {
+        ...zabbixLinkLossCache.data,
+        stale: true,
+        staleReason: error.message,
+      };
+    }
+
+    return {
+      summary: {
+        totalItems: 0,
+        ignored: 0,
+        linkLoss: 0,
+        dyingGasp: 0,
+        onuOffline: 0,
+        totalMonitorados: 0,
+      },
+      causes: {
+        linkLoss: { descricao: 'Link Loss', quantidade: 0 },
+        dyingGasp: { descricao: 'Dying Gasp', quantidade: 0 },
+        onuOffline: { descricao: 'ONU Offline', quantidade: 0 },
+      },
+      groups: {
+        linkLoss: [],
+        dyingGasp: [],
+        onuOffline: [],
+      },
+      fetchedAt: now,
+      sourceUpdatedAt: null,
+      source: 'indisponivel',
+      stale: true,
+      staleReason: error.message,
+      unavailable: true,
+    };
+  }
 }
 
 function parseZabbixDisconnectionDate(value) {
@@ -1318,6 +1379,7 @@ async function refreshZabbixLinkLossCache() {
       fetchedAt: now,
       error: null,
     };
+    saveZabbixLinkLossCache();
     return normalized;
   } catch (error) {
     zabbixLinkLossCache.error = error.message;
@@ -1692,16 +1754,8 @@ app.get('/api/clients-24h-offline', safe(async (req, res) => {
 }));
 
 app.get('/api/clients-linkloss', safe(async (req, res) => {
-  try {
-    const result = await getZabbixLinkLossDashboard();
-    res.json(result);
-  } catch (error) {
-    console.warn('[clients-linkloss]', error.message);
-    res.status(502).json({
-      error: 'Nao foi possivel consultar dados de Link Loss/Dying Gasp no Zabbix.',
-      detail: error.message,
-    });
-  }
+  const result = await getZabbixLinkLossDashboard();
+  res.json(result);
 }));
 
 app.get('/api/onus', safe(async (req, res) => {
