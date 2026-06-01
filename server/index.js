@@ -872,10 +872,11 @@ async function getClients24hOffline() {
       }) || currentAlarm || currentAlarmByLogin || currentAlarmByName || null;
       const statusOnuRaw = matchedOnu?.['Status ONU'] || 'ONU SEM INFORMACAO';
       const isOnuOnline = !!matchedOnu && isOnlineOnu(matchedOnu);
-      const onuStatusDisplay = isOnuOnline
-        ? 'ONLINE'
-        : resolvedAlarm?.causa
-          ? `${resolvedAlarm.causa} - ${resolvedAlarm.codigo || ''}`.trim()
+      const hasCurrentAlarm = !!resolvedAlarm?.causa && ['400', '402', '403'].includes(String(resolvedAlarm?.codigo || '').trim());
+      const onuStatusDisplay = hasCurrentAlarm
+        ? `${resolvedAlarm.causa} - ${resolvedAlarm.codigo || ''}`.trim()
+        : isOnuOnline
+          ? 'ONLINE'
           : statusOnuRaw;
 
       return {
@@ -943,6 +944,7 @@ async function getClients24hOffline() {
             referenceTs: row.referenceTs,
           });
           const statusRaw = row.onuStatusRaw || 'ONU SEM INFORMACAO';
+          const hasCurrentAlarm = !!resolvedAlarm?.causa && ['400', '402', '403'].includes(String(resolvedAlarm?.codigo || '').trim());
 
           return {
             ...row,
@@ -952,7 +954,7 @@ async function getClients24hOffline() {
             slot: row.slot ?? parseIntSafe(liveOnu.slotno),
             pon: row.pon ?? parseIntSafe(liveOnu.ponno),
             onuEncontrada: true,
-            onuStatus: resolvedAlarm?.causa
+            onuStatus: hasCurrentAlarm
               ? `${resolvedAlarm.causa} - ${resolvedAlarm.codigo || ''}`.trim()
               : statusRaw,
             zabbixAlarmName: resolvedAlarm?.causa || row.zabbixAlarmName || null,

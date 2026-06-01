@@ -506,10 +506,10 @@
         }
       ]
     },
-    "fetchedAt": 1780325103880,
+    "fetchedAt": 1780325477008,
     "sourceUpdatedAt": "01/06/2026 11:43:02",
     "source": "script_zabbix.py",
     "stale": false
   },
-  "fetchedAt": 1780325103880
+  "fetchedAt": 1780325477008
 }
