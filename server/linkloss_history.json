@@ -1,0 +1,121 @@
+{
+  "bySerial": {
+    "FHTTFE3294F9": {
+      "2026-06-01": {
+        "recoveredEventKeys": [
+          "402:1780286638000"
+        ],
+        "lastSeenEventKey": "402:1780286638000",
+        "totalRecoveredDrops": 1
+      }
+    },
+    "FHTT969AFD48": {
+      "2026-06-01": {
+        "recoveredEventKeys": [
+          "402:1780305788000"
+        ],
+        "lastSeenEventKey": "402:1780305788000",
+        "totalRecoveredDrops": 1
+      }
+    },
+    "FHTT12B7ECE8": {
+      "2026-06-01": {
+        "recoveredEventKeys": [
+          "402:1780306844000"
+        ],
+        "lastSeenEventKey": "402:1780306844000",
+        "totalRecoveredDrops": 1
+      }
+    },
+    "FHTTFE32A444": {
+      "2026-06-01": {
+        "recoveredEventKeys": [
+          "402:1780314989000"
+        ],
+        "lastSeenEventKey": "402:1780314989000",
+        "totalRecoveredDrops": 1
+      }
+    },
+    "FHTT10E5D4B0": {
+      "2026-06-01": {
+        "recoveredEventKeys": [
+          "400:1780315988000"
+        ],
+        "lastSeenEventKey": "400:1780315988000",
+        "totalRecoveredDrops": 1
+      }
+    },
+    "FHTT035E1880": {
+      "2026-06-01": {
+        "recoveredEventKeys": [
+          "402:1780318898000"
+        ],
+        "lastSeenEventKey": "402:1780318898000",
+        "totalRecoveredDrops": 1
+      }
+    },
+    "FHTT91F43C90": {
+      "2026-06-01": {
+        "recoveredEventKeys": [
+          "402:1780319297000"
+        ],
+        "lastSeenEventKey": "402:1780319297000",
+        "totalRecoveredDrops": 1
+      }
+    },
+    "FHTT0591EC40": {
+      "2026-06-01": {
+        "recoveredEventKeys": [
+          "402:1780321341000"
+        ],
+        "lastSeenEventKey": "402:1780321341000",
+        "totalRecoveredDrops": 1
+      }
+    },
+    "FHTT100C5720": {
+      "2026-06-01": {
+        "recoveredEventKeys": [
+          "402:1780321160000"
+        ],
+        "lastSeenEventKey": "402:1780321160000",
+        "totalRecoveredDrops": 1
+      }
+    },
+    "FHTT977562D0": {
+      "2026-06-01": {
+        "recoveredEventKeys": [
+          "402:1780321406000"
+        ],
+        "lastSeenEventKey": "402:1780321406000",
+        "totalRecoveredDrops": 1
+      }
+    },
+    "FHTT06000B64": {
+      "2026-06-01": {
+        "recoveredEventKeys": [
+          "402:1780322024000"
+        ],
+        "lastSeenEventKey": "402:1780322024000",
+        "totalRecoveredDrops": 1
+      }
+    },
+    "FHTT127627A8": {
+      "2026-06-01": {
+        "recoveredEventKeys": [
+          "402:1780322190000"
+        ],
+        "lastSeenEventKey": "402:1780322190000",
+        "totalRecoveredDrops": 1
+      }
+    },
+    "FHTT0945E76E": {
+      "2026-06-01": {
+        "recoveredEventKeys": [
+          "402:1780322573000"
+        ],
+        "lastSeenEventKey": "402:1780322573000",
+        "totalRecoveredDrops": 1
+      }
+    }
+  }
+}

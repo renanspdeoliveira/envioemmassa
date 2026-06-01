@@ -435,6 +435,42 @@ async function lookupByOnuSerial(serial) {
   };
 }
 
+async function lookupOnuByLogin(login) {
+  const normalizedLogin = String(login || '').trim().toLowerCase();
+  if (!normalizedLogin) return { data: null, errors: ['Login invalido.'] };
+
+  const errors = [];
+
+  try {
+    const resp = await ixcRequest('fn_onu', {
+      qtype: 'fn_onu.login',
+      query: normalizedLogin,
+      oper: '=',
+      limit: '5',
+    });
+
+    const row = normalizeIxcRows(resp).find((item) => String(item?.login || '').trim().toLowerCase() === normalizedLogin) || null;
+    if (!row) return { data: null, errors: ['ONU nao encontrada pelo login na IXC.'] };
+
+    return {
+      data: {
+        login: normalizedLogin,
+        serial: String(row.mac || row.serial || row.onu_mac || row.login_mac || '').trim().toUpperCase(),
+        mac: String(row.mac || row.serial || row.onu_mac || row.login_mac || '').trim().toUpperCase(),
+        nome: String(row.nome || '').trim(),
+        id_cliente: String(row.id_cliente || '').trim(),
+        id_contrato: String(row.id_contrato || '').trim(),
+        ponid: String(row.ponid || '').trim(),
+        slotno: String(row.slotno || '').trim(),
+        ponno: String(row.ponno || '').trim(),
+      },
+      errors,
+    };
+  } catch (e) {
+    return { data: null, errors: [e.message] };
+  }
+}
+
 async function testConnection() {
   const data = await ixcRequest('cliente', { limit: '1' });
   const rows = normalizeIxcRows(data);
@@ -467,4 +503,4 @@ async function fetchUnauthorizedOnus() {
   return [...olt1, ...olt2];
 }
 
-module.exports = { ixcConfig, loadConfig, saveConfig, ixcRequest, ixcRequestWithBody, syncContactsByLogins, lookupLogin, lookupClientById, lookupByOnuSerial, testConnection, fetchUnauthorizedOnus };
+module.exports = { ixcConfig, loadConfig, saveConfig, ixcRequest, ixcRequestWithBody, syncContactsByLogins, lookupLogin, lookupClientById, lookupByOnuSerial, lookupOnuByLogin, testConnection, fetchUnauthorizedOnus };

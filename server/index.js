@@ -35,9 +35,10 @@ const BRR_FILE  = path.join(__dirname, 'bairros.json');
 const CLI_FILE  = path.join(__dirname, 'clientes.json');
 const ALWAYS_DISCONNECT_FILE = path.join(__dirname, 'clientes_sempre_desligam.json');
 const RAW_IXC_FILE = path.join(__dirname, 'ixc_radpop_raw.json');
+const LINKLOSS_HISTORY_FILE = path.join(__dirname, 'linkloss_history.json');
 const SCRIPT_24H_FILE = path.join(__dirname, '..', 'script_24horas_cliente.py');
 const SCRIPT_UNAUTHORIZED_FILE = path.join(__dirname, '..', 'script_onu_nao_autroizada.py');
-const SCRIPT_ZABBIX_FILE = path.join(__dirname, '..', 'script_zabixx.py');
+const SCRIPT_ZABBIX_FILE = path.join(__dirname, '..', 'script_zabbix.py');
 const ZABBIX_OUTPUT_FILE = path.join(__dirname, '..', 'zabbix_onus.json');
 const REMOVED_ONU_MACS = new Set([
   'FHTT03dd9700',
@@ -59,9 +60,11 @@ let bairroMap   = readJson(BRR_FILE, {});
 let clientesMap = readJson(CLI_FILE, {});
 const alwaysDisconnectList = readJson(ALWAYS_DISCONNECT_FILE, []);
 let rawIxcData  = readJson(RAW_IXC_FILE, { registros:[] });
+let linkLossHistory = readJson(LINKLOSS_HISTORY_FILE, { bySerial: {} });
 
 function saveBairros()  { fs.writeFileSync(BRR_FILE, JSON.stringify(bairroMap,   null, 2)); }
 function saveClientes() { fs.writeFileSync(CLI_FILE, JSON.stringify(clientesMap, null, 2)); }
+function saveLinkLossHistory() { fs.writeFileSync(LINKLOSS_HISTORY_FILE, JSON.stringify(linkLossHistory, null, 2)); }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 function formatClientName(raw) {
@@ -163,15 +166,18 @@ function findAlwaysDisconnectClient({ macSerial, nomeCliente }) {
 function buildRawOnuIndex(records) {
   const byMac = new Map();
   const byLoginId = new Map();
+  const byLogin = new Map();
 
   for (const row of records || []) {
     const mac = (row?.mac || '').trim().toUpperCase();
     const loginId = parseIntSafe(row?.id_login);
+    const login = String(row?.login || '').trim().toLowerCase();
     if (mac) byMac.set(mac, row);
     if (loginId !== null) byLoginId.set(String(loginId), row);
+    if (login) byLogin.set(login, row);
   }
 
-  return { byMac, byLoginId };
+  return { byMac, byLoginId, byLogin };
 }
 
 function buildBaseOnuIndex(records) {
@@ -314,8 +320,10 @@ function hydrateOnu(r) {
   const nomeCanonical = canonicalClientName(nomeOriginal);
   const byNome = relatorio.by_nome?.[nomeFmt] || {};
   const contractLogin = loginIndex.byContractId.get(String(byNome.id_contrato || '').trim());
+  const directTechnicalLogin = inferLoginFromRawName(nomeOriginal);
   const inferredLogin =
     r.Login ||
+    directTechnicalLogin ||
     loginIndex.exactByName.get(normStr(nomeOriginal)) ||
     loginIndex.uniqueByFormattedName.get(normStr(nomeFmt)) ||
     loginIndex.uniqueByCanonicalName.get(nomeCanonical) ||
@@ -428,6 +436,124 @@ function formatDateTimePtBr(value) {
   });
 }
 
+async function resolveOfflineOnuByLogin(login) {
+  const normalizedLogin = String(login || '').trim().toLowerCase();
+  if (!normalizedLogin) return null;
+
+  const cached = offlineOnuLookupCache.get(normalizedLogin);
+  if (cached && Date.now() - cached.fetchedAt < 10 * 60_000) {
+    return cached.data || null;
+  }
+
+  if (!ixc?.lookupOnuByLogin) return null;
+
+  try {
+    const { data } = await ixc.lookupOnuByLogin(normalizedLogin);
+    offlineOnuLookupCache.set(normalizedLogin, { data: data || null, fetchedAt: Date.now() });
+    return data || null;
+  } catch (_) {
+    offlineOnuLookupCache.set(normalizedLogin, { data: null, fetchedAt: Date.now() });
+    return null;
+  }
+}
+
+function looksLikeTechnicalName(name, login = '') {
+  const normalizedName = canonicalClientName(name || '');
+  const normalizedLogin = canonicalClientName(login || '');
+
+  if (!normalizedName) return true;
+  if (normalizedLogin && normalizedName === normalizedLogin) return true;
+  if (/^[a-z0-9_.-]+$/i.test(String(name || '').trim()) && !String(name || '').includes(' ')) return true;
+  return false;
+}
+
+function formatDisplayClientName(name) {
+  const raw = String(name || '').trim();
+  if (!raw) return '';
+  if (looksLikeTechnicalName(raw)) return raw;
+  const lettersOnly = raw.replace(/[^A-Za-zÀ-ÿ\s]/g, '');
+  const isAllCaps = lettersOnly && lettersOnly === lettersOnly.toUpperCase();
+  if (!isAllCaps) return raw;
+
+  return raw
+    .toLowerCase()
+    .split(/\s+/)
+    .filter(Boolean)
+    .map((part) => {
+      if (/^\d+$/.test(part)) return part;
+      if (part.length <= 2 && /^[ivxlcdm]+$/i.test(part)) return part.toUpperCase();
+      return part.charAt(0).toUpperCase() + part.slice(1);
+    })
+    .join(' ');
+}
+
+function normalizeLoginValue(value) {
+  return String(value || '').trim().toLowerCase();
+}
+
+function inferLoginFromRawName(rawName) {
+  const normalized = normalizeLoginValue(rawName);
+  if (!normalized) return '';
+
+  if (relatorio.by_login?.[normalized]) return normalized;
+  if (clientesMap[normalized]) return normalized;
+  return '';
+}
+
+function buildAlarmTimelineMap(rows, keyGetter) {
+  const map = new Map();
+
+  for (const row of rows || []) {
+    const key = String(keyGetter(row) || '').trim();
+    if (!key) continue;
+    if (!map.has(key)) map.set(key, []);
+    map.get(key).push(row);
+  }
+
+  for (const items of map.values()) {
+    items.sort((a, b) => Number(b?.eventTs || 0) - Number(a?.eventTs || 0));
+  }
+
+  return map;
+}
+
+function pickClosestAlarm(rows, referenceTs) {
+  const candidates = Array.isArray(rows) ? rows.filter(Boolean) : [];
+  if (!candidates.length) return null;
+  if (!referenceTs) return candidates[0] || null;
+
+  const exactWindowMs = 15 * 60_000;
+  let best = null;
+  let bestDiff = Number.POSITIVE_INFINITY;
+
+  for (const row of candidates) {
+    const eventTs = Number(row?.eventTs || 0);
+    if (!eventTs) continue;
+    const diff = Math.abs(eventTs - referenceTs);
+    if (diff < bestDiff) {
+      best = row;
+      bestDiff = diff;
+    }
+  }
+
+  if (best && bestDiff <= exactWindowMs) return best;
+  return best || candidates[0] || null;
+}
+
+function pickBestZabbixAlarm({ serialRows, loginRows, nameRows, referenceTs }) {
+  const merged = [];
+  const seen = new Set();
+
+  for (const row of [...(serialRows || []), ...(loginRows || []), ...(nameRows || [])]) {
+    const key = `${String(row?.serial || '').trim().toUpperCase()}__${Number(row?.eventTs || 0)}__${String(row?.codigo || '')}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    merged.push(row);
+  }
+
+  return pickClosestAlarm(merged, referenceTs);
+}
+
 function extractPythonString(source, varName) {
   const match = source.match(new RegExp(`${varName}\\s*=\\s*["']([^"']+)["']`));
   return match ? match[1].trim() : '';
@@ -506,6 +632,7 @@ let zabbixLinkLossCache = {
   error: null,
 };
 const zabbixSerialBindingCache = new Map();
+const offlineOnuLookupCache = new Map();
 
 function invalidate24hOfflineCache() {
   clients24hOfflineCache = {
@@ -644,6 +771,23 @@ async function getClients24hOffline() {
     }
 
   const nowDate = new Date();
+  let zabbixAlarmMap = new Map();
+  let zabbixAlarmByLoginMap = new Map();
+  let zabbixAlarmByNameMap = new Map();
+  try {
+    const zabbixDashboard = await getZabbixLinkLossDashboard();
+    const allAlarmRows = Object.values(zabbixDashboard?.groups || {})
+      .flat()
+      .filter(Boolean)
+      .sort((a, b) => Number(b?.eventTs || 0) - Number(a?.eventTs || 0));
+
+    zabbixAlarmMap = buildAlarmTimelineMap(allAlarmRows, (row) => String(row?.serial || '').trim().toUpperCase());
+    zabbixAlarmByLoginMap = buildAlarmTimelineMap(allAlarmRows, (row) => normalizeLoginValue(row?.login));
+    zabbixAlarmByNameMap = buildAlarmTimelineMap(allAlarmRows, (row) => canonicalClientName(row?.nomeCliente || ''));
+  } catch (error) {
+    console.warn('[24h-offline][zabbix-alarm-map]', error.message);
+  }
+
   const cutoff = nowDate.getTime() - (24 * 3_600_000);
   const cutoff20h = nowDate.getTime() - (20 * 3_600_000);
   const cutoffDate = new Date(cutoff);
@@ -664,7 +808,10 @@ async function getClients24hOffline() {
       if (!lastConnectionAt) return null;
 
       const login = String(cliente?.login || '').trim();
-      const loginId = parseIntSafe(cliente?.id_login);
+      const loginId = parseIntSafe(cliente?.id_login ?? cliente?.id);
+      const rawByLogin = login ? rawOnuIndex.byLogin.get(login.toLowerCase()) : null;
+      const rawByLoginId = loginId !== null ? rawOnuIndex.byLoginId.get(String(loginId)) : null;
+      const rawMatch = rawByLoginId || rawByLogin || null;
       const matchedOnu =
         (login && baseOnuIndex.byLogin.get(login.toLowerCase())) ||
         (loginId !== null ? baseOnuIndex.byLoginId.get(String(loginId)) : null) ||
@@ -672,13 +819,41 @@ async function getClients24hOffline() {
       const loginKey = login.toLowerCase();
       const fallbackContato = clientesMap[loginKey] || relatorio.by_login?.[loginKey] || {};
       const ignoreOfflineAlways = !!fallbackContato?.ignoreOfflineAlways;
-      const nomeCliente = matchedOnu?.nome_formatado || matchedOnu?.['Nome Cliente'] || formatClientName(cliente?.nome || '');
+      const nomeFromIxc = String(cliente?.nome || '').trim();
+      const nomeFromFallback = String(fallbackContato?.name || fallbackContato?.nome || '').trim();
+      const nomeFromMatchedOnu = String(matchedOnu?.['Nome Cliente'] || matchedOnu?.nome_formatado || '').trim();
+      const nomeClienteRaw = looksLikeTechnicalName(nomeFromMatchedOnu, login)
+        ? (nomeFromIxc || nomeFromFallback || nomeFromMatchedOnu || login)
+        : (nomeFromMatchedOnu || nomeFromIxc || nomeFromFallback || login);
+      const nomeCliente = formatDisplayClientName(nomeClienteRaw);
       const alwaysDisconnectMatch = findAlwaysDisconnectClient({
         macSerial: matchedOnu?.['MAC/Serial'] || '',
         nomeCliente,
       });
 
       const offlineMs = nowDate.getTime() - lastConnectionAt.getTime();
+      const referenceTs = lastConnectionAt.getTime();
+      const currentAlarmByLogin = login ? pickClosestAlarm(zabbixAlarmByLoginMap.get(login.toLowerCase()) || [], referenceTs) : null;
+      const currentAlarmByName = pickClosestAlarm(
+        zabbixAlarmByNameMap.get(canonicalClientName(nomeCliente || nomeFromIxc || '')) || [],
+        referenceTs
+      ) || null;
+      const macSerial = matchedOnu?.['MAC/Serial'] || rawMatch?.mac || currentAlarmByLogin?.serial || null;
+      const currentAlarmRows = macSerial ? (zabbixAlarmMap.get(String(macSerial).trim().toUpperCase()) || []) : [];
+      const currentAlarm = pickClosestAlarm(currentAlarmRows, referenceTs);
+      const resolvedAlarm = pickBestZabbixAlarm({
+        serialRows: currentAlarmRows,
+        loginRows: login ? (zabbixAlarmByLoginMap.get(login.toLowerCase()) || []) : [],
+        nameRows: zabbixAlarmByNameMap.get(canonicalClientName(nomeCliente || nomeFromIxc || '')) || [],
+        referenceTs,
+      }) || currentAlarm || currentAlarmByLogin || currentAlarmByName || null;
+      const statusOnuRaw = matchedOnu?.['Status ONU'] || 'ONU SEM INFORMACAO';
+      const isOnuOnline = !!matchedOnu && isOnlineOnu(matchedOnu);
+      const onuStatusDisplay = isOnuOnline
+        ? 'ONLINE'
+        : resolvedAlarm?.causa
+          ? `${resolvedAlarm.causa} - ${resolvedAlarm.codigo || ''}`.trim()
+          : statusOnuRaw;
 
       return {
         id: String(cliente?.id || cliente?.id_cliente || ''),
@@ -705,23 +880,73 @@ async function getClients24hOffline() {
                 ? '20plus'
                 : 'geral',
         onuEncontrada: !!matchedOnu,
-        onuStatus: matchedOnu?.['Status ONU'] || 'ONU SEM INFORMACAO',
-        ponId: matchedOnu?.['PON ID'] || null,
+        onuStatus: onuStatusDisplay,
+        onuStatusRaw: statusOnuRaw,
+        zabbixAlarmName: resolvedAlarm?.causa || null,
+        zabbixAlarmCode: resolvedAlarm?.codigo || null,
+        zabbixAlarmOltPon: resolvedAlarm?.oltPonLabel || null,
+        ponId: matchedOnu?.['PON ID'] || rawMatch?.ponid || null,
         olt: matchedOnu?.OLT || null,
-        slot: matchedOnu?.Slot ?? null,
-        pon: matchedOnu?.PON ?? null,
-        macSerial: matchedOnu?.['MAC/Serial'] || null,
+        slot: matchedOnu?.Slot ?? parseIntSafe(rawMatch?.slotno),
+        pon: matchedOnu?.PON ?? parseIntSafe(rawMatch?.ponno),
+        macSerial,
         nomeCliente,
         whatsapp: matchedOnu?.whatsapp || fallbackContato?.whatsapp || '',
         ignoreOfflineAlways,
         sempreDesliga: !!alwaysDisconnectMatch || ignoreOfflineAlways,
         sempreDesligaRelato: alwaysDisconnectMatch?.relato || '',
+        referenceTs,
       };
     })
+    .map(async (row) => {
+      if (row.macSerial || !row.login) return row;
+
+      const liveOnu = await resolveOfflineOnuByLogin(row.login);
+      if (!liveOnu) return row;
+
+      const liveMac = String(liveOnu.mac || liveOnu.serial || '').trim().toUpperCase() || null;
+      const liveName = formatDisplayClientName(liveOnu.nome || row.nomeCliente || row.login);
+
+      return {
+        ...(() => {
+          const resolvedMac = liveMac || row.macSerial;
+          const serialRows = resolvedMac ? (zabbixAlarmMap.get(String(resolvedMac).trim().toUpperCase()) || []) : [];
+          const loginRows = row.login ? (zabbixAlarmByLoginMap.get(row.login.toLowerCase()) || []) : [];
+          const nameRows = zabbixAlarmByNameMap.get(canonicalClientName(liveName || row.nomeCliente || row.login)) || [];
+          const resolvedAlarm = pickBestZabbixAlarm({
+            serialRows,
+            loginRows,
+            nameRows,
+            referenceTs: row.referenceTs,
+          });
+          const statusRaw = row.onuStatusRaw || 'ONU SEM INFORMACAO';
+
+          return {
+            ...row,
+            macSerial: resolvedMac,
+            nomeCliente: liveName || row.nomeCliente,
+            ponId: row.ponId || liveOnu.ponid || null,
+            slot: row.slot ?? parseIntSafe(liveOnu.slotno),
+            pon: row.pon ?? parseIntSafe(liveOnu.ponno),
+            onuEncontrada: true,
+            onuStatus: resolvedAlarm?.causa
+              ? `${resolvedAlarm.causa} - ${resolvedAlarm.codigo || ''}`.trim()
+              : statusRaw,
+            zabbixAlarmName: resolvedAlarm?.causa || row.zabbixAlarmName || null,
+            zabbixAlarmCode: resolvedAlarm?.codigo || row.zabbixAlarmCode || null,
+            zabbixAlarmOltPon: resolvedAlarm?.oltPonLabel || row.zabbixAlarmOltPon || null,
+          };
+        })(),
+      };
+    })
+    ;
+
+  const resolvedData = (await Promise.all(data))
     .filter(Boolean)
+    .map(({ referenceTs, ...row }) => row)
     .sort((a, b) => b.offlineMs - a.offlineMs);
 
-  const summary = data.reduce((acc, item) => {
+  const summary = resolvedData.reduce((acc, item) => {
     if (item.faixaOffline === 'hoje' || item.faixaOffline === 'hoje20plus') {
       acc.totalHoje += 1;
     }
@@ -772,7 +997,7 @@ async function getClients24hOffline() {
   });
 
   clients24hOfflineCache = {
-    data,
+    data: resolvedData,
     summary,
     fetchedAt: now,
     source: offlineSource.source,
@@ -783,7 +1008,7 @@ async function getClients24hOffline() {
 
 async function getZabbixLinkLossDashboard() {
   const now = Date.now();
-  if (zabbixLinkLossCache.data && (now - zabbixLinkLossCache.fetchedAt) < 20_000) {
+  if (zabbixLinkLossCache.data && (now - zabbixLinkLossCache.fetchedAt) < 5_000) {
     return zabbixLinkLossCache.data;
   }
   return refreshZabbixLinkLossCache();
@@ -804,10 +1029,148 @@ function getPonGroupFromPosition(posicao) {
   return `${parts[1]}/${parts[2]}`;
 }
 
+function getDateKeyFromTs(ts) {
+  if (!ts || !Number.isFinite(ts)) return '';
+  const date = new Date(ts);
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+function isTodayTs(ts) {
+  return getDateKeyFromTs(ts) === getDateKeyFromTs(Date.now());
+}
+
+function parseOltNumberFromCentral(central) {
+  const raw = String(central || '').trim();
+  const match = raw.match(/central-\s*(\d+)/i);
+  if (match) return match[1];
+  return null;
+}
+
+function formatLinkLossOltPon({ central, posicao }) {
+  const olt = parseOltNumberFromCentral(central);
+  const parts = String(posicao || '').trim().split('/').map((part) => part.trim()).filter(Boolean);
+  const pon = parts.length >= 3
+    ? `${parts[1]}/${parts[2]}`
+    : parts.length >= 2
+      ? `${parts[0]}/${parts[1]}`
+      : parts[0] || null;
+
+  if (olt && pon) return `OLT ${olt} - PON ${pon}`;
+  if (olt) return `OLT ${olt}`;
+  if (pon) return `PON ${pon}`;
+  return '-';
+}
+
+function ensureLinkLossHistoryRecord(serial, dateKey) {
+  if (!serial || !dateKey) return null;
+  if (!linkLossHistory.bySerial[serial]) linkLossHistory.bySerial[serial] = {};
+  if (!linkLossHistory.bySerial[serial][dateKey]) {
+    linkLossHistory.bySerial[serial][dateKey] = {
+      recoveredEventKeys: [],
+      lastSeenEventKey: '',
+      totalRecoveredDrops: 0,
+    };
+  }
+  return linkLossHistory.bySerial[serial][dateKey];
+}
+
+function updateRecoveredLinkLossHistory(rows) {
+  let changed = false;
+
+  for (const row of rows) {
+    const codigo = String(row?.codigo || '');
+    const serial = String(row?.serial || '').trim().toUpperCase();
+    const eventTs = Number(row?.eventTs || 0);
+    const localOnu = serial ? baseOnuIndex.byMac.get(serial) : null;
+    const isRecovered = !!localOnu && isOnlineOnu(localOnu);
+    const isAccumulable = (codigo === '400' || codigo === '402') && serial && eventTs && isTodayTs(eventTs);
+
+    if (!isAccumulable) continue;
+
+    const ageMs = Date.now() - eventTs;
+    if (ageMs < 5 * 60_000) continue;
+    if (!isRecovered) continue;
+
+    const dateKey = getDateKeyFromTs(eventTs);
+    const record = ensureLinkLossHistoryRecord(serial, dateKey);
+    if (!record) continue;
+
+    const eventKey = `${codigo}:${eventTs}`;
+    if (!record.recoveredEventKeys.includes(eventKey)) {
+      record.recoveredEventKeys.push(eventKey);
+      record.totalRecoveredDrops = record.recoveredEventKeys.length;
+      changed = true;
+    }
+
+    if (record.lastSeenEventKey !== eventKey) {
+      record.lastSeenEventKey = eventKey;
+      changed = true;
+    }
+  }
+
+  if (changed) saveLinkLossHistory();
+}
+
+function getRecoveredDropsForRow(row) {
+  const serial = String(row?.serial || '').trim().toUpperCase();
+  const dateKey = getDateKeyFromTs(Number(row?.eventTs || 0));
+  const record = linkLossHistory.bySerial?.[serial]?.[dateKey];
+  return Number(record?.totalRecoveredDrops || 0);
+}
+
+function dedupeLinkLossRows(rows, { onlyToday = false } = {}) {
+  const deduped = [];
+  const seen = new Set();
+
+  for (const row of rows) {
+    if (onlyToday && !isTodayTs(Number(row?.eventTs || 0))) continue;
+
+    const serial = String(row?.serial || '').trim().toUpperCase();
+    const nameKey = canonicalClientName(row?.nomeCliente || '');
+    const key = serial || nameKey;
+    if (!key || seen.has(key)) continue;
+    seen.add(key);
+    deduped.push(row);
+  }
+
+  return deduped;
+}
+
+function getZabbixCauseLabel(code, fallback) {
+  if (String(code) === '400') return 'Link Loss';
+  if (String(code) === '402') return 'Dying Gasp';
+  if (String(code) === '403') return 'ONU Offline';
+  return fallback || 'Indefinido';
+}
+
+function getZabbixGroupKey(code) {
+  if (String(code) === '400') return 'linkLoss';
+  if (String(code) === '402') return 'dyingGasp';
+  if (String(code) === '403') return 'onuOffline';
+  return 'outros';
+}
+
+function getZabbixScriptPayload() {
+  if (fs.existsSync(SCRIPT_ZABBIX_FILE)) {
+    return execPythonScript(SCRIPT_ZABBIX_FILE, ['--json']).catch((error) => {
+      const filePayload = readJson(ZABBIX_OUTPUT_FILE, null);
+      if (filePayload) return filePayload;
+      throw error;
+    });
+  }
+
+  const filePayload = readJson(ZABBIX_OUTPUT_FILE, null);
+  if (filePayload) return Promise.resolve(filePayload);
+  return Promise.reject(new Error('Script do Zabbix e arquivo zabbix_onus.json indisponiveis.'));
+}
+
 async function refreshZabbixLinkLossCache() {
   const now = Date.now();
   try {
-    const scriptResult = readJson(ZABBIX_OUTPUT_FILE, null);
+    const scriptResult = await getZabbixScriptPayload();
     if (!scriptResult || scriptResult.ok === false) {
       throw new Error(scriptResult?.erro || 'Arquivo zabbix_onus.json indisponivel ou invalido');
     }
@@ -816,14 +1179,16 @@ async function refreshZabbixLinkLossCache() {
     const enrichedDetails = await Promise.all(details.map(async (row) => {
       const serial = String(row?.serial || '').trim().toUpperCase();
       const localOnu = serial ? baseOnuIndex.byMac.get(serial) : null;
-      let login = String(localOnu?.Login || '').toLowerCase().trim();
+      const localRawName = String(localOnu?.['Nome Cliente'] || '').trim();
+      let login = normalizeLoginValue(localOnu?.Login);
+      if (!login) login = inferLoginFromRawName(localRawName);
       let nomeCliente = String(localOnu?.nome_formatado || localOnu?.['Nome Cliente'] || '').trim();
       let idCliente = String(localOnu?.cliente_id_ixc || '').trim();
       let idContrato = String(localOnu?.contrato_id_ixc || '').trim();
       let whatsapp = String(localOnu?.whatsapp || '').trim();
-      let origemVinculo = localOnu ? 'local' : 'indefinido';
+      let origemVinculo = localOnu ? (login ? 'local' : 'local-parcial') : 'indefinido';
 
-      if (!login && serial) {
+      if (serial && (!login || !idContrato || !whatsapp || !nomeCliente || looksLikeTechnicalName(nomeCliente, login))) {
         const cached = zabbixSerialBindingCache.get(serial);
         if (cached && Date.now() - cached.fetchedAt < 10 * 60_000) {
           login = cached.login || '';
@@ -863,6 +1228,8 @@ async function refreshZabbixLinkLossCache() {
 
       return {
         ...row,
+        codigo: String(row?.codigo || '').trim(),
+        causa: getZabbixCauseLabel(row?.codigo, row?.causa),
         serial,
         login: login || null,
         nomeCliente: nomeCliente || null,
@@ -871,9 +1238,12 @@ async function refreshZabbixLinkLossCache() {
         whatsapp: whatsapp || null,
         eventTs,
         ponGroup,
+        oltPonLabel: formatLinkLossOltPon({ central: row?.central, posicao: row?.posicao || row?.pon_onu }),
+        onlineNow: !!localOnu && isOnlineOnu(localOnu),
         origemVinculo,
       };
     }));
+    updateRecoveredLinkLossHistory(enrichedDetails);
 
     const criticalMap = enrichedDetails.reduce((acc, row) => {
       const key = `${row.ponGroup || ''}__${row.eventTs || 0}`;
@@ -888,13 +1258,26 @@ async function refreshZabbixLinkLossCache() {
         const groupedCount = criticalMap[key] || 0;
         return {
           ...row,
+          recoveredDropsToday: getRecoveredDropsForRow(row),
+          displayNameAlert: getRecoveredDropsForRow(row) >= 2,
+          groupKey: getZabbixGroupKey(row?.codigo),
           samePonSameMomentCount: groupedCount,
           isCriticalPonDrop: groupedCount >= 2,
         };
       })
       .sort((a, b) => (b.eventTs || 0) - (a.eventTs || 0));
-    const linkLossRows = normalizedDetails.filter((row) => String(row?.codigo || '') === '400');
-    const dyingGaspRows = normalizedDetails.filter((row) => String(row?.codigo || '') === '402');
+    const linkLossRows = dedupeLinkLossRows(
+      normalizedDetails.filter((row) => String(row?.codigo || '') === '400'),
+      { onlyToday: true }
+    );
+    const dyingGaspRows = dedupeLinkLossRows(
+      normalizedDetails.filter((row) => String(row?.codigo || '') === '402'),
+      { onlyToday: true }
+    );
+    const onuOfflineRows = dedupeLinkLossRows(
+      normalizedDetails.filter((row) => String(row?.codigo || '') === '403'),
+      { onlyToday: false }
+    );
 
     const normalized = {
       summary: {
@@ -902,25 +1285,31 @@ async function refreshZabbixLinkLossCache() {
         ignored: Number(scriptResult?.resumo?.ignorados || 0),
         linkLoss: Number(scriptResult?.resumo?.link_loss || 0),
         dyingGasp: Number(scriptResult?.resumo?.dying_gasp || 0),
+        onuOffline: Number(scriptResult?.resumo?.onu_offline || 0),
         totalMonitorados: Number(scriptResult?.resumo?.total_monitorados || 0),
       },
       causes: {
         linkLoss: {
           descricao: String(scriptResult?.causas?.['400']?.descricao || 'Link Loss'),
-          quantidade: Number(scriptResult?.causas?.['400']?.quantidade || linkLossRows.length),
+          quantidade: linkLossRows.length,
         },
         dyingGasp: {
           descricao: String(scriptResult?.causas?.['402']?.descricao || 'Dying Gasp'),
-          quantidade: Number(scriptResult?.causas?.['402']?.quantidade || dyingGaspRows.length),
+          quantidade: dyingGaspRows.length,
+        },
+        onuOffline: {
+          descricao: String(scriptResult?.causas?.['403']?.descricao || 'ONU Offline'),
+          quantidade: onuOfflineRows.length,
         },
       },
       groups: {
         linkLoss: linkLossRows,
         dyingGasp: dyingGaspRows,
+        onuOffline: onuOfflineRows,
       },
       fetchedAt: now,
       sourceUpdatedAt: scriptResult?.ultima_atualizacao || null,
-      source: 'script_zabixx.py',
+      source: 'script_zabbix.py',
       stale: false,
     };
 
@@ -1593,10 +1982,10 @@ app.listen(PORT, () => {
   console.log(`📡 ${baseOnus.length} ONUs | ${resumoPon.length} PONs | ${Object.keys(relatorio.by_nome).length} contratos\n`);
 
   if (!fs.existsSync(SCRIPT_ZABBIX_FILE)) {
-    console.warn('[clients-linkloss] script_zabixx.py nao encontrado');
+    console.warn('[clients-linkloss] script_zabbix.py nao encontrado');
   } else {
     refreshZabbixLinkLossCache()
-      .then(() => console.log('[clients-linkloss] cache inicial carregado via zabbix_onus.json'))
+      .then(() => console.log('[clients-linkloss] cache inicial carregado'))
       .catch((error) => console.warn('[clients-linkloss] aguardando zabbix_onus.json:', error.message));
   }
 
@@ -1604,5 +1993,5 @@ app.listen(PORT, () => {
     refreshZabbixLinkLossCache().catch((error) => {
       console.warn('[clients-linkloss] refresh em background falhou:', error.message);
     });
-  }, 60_000);
+  }, 10_000);
 });
