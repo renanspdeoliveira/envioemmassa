@@ -116,6 +116,24 @@
         "lastSeenEventKey": "402:1780322573000",
         "totalRecoveredDrops": 1
       }
+    },
+    "FHTT10D887A8": {
+      "2026-06-01": {
+        "recoveredEventKeys": [
+          "402:1780322715000"
+        ],
+        "lastSeenEventKey": "402:1780322715000",
+        "totalRecoveredDrops": 1
+      }
+    },
+    "FHTT07EC8658": {
+      "2026-06-01": {
+        "recoveredEventKeys": [
+          "402:1780324194000"
+        ],
+        "lastSeenEventKey": "402:1780324194000",
+        "totalRecoveredDrops": 1
+      }
     }
   }
 }

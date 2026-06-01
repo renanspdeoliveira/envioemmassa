@@ -32,6 +32,8 @@ export default function LinkLossPage() {
   const summary = data?.summary || {}
   const causes = data?.causes || {}
   const groups = data?.groups || {}
+  const isStale = data?.stale === true
+  const isUnavailable = data?.unavailable === true
 
   const rows = groups[activeTab] || []
   const lastSourceUpdate = data?.sourceUpdatedAt || data?.fetchedAt || null
@@ -46,7 +48,7 @@ export default function LinkLossPage() {
         subtitle={`${Number(summary.totalMonitorados || 0).toLocaleString('pt-BR')} eventos monitorados no Zabbix com atualizacao automatica a cada 5 segundos`}
         action={(
           <div style={{ display: 'flex', gap: 8 }}>
-            {data?.stale ? <Badge color="amber">Cache antigo</Badge> : null}
+            {isStale ? <Badge color="amber">{isUnavailable ? 'Zabbix indisponivel' : 'Ultimo cache'}</Badge> : <Badge color="green">Ao vivo</Badge>}
             {refreshing ? <Badge color="blue">Atualizando...</Badge> : null}
             <Btn onClick={refetch}>
               <RefreshCw size={14} />
@@ -87,7 +89,16 @@ export default function LinkLossPage() {
       </div>
 
       <Card style={{ marginBottom: 16 }}>
-        <CardHeader title="Guias" subtitle={lastSourceUpdate ? `Ultima atualizacao do Zabbix: ${formatDate(lastSourceUpdate)}` : 'Escolha a causa para ver a lista detalhada'} />
+        <CardHeader
+          title="Guias"
+          subtitle={
+            isStale
+              ? `Exibindo ultimo retorno valido${lastSourceUpdate ? ` · Zabbix: ${formatDate(lastSourceUpdate)}` : ''}`
+              : lastSourceUpdate
+                ? `Ultima atualizacao do Zabbix: ${formatDate(lastSourceUpdate)}`
+                : 'Escolha a causa para ver a lista detalhada'
+          }
+        />
         <div style={tabsWrap}>
           {Object.entries(TAB_META).map(([key, meta]) => (
             <TabButton
