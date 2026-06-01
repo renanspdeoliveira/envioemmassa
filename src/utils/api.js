@@ -12,6 +12,7 @@ async function request(path, options = {}) {
 export const api = {
   stats:       ()          => request('/stats'),
   clients24hOffline: ()    => request('/clients-24h-offline'),
+  clientsLinkloss: ()      => request('/clients-linkloss'),
   onus:        (p={})      => request('/onus?' + new URLSearchParams(p)),
   onuDetail:   (mac)       => request(`/onus/detail/${encodeURIComponent(mac)}`),
   onuExport:   (p={})      => request('/onus/export?' + new URLSearchParams(p)),

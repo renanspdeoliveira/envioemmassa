@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom'
-import { Activity, Database, Send, Wifi, WifiOff } from 'lucide-react'
+import { Activity, Database, Send, ShieldAlert, Wifi, WifiOff } from 'lucide-react'
 import { PageHeader } from '../components/UI'
 
 const hubLinks = [
@@ -7,6 +7,7 @@ const hubLinks = [
   { to: '/onus', label: 'ONUs', icon: Database, accent: '#63df86', description: 'Lista e detalhes da base', position: 'hub-card-top-right' },
   { to: '/sinal', label: 'Sinal', icon: Activity, accent: '#8ec5ff', description: 'Saude optica da rede', position: 'hub-card-bottom-left' },
   { to: '/clientes-24h-offline', label: 'Clientes 24h', icon: WifiOff, accent: '#ffb86f', description: 'Clientes em atencao', position: 'hub-card-bottom-right' },
+  { to: '/linkloss', label: 'Link Loss', icon: ShieldAlert, accent: '#ff8f7a', description: 'Falhas 400, 402 e 403 do Zabbix', position: 'hub-card-center-left' },
   { to: '/envio', label: 'Envio', icon: Send, accent: '#7df9ff', description: 'Acoes e comunicacao', position: 'hub-card-center-right' },
 ]
 
@@ -232,7 +233,9 @@ const hubResponsiveCss = `
   .hub-card-top-right { right: 24%; top: 20%; animation-delay: .5s; }
   .hub-card-bottom-left { left: 25%; bottom: 24%; animation-delay: .9s; }
   .hub-card-bottom-right { right: 22%; bottom: 18%; animation-delay: 1.3s; }
+  .hub-card-center-left { left: 18%; top: 46%; transform: translateY(-50%); animation-delay: 1.5s; }
   .hub-card-center-right { right: 18%; top: 46%; transform: translateY(-50%); animation-delay: 1.7s; }
+  .hub-card-center-left:hover { transform: translateY(calc(-50% - 6px)) scale(1.02); }
   .hub-card-center-right:hover { transform: translateY(calc(-50% - 6px)) scale(1.02); }
 
   @keyframes hubFloat {
@@ -264,6 +267,7 @@ const hubResponsiveCss = `
     .hub-card-top-right,
     .hub-card-bottom-left,
     .hub-card-bottom-right,
+    .hub-card-center-left,
     .hub-card-center-right {
       position: relative !important;
       inset: auto !important;

@@ -10,6 +10,7 @@ const DashboardPage = lazy(() => import('./pages/DashboardPage'))
 const OnusPage = lazy(() => import('./pages/OnusPage'))
 const OnuDetailPage = lazy(() => import('./pages/OnuDetailPage'))
 const OnuDesautorizadasPage = lazy(() => import('./pages/OnuDesautorizadasPage'))
+const LinkLossPage = lazy(() => import('./pages/LinkLossPage'))
 const PonsPage = lazy(() => import('./pages/PonsPage'))
 const PonDetailPage = lazy(() => import('./pages/PonDetailPage'))
 const SinalPage = lazy(() => import('./pages/SinalPage'))
@@ -35,6 +36,7 @@ function AppShell() {
             <Route path="/" element={<HomeHubPage />} />
             <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/onus-desautorizadas" element={<OnuDesautorizadasPage />} />
+            <Route path="/linkloss" element={<LinkLossPage />} />
             <Route path="/onus" element={<OnusPage />} />
             <Route path="/onus/:mac" element={<OnuDetailPage />} />
             <Route path="/pons" element={<PonsPage />} />

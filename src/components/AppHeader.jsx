@@ -13,6 +13,7 @@ const navLinks = [
   { to: '/onus', label: 'ONUs' },
   { to: '/sinal', label: 'Sinal' },
   { to: '/onus-desautorizadas', label: 'Desautorizadas' },
+  { to: '/linkloss', label: 'Link Loss' },
   { to: '/clientes-24h-offline', label: 'Clientes 24h' },
   { to: '/envio', label: 'Envio' },
 ]

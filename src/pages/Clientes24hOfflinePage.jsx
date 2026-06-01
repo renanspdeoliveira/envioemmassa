@@ -263,7 +263,7 @@ export default function Clientes24hOfflinePage() {
               <div style={{ position: 'relative', flex: '1 1 320px' }}>
                 <Search size={14} style={{ position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-tertiary)', pointerEvents: 'none' }} />
                 <Input
-                  placeholder="Buscar login, contrato, PON ID, MAC, WhatsApp..."
+                  placeholder="Buscar login, contrato, MAC, WhatsApp..."
                   value={search}
                   onChange={(e) => { setSearch(e.target.value); setPage(1) }}
                   style={{ width: '100%', paddingLeft: 32 }}
@@ -295,14 +295,14 @@ export default function Clientes24hOfflinePage() {
               <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
                 <thead>
                   <tr>
-                    {['Login', 'Contrato', 'Ativo', 'Online', 'Status ONU', 'OLT/GBOC/PON', 'Tempo Offline', 'Data original', 'WhatsApp', 'MAC/Serial', 'Detalhes'].map((col) => (
+                    {['Login', 'Contrato', 'Ativo', 'Online', 'Status ONU', 'Tempo Offline', 'WhatsApp', 'MAC/Serial', 'Detalhes'].map((col) => (
                       <th key={col} style={th}>{col}</th>
                     ))}
                   </tr>
                 </thead>
                 <tbody>
                   {pageRows.length === 0 ? (
-                    <tr><td colSpan={11}><Empty message="Nenhum cliente offline encontrado com os filtros atuais" /></td></tr>
+                    <tr><td colSpan={9}><Empty message="Nenhum cliente offline encontrado com os filtros atuais" /></td></tr>
                   ) : pageRows.map((row) => (
                     <tr
                       key={`${row.id}-${row.login}-${row.ultimaConexao}`}
@@ -312,8 +312,10 @@ export default function Clientes24hOfflinePage() {
                       onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent' }}
                     >
                       <td style={{ ...td, minWidth: 180, maxWidth: 220 }}>
-                        <div style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{row.login || 'Sem login'}</div>
-                        {row.nomeCliente ? <div style={{ fontSize: 11, color: 'var(--text-secondary)', marginTop: 3 }}>{row.nomeCliente}</div> : null}
+                        <div style={{ fontWeight: 700, color: 'var(--text-primary)', textTransform: 'uppercase' }}>
+                          {row.nomeCliente || 'SEM NOME'}
+                        </div>
+                        {row.login ? <div style={{ fontSize: 11, color: 'var(--text-secondary)', marginTop: 3 }}>{row.login}</div> : null}
                         {row.sempreDesliga ? (
                           <div
                             style={{ fontSize: 11, color: '#f6c86f', marginTop: 4, fontWeight: 700, letterSpacing: '0.02em' }}
@@ -323,25 +325,26 @@ export default function Clientes24hOfflinePage() {
                           </div>
                         ) : null}
                       </td>
-                      <td style={td}><span style={mono}>{row.contrato || '-'}</span></td>
+                      <td style={td}>
+                        <span style={{ ...mono, color: row.ativo === 'Ativo' ? 'var(--green-text)' : 'var(--text-secondary)', fontWeight: row.ativo === 'Ativo' ? 700 : 400 }}>
+                          {row.contrato || '-'}
+                        </span>
+                      </td>
                       <td style={td}><Badge color={row.ativo === 'Ativo' ? 'green' : row.ativo === 'Nao ativo' ? 'red' : 'gray'}>{row.ativo}</Badge></td>
                       <td style={td}><Badge color={row.onlineRadius === 'Online' ? 'green' : row.onlineRadius === 'Offline' ? 'red' : 'gray'}>{row.onlineRadius}</Badge></td>
                       <td style={td}>
-                        {row.onuStatus === 'Autorizada' || row.onuStatus === 'Pedindo autenticacao' || row.onuStatus === 'Sem status'
-                          ? <StatusBadge status={row.onuStatus} />
-                          : <Badge color={row.onuEncontrada ? 'gray' : 'amber'}>{row.onuStatus}</Badge>}
-                      </td>
-                      <td style={td}>
-                        <span style={{ color: 'var(--text-primary)' }}>{row.olt || '-'}</span>
-                        <div style={{ fontSize: 11, color: 'var(--text-secondary)', marginTop: 3 }}>
-                          GBOC {row.slot ?? '-'} | PON {row.pon ?? '-'}
-                        </div>
-                        <div style={{ fontSize: 11, color: 'var(--text-secondary)', marginTop: 3 }}>
-                          PON ID {row.ponId || '-'}
-                        </div>
+                        {row.onuStatus === 'ONLINE'
+                          ? <Badge color="green">ONLINE</Badge>
+                          : row.onuStatus === 'Pedindo autenticacao' || row.onuStatus === 'Sem status'
+                            ? <StatusBadge status={row.onuStatus} />
+                            : <Badge color={getAlarmBadgeColor(row.onuStatus)}>{row.onuStatus}</Badge>}
+                        {row.zabbixAlarmOltPon ? (
+                          <div style={{ fontSize: 11, color: 'var(--text-secondary)', marginTop: 4 }}>
+                            {row.zabbixAlarmOltPon}
+                          </div>
+                        ) : null}
                       </td>
                       <td style={td}><Badge color="red">{row.tempoOffline}</Badge></td>
-                      <td style={td}><span style={mono}>{row.ultimaConexao || '-'}</span></td>
                       <td style={td}>
                         <span style={{ ...mono, color: row.whatsapp ? 'var(--green-text)' : 'var(--text-tertiary)' }}>
                           {fmtPhone(row.whatsapp)}
@@ -434,6 +437,14 @@ function fmtPhoneCsv(value) {
   if (digits.length === 11) return `${digits.slice(0, 2)} ${digits.slice(2, 7)}-${digits.slice(7)}`
   if (digits.length === 10) return `${digits.slice(0, 2)} ${digits.slice(2, 6)}-${digits.slice(6)}`
   return value || ''
+}
+
+function getAlarmBadgeColor(status) {
+  const normalized = String(status || '').toLowerCase()
+  if (normalized.includes('dying gasp')) return 'amber'
+  if (normalized.includes('onu offline')) return 'red'
+  if (normalized.includes('link loss')) return 'red'
+  return 'gray'
 }
 
 function formatDurationFromMs(ms) {
